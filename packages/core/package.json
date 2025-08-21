@@ -1,0 +1,30 @@
+{
+  "name": "@craftile/core",
+  "version": "0.1.0",
+  "description": "Framework-agnostic block editor engine for Craftile",
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "craftile",
+    "block-editor",
+    "cms",
+    "editor",
+    "blocks"
+  ],
+  "authors": [
+    {
+      "name": "Eldo Magan",
+      "email": "magan.eldo@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@craftile/event-bus": "workspace:*",
+    "@craftile/types": "workspace:*"
+  }
+}

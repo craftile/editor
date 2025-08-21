@@ -1,0 +1,16 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+**/node_modules/**
+node_modules
+
+dist
+dist-ssr
+out
+build
+tsconfig.tsbuildinfo
+.DS_Store
+.idea

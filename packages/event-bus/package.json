@@ -1,0 +1,27 @@
+{
+  "name": "@craftile/event-bus",
+  "version": "0.1.0",
+  "description": "Generic event bus utility for Craftile packages",
+  "type": "module",
+  "types": "src/index.ts",
+  "exports": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "craftile",
+    "event-bus",
+    "events",
+    "event-emitter"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eldo Magan",
+      "email": "magan.eldo@gmail.com"
+    }
+  ]
+}

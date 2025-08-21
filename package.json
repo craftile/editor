@@ -1,0 +1,22 @@
+{
+  "name": "@craftile/editor",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eldo Magan",
+      "email": "magan.eldo@gmail.com"
+    }
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "packageManager": "pnpm@8.6.12",
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  }
+}
