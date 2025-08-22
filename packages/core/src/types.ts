@@ -17,7 +17,13 @@ export interface EngineConfig {
   blocksManager?: BlocksManager;
 }
 
+export interface Command {
+  apply(): void;
+  revert(): void;
+}
+
 // Event system types
 export interface EngineEvents {
   'page:set': { previousPage?: Page; newPage: Page };
+  'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionName?: string };
 }

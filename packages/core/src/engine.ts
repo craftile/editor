@@ -2,36 +2,77 @@ import { EventBus } from '@craftile/event-bus';
 import type { EngineConfig, EngineEvents, Page } from './types';
 import type { Block, BlockSchema } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
+import { HistoryManager } from './history-manager';
+import { InsertBlockCommand } from './commands/insert-block';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
   protected blocksManager: BlocksManager;
+  protected historyManager: HistoryManager;
 
   constructor(config: EngineConfig = {}) {
     super();
 
-    this.setPage(config.page ? config.page : { blocks: {}, regions: [{ name: 'main', blocks: [] }] });
     this.blocksManager = config.blocksManager || new BlocksManager();
+    this.historyManager = new HistoryManager();
+    this.setPage(config.page ? config.page : { blocks: {}, regions: [{ name: 'main', blocks: [] }] });
 
     if (config.blockSchemas && config.blockSchemas.length > 0) {
       config.blockSchemas.forEach((schema) => {
         this.blocksManager.register(schema.type, schema);
       });
     }
+  }
 
-    this.initializeParentChildRelationships();
-
-    // Initialize regions if not present
-    if (!this.page.regions || this.page.regions.length === 0) {
-      this.page.regions = [
-        {
-          name: 'main',
-          blocks: Object.values(this.page.blocks)
-            .filter((block) => !block.parentId)
-            .map((block) => block.id),
-        },
-      ];
+  /**
+   * Insert a new block into the page
+   *
+   * @param blockType - The type of block to insert (must be registered)
+   * @param options - Optional configuration for block insertion
+   * @param options.parentId - ID of parent block (for nested blocks)
+   * @param options.regionName - Target region name (defaults to 'main')
+   * @param options.index - Position to insert at (defaults to end)
+   * @returns The ID of the newly inserted block
+   * @throws {Error} When block type is not registered or parent-child relationship is invalid
+   * @emits block:insert - When the block is successfully inserted
+   */
+  insertBlock(
+    blockType: string,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
     }
+  ): string {
+    const blockSchema = this.blocksManager.get(blockType);
+    if (!blockSchema) {
+      throw new Error(`Block type '${blockType}' is not registered`);
+    }
+
+    if (options?.parentId) {
+      const parentBlock = this.page.blocks[options.parentId];
+      if (!parentBlock) {
+        throw new Error(`Parent block not found: ${options.parentId}`);
+      }
+
+      if (!this.blocksManager.canBeChild(blockType, parentBlock.type)) {
+        throw new Error(`Block type '${blockType}' cannot be a child of '${parentBlock.type}'`);
+      }
+    }
+
+    const command = new InsertBlockCommand(this.page, {
+      blockType,
+      parentId: options?.parentId,
+      regionName: options?.regionName,
+      index: options?.index,
+      blockSchema,
+      emit: this.emit.bind(this) as (event: string, data: any) => void,
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+
+    return command.getBlockId();
   }
 
   /**
@@ -57,11 +98,23 @@ export class Engine extends EventBus<EngineEvents> {
       this.page.regions = [{ name: 'main', blocks: Object.keys(this.page.blocks) }];
     }
 
-    // Initialize parent-child relationships for the new page
+    // Initialize regions if not present
+    if (!this.page.regions || this.page.regions.length === 0) {
+      this.page.regions = [
+        {
+          name: 'main',
+          blocks: Object.values(this.page.blocks)
+            .filter((block) => !block.parentId)
+            .map((block) => block.id),
+        },
+      ];
+    }
+
     this.initializeParentChildRelationships();
 
     // Clear history since we're switching to a completely new page
-    // this.historyManager.clear();
+    // maybe we should keep a separate history per page
+    this.historyManager.clear();
 
     this.emit('page:set', {
       previousPage: beforePage,
