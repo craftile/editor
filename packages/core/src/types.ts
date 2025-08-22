@@ -26,4 +26,7 @@ export interface Command {
 export interface EngineEvents {
   'page:set': { previousPage?: Page; newPage: Page };
   'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionName?: string };
+  'block:remove': { blockId: string; block: Block; parentId?: string };
 }
+
+export type EngineEmitFn = <K extends keyof EngineEvents>(event: K, data: EngineEvents[K]) => void;

@@ -1,5 +1,5 @@
 import type { Block, BlockSchema } from '@craftile/types';
-import type { Command, Page } from '../types';
+import type { Command, EngineEmitFn, Page } from '../types';
 import { generateId } from '../utils';
 
 export interface InsertBlockOptions {
@@ -9,7 +9,7 @@ export interface InsertBlockOptions {
   index?: number;
   properties?: Record<string, any>;
   blockSchema?: BlockSchema;
-  emit: (event: string, data: any) => void;
+  emit: EngineEmitFn;
 }
 
 export class InsertBlockCommand implements Command {
@@ -22,7 +22,7 @@ export class InsertBlockCommand implements Command {
   private properties: Record<string, any>;
   private insertedBlock?: Block;
   private actualIndex?: number;
-  private emit: (event: string, data: any) => void;
+  private emit: EngineEmitFn;
 
   constructor(page: Page, options: InsertBlockOptions) {
     this.page = page;
