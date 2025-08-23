@@ -129,5 +129,12 @@ describe('Engine', () => {
       const page = engine.getPage();
       expect(page.blocks['block-1'].disabled).toBe(true);
     });
+
+    it('should set block property', () => {
+      engine.setBlockProperty('block-1', 'text', 'Updated Button');
+
+      const page = engine.getPage();
+      expect(page.blocks['block-1'].properties.text).toBe('Updated Button');
+    });
   });
 });

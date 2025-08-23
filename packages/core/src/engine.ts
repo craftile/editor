@@ -7,6 +7,7 @@ import { InsertBlockCommand } from './commands/insert-block';
 import { RemoveBlockCommand } from './commands/remove-block';
 import { MoveBlockCommand } from './commands/move-block';
 import { ToggleBlockCommand } from './commands/toggle-block';
+import { SetBlockPropertyCommand } from './commands/set-block-property';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
@@ -154,6 +155,27 @@ export class Engine extends EventBus<EngineEvents> {
     const command = new ToggleBlockCommand(this.page, {
       blockId,
       disabled,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+  }
+
+  /**
+   * Set a property value for a block
+   *
+   * @param blockId - ID of the target block
+   * @param propertyKey - The property key to set
+   * @param propertyValue - The new value for the property
+   * @throws {Error} When block is not found
+   * @emits block:property:set - When the property is successfully set
+   */
+  setBlockProperty(blockId: string, propertyKey: string, propertyValue: any): void {
+    const command = new SetBlockPropertyCommand(this.page, {
+      blockId,
+      propertyKey,
+      propertyValue,
       emit: this.emit.bind(this),
     });
 
