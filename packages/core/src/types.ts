@@ -38,6 +38,14 @@ export interface EngineEvents {
     sourceRegionName?: string | null;
     sourceIndex: number;
   };
+  'block:duplicate': {
+    originalBlockId: string;
+    newBlockId: string;
+    newBlock: Block;
+    parentId?: string;
+    index?: number;
+    regionName?: string;
+  };
 }
 
 export type EngineEmitFn = <K extends keyof EngineEvents>(

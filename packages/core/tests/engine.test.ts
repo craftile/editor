@@ -136,5 +136,16 @@ describe('Engine', () => {
       const page = engine.getPage();
       expect(page.blocks['block-1'].properties.text).toBe('Updated Button');
     });
+
+    it('should duplicate block', () => {
+      const initialBlockCount = Object.keys(engine.getPage().blocks).length;
+
+      const duplicatedId = engine.duplicateBlock('block-1');
+
+      const page = engine.getPage();
+      expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount + 1);
+      expect(page.blocks[duplicatedId]).toBeDefined();
+      expect(page.blocks[duplicatedId].type).toBe('button');
+    });
   });
 });

@@ -8,6 +8,7 @@ import { RemoveBlockCommand } from './commands/remove-block';
 import { MoveBlockCommand } from './commands/move-block';
 import { ToggleBlockCommand } from './commands/toggle-block';
 import { SetBlockPropertyCommand } from './commands/set-block-property';
+import { DuplicateBlockCommand } from './commands/duplicate-block';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
@@ -181,6 +182,21 @@ export class Engine extends EventBus<EngineEvents> {
 
     command.apply();
     this.historyManager.addCommand(command);
+  }
+
+  /**
+   * Duplicate a block (creates a copy placed right after the original)
+   */
+  duplicateBlock(blockId: string): string {
+    const command = new DuplicateBlockCommand(this.page, {
+      blockId,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+
+    return command.getDuplicatedBlockId();
   }
 
   /**
