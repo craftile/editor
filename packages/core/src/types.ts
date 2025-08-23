@@ -27,6 +27,18 @@ export interface EngineEvents {
   'page:set': { previousPage?: Page; newPage: Page };
   'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionName?: string };
   'block:remove': { blockId: string; block: Block; parentId?: string };
+  'block:move': {
+    blockId: string;
+    targetParentId?: string;
+    targetIndex?: number;
+    targetRegionName?: string;
+    sourceParentId?: string | null;
+    sourceRegionName?: string | null;
+    sourceIndex: number;
+  };
 }
 
-export type EngineEmitFn = <K extends keyof EngineEvents>(event: K, data: EngineEvents[K]) => void;
+export type EngineEmitFn = <K extends keyof EngineEvents>(
+  event: K,
+  ...args: EngineEvents[K] extends void ? [] : [EngineEvents[K]]
+) => void;

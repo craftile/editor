@@ -91,4 +91,36 @@ describe('Engine', () => {
       expect(page.blocks['new-block']).toBeDefined();
     });
   });
+
+  describe('Block Operations', () => {
+    it('should insert block', () => {
+      const blockId = engine.insertBlock('text');
+      const page = engine.getPage();
+
+      expect(blockId).toBeDefined();
+      expect(page.blocks[blockId]).toBeDefined();
+      expect(page.blocks[blockId].type).toBe('text');
+      expect(page.regions![0].blocks).toContain(blockId);
+    });
+
+    it('should remove block', () => {
+      const initialBlockCount = Object.keys(engine.getPage().blocks).length;
+
+      engine.removeBlock('block-1');
+
+      const page = engine.getPage();
+      expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount - 1);
+      expect(page.blocks['block-1']).toBeUndefined();
+    });
+
+    it('should move block', () => {
+      const initialOrder = [...engine.getPage().regions![0].blocks];
+
+      engine.moveBlock('block-1', { targetIndex: 1 });
+
+      const page = engine.getPage();
+      expect(page.regions![0].blocks).not.toEqual(initialOrder);
+      expect(page.regions![0].blocks).toContain('block-1');
+    });
+  });
 });

@@ -4,6 +4,8 @@ import type { Block, BlockSchema } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
 import { InsertBlockCommand } from './commands/insert-block';
+import { RemoveBlockCommand } from './commands/remove-block';
+import { MoveBlockCommand } from './commands/move-block';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
@@ -66,13 +68,82 @@ export class Engine extends EventBus<EngineEvents> {
       regionName: options?.regionName,
       index: options?.index,
       blockSchema,
-      emit: this.emit.bind(this) as (event: string, data: any) => void,
+      emit: this.emit.bind(this),
     });
 
     command.apply();
     this.historyManager.addCommand(command);
 
     return command.getBlockId();
+  }
+
+  /**
+   * Remove a block from the page
+   *
+   * @param blockId - ID of the block to remove
+   * @throws {Error} When block is not found
+   * @emits block:remove - When the block is successfully removed
+   */
+  removeBlock(blockId: string): void {
+    const block = this.page.blocks[blockId];
+
+    if (!block) {
+      throw new Error(`Block not found: ${blockId}`);
+    }
+
+    const command = new RemoveBlockCommand(this.page, {
+      blockId,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+  }
+
+  /**
+   * Move a block to a new location (reorder within parent or move to different parent/region)
+   *
+   * @param blockId - ID of the block to remove
+   * @param options - Optional configuration for block move operation
+   * @param options.targetParentId - ID of target parent block
+   * @param options.targetIndex - position in the target parent block children
+   * @param options.targetRegionName - target region name
+   */
+  moveBlock(
+    blockId: string,
+    options?: {
+      targetParentId?: string;
+      targetIndex?: number;
+      targetRegionName?: string;
+    }
+  ): void {
+    const block = this.page.blocks[blockId];
+
+    if (!block) {
+      throw new Error(`Block not found: ${blockId}`);
+    }
+
+    if (options?.targetParentId) {
+      const targetParent = this.page.blocks[options.targetParentId];
+      if (!targetParent) {
+        throw new Error(`Target parent block not found: ${options.targetParentId}`);
+      }
+
+      if (!this.blocksManager.canBeChild(block.type, targetParent.type)) {
+        throw new Error(`Block type '${block.type}' cannot be a child of '${targetParent.type}'`);
+      }
+    }
+
+    const command = new MoveBlockCommand(this.page, {
+      blockId,
+      targetParentId: options?.targetParentId,
+      targetIndex: options?.targetIndex,
+      targetRegionName: options?.targetRegionName,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
   }
 
   /**

@@ -30,8 +30,8 @@ const textSchema: BlockSchema = {
 describe('InsertBlockCommand', () => {
   let page: Page;
   let emittedEvents: Array<{ event: string; data: any }> = [];
-  const mockEmit = (event: string, data: any) => {
-    emittedEvents.push({ event, data });
+  const mockEmit = (event: string, ...args: any[]) => {
+    emittedEvents.push({ event, data: args[0] });
   };
 
   beforeEach(() => {
