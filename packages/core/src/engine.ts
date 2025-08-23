@@ -88,12 +88,6 @@ export class Engine extends EventBus<EngineEvents> {
    * @emits block:remove - When the block is successfully removed
    */
   removeBlock(blockId: string): void {
-    const block = this.page.blocks[blockId];
-
-    if (!block) {
-      throw new Error(`Block not found: ${blockId}`);
-    }
-
     const command = new RemoveBlockCommand(this.page, {
       blockId,
       emit: this.emit.bind(this),
@@ -121,10 +115,6 @@ export class Engine extends EventBus<EngineEvents> {
     }
   ): void {
     const block = this.page.blocks[blockId];
-
-    if (!block) {
-      throw new Error(`Block not found: ${blockId}`);
-    }
 
     if (options?.targetParentId) {
       const targetParent = this.page.blocks[options.targetParentId];
@@ -268,6 +258,46 @@ export class Engine extends EventBus<EngineEvents> {
    */
   getBlockSchema(type: string): BlockSchema | undefined {
     return this.blocksManager.get(type);
+  }
+
+  /**
+   * Undo the last operation
+   */
+  undo(): boolean {
+    const command = this.historyManager.undo();
+
+    if (command !== null) {
+      this.emit('undo', { command });
+    }
+
+    return command !== null;
+  }
+
+  /**
+   * Redo the last undone operation
+   */
+  redo(): boolean {
+    const command = this.historyManager.redo();
+
+    if (command !== null) {
+      this.emit('redo', { command });
+    }
+
+    return command !== null;
+  }
+
+  /**
+   * Check if undo is possible
+   */
+  canUndo(): boolean {
+    return this.historyManager.canUndo();
+  }
+
+  /**
+   * Check if redo is possible
+   */
+  canRedo(): boolean {
+    return this.historyManager.canRedo();
   }
 
   /**

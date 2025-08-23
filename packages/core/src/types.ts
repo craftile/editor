@@ -46,6 +46,8 @@ export interface EngineEvents {
     index?: number;
     regionName?: string;
   };
+  undo: { command: any };
+  redo: { command: any };
 }
 
 export type EngineEmitFn = <K extends keyof EngineEvents>(

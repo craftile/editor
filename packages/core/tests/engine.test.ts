@@ -148,4 +148,24 @@ describe('Engine', () => {
       expect(page.blocks[duplicatedId].type).toBe('button');
     });
   });
+
+  describe('History Management', () => {
+    it('should support undo/redo', () => {
+      const originalText = engine.getPage().blocks['block-1'].properties.text;
+
+      // Make a change
+      engine.setBlockProperty('block-1', 'text', 'Changed');
+      expect(engine.getPage().blocks['block-1'].properties.text).toBe('Changed');
+
+      // Undo
+      expect(engine.canUndo()).toBe(true);
+      engine.undo();
+      expect(engine.getPage().blocks['block-1'].properties.text).toBe(originalText);
+
+      // Redo
+      expect(engine.canRedo()).toBe(true);
+      engine.redo();
+      expect(engine.getPage().blocks['block-1'].properties.text).toBe('Changed');
+    });
+  });
 });
