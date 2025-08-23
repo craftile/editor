@@ -27,6 +27,7 @@ export interface EngineEvents {
   'page:set': { previousPage?: Page; newPage: Page };
   'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionName?: string };
   'block:remove': { blockId: string; block: Block; parentId?: string };
+  'block:toggle': { blockId: string; disabled: boolean; oldValue?: boolean };
   'block:move': {
     blockId: string;
     targetParentId?: string;

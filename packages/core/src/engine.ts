@@ -6,6 +6,7 @@ import { HistoryManager } from './history-manager';
 import { InsertBlockCommand } from './commands/insert-block';
 import { RemoveBlockCommand } from './commands/remove-block';
 import { MoveBlockCommand } from './commands/move-block';
+import { ToggleBlockCommand } from './commands/toggle-block';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
@@ -139,6 +140,20 @@ export class Engine extends EventBus<EngineEvents> {
       targetParentId: options?.targetParentId,
       targetIndex: options?.targetIndex,
       targetRegionName: options?.targetRegionName,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+  }
+
+  /**
+   * Toggle a block's disabled state (enable/disable)
+   */
+  toggleBlock(blockId: string, disabled?: boolean): void {
+    const command = new ToggleBlockCommand(this.page, {
+      blockId,
+      disabled,
       emit: this.emit.bind(this),
     });
 

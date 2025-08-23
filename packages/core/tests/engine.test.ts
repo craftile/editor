@@ -122,5 +122,12 @@ describe('Engine', () => {
       expect(page.regions![0].blocks).not.toEqual(initialOrder);
       expect(page.regions![0].blocks).toContain('block-1');
     });
+
+    it('should toggle block', () => {
+      engine.toggleBlock('block-1');
+
+      const page = engine.getPage();
+      expect(page.blocks['block-1'].disabled).toBe(true);
+    });
   });
 });
