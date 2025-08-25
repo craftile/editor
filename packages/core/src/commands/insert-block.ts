@@ -1,5 +1,5 @@
-import type { Block, BlockSchema } from '@craftile/types';
-import type { Command, EngineEmitFn, Page } from '../types';
+import type { Block, BlockSchema, Page } from '@craftile/types';
+import type { Command, EngineEmitFn } from '../types';
 import { generateId } from '../utils';
 
 export interface InsertBlockOptions {

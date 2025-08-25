@@ -28,3 +28,13 @@ export interface BlockSchema {
   accepts?: string[]; // Allowed children types
   meta?: Record<string, any>; // UI-specific metadata for editors
 }
+
+export interface Region {
+  name: string;
+  blocks: string[]; // Array of block IDs in this region
+}
+
+export interface Page {
+  blocks: Record<string, Block>; // all blocks flatened by ID
+  regions?: Region[];
+}

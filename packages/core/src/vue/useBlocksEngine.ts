@@ -1,7 +1,7 @@
 import { ref, onUnmounted, computed, toRaw, nextTick, type Ref } from 'vue';
+import type { Block, Page, Region } from '@craftile/types';
+import type { EngineConfig } from '../types';
 import { Engine } from '../engine';
-import type { EngineConfig, Page, Region } from '../types';
-import type { Block } from '@craftile/types';
 
 export interface UseBlocksEngineOptions extends EngineConfig {
   autoSync?: boolean;

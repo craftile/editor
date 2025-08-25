@@ -1,6 +1,6 @@
 import { EventBus } from '@craftile/event-bus';
-import type { EngineConfig, EngineEvents, Page } from './types';
-import type { Block, BlockSchema } from '@craftile/types';
+import type { EngineConfig, EngineEvents } from './types';
+import type { Block, BlockSchema, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
 import { InsertBlockCommand } from './commands/insert-block';

@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Engine } from '../src/engine';
-import type { Page } from '../src/types';
-import type { BlockSchema } from '@craftile/types';
+import type { BlockSchema, Page } from '@craftile/types';
 
 const testPage: Page = {
   blocks: {

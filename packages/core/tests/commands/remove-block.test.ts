@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Page } from '../../src/types';
+import type { Page } from '@craftile/types';
 import { RemoveBlockCommand } from '../../src/commands/remove-block';
 
 const testPage: Page = {

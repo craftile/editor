@@ -1,15 +1,5 @@
-import type { Block, BlockSchema } from '@craftile/types';
+import type { Block, BlockSchema, Page } from '@craftile/types';
 import type { BlocksManager } from './blocks-manager';
-
-export interface Region {
-  name: string;
-  blocks: string[]; // Array of block IDs in this region
-}
-
-export interface Page {
-  blocks: Record<string, Block>; // all blocks flatened by ID
-  regions?: Region[];
-}
 
 export interface EngineConfig {
   page?: Page;

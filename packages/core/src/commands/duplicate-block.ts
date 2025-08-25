@@ -1,5 +1,5 @@
-import type { Command, EngineEmitFn, Page } from '../types';
-import type { Block } from '@craftile/types';
+import type { Command, EngineEmitFn } from '../types';
+import type { Block, Page } from '@craftile/types';
 import { generateId } from '../utils';
 
 export interface DuplicateBlockOptions {

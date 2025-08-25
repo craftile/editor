@@ -1,5 +1,5 @@
-import type { Block } from '@craftile/types';
-import type { Command, EngineEmitFn, Page } from '../types';
+import type { Block, Page } from '@craftile/types';
+import type { Command, EngineEmitFn } from '../types';
 
 export interface MoveBlockOptions {
   blockId: string;

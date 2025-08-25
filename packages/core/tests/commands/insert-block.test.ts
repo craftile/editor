@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { BlockSchema } from '@craftile/types';
-import type { Page } from '../../src/types';
+import type { BlockSchema, Page } from '@craftile/types';
 import { InsertBlockCommand } from '../../src/commands/insert-block';
 
 const testPage: Page = {

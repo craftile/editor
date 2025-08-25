@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Page } from '../../src/types';
+import type { Page } from '@craftile/types';
 import { MoveBlockCommand } from '../../src/commands/move-block';
 
 const testPage: Page = {

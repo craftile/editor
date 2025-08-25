@@ -1,6 +1,6 @@
-import { SetBlockPropertyCommand } from './../../src/commands/set-block-property';
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Page } from '../../src/types';
+import type { Page } from '@craftile/types';
+import { SetBlockPropertyCommand } from './../../src/commands/set-block-property';
 
 const testPage: Page = {
   blocks: {

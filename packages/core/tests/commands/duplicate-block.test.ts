@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Page } from '../../src/types';
 import { DuplicateBlockCommand } from '../../src/commands/duplicate-block';
+import type { Page } from '@craftile/types';
 
 const testPage: Page = {
   blocks: {
