@@ -26,7 +26,7 @@ export class UIManager {
     return prefix + '-' + (Date.now().toString(36) + Math.random().toString(36).substr(2));
   }
 
-  addSidebarPanel(config: SidebarPanel): void {
+  registerSidebarPanel(config: SidebarPanel): void {
     const finalConfig = {
       ...config,
       id: config.id || this.generateId('sidebar-panel'),

@@ -1,7 +1,7 @@
 import { createCraftileEditor } from '@craftile/editor';
 import { blockSchemas } from './blockSchemas';
 
-createCraftileEditor({
+const editor = createCraftileEditor({
   el: '#app',
   blockSchemas,
   initialPage: {
@@ -230,4 +230,53 @@ createCraftileEditor({
       },
     ],
   },
+});
+
+editor.ui.registerSidebarPanel({
+  title: 'Render Panel',
+  render: () => {
+    const div = document.createElement('div');
+    div.style.height = '100%';
+    div.style.padding = '16px';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Framework-Agnostic Panel';
+    title.style.fontSize = '18px';
+    title.style.fontWeight = '500';
+    title.style.marginBottom = '16px';
+
+    const description = document.createElement('p');
+    description.textContent = 'This panel is created using a pure render function without Vue.';
+    description.style.color = '#6b7280';
+    description.style.marginBottom = '16px';
+
+    const button = document.createElement('button');
+    button.textContent = 'Click Me';
+    button.style.backgroundColor = '#3b82f6';
+    button.style.color = 'white';
+    button.style.padding = '8px 16px';
+    button.style.borderRadius = '4px';
+    button.style.border = 'none';
+    button.style.cursor = 'pointer';
+    button.onmouseover = () => (button.style.backgroundColor = '#2563eb');
+    button.onmouseout = () => (button.style.backgroundColor = '#3b82f6');
+    button.onclick = () => {
+      alert('Render function button clicked!');
+    };
+
+    div.appendChild(title);
+    div.appendChild(description);
+    div.appendChild(button);
+
+    return div;
+  },
+
+  icon: () => {
+    const icon = document.createElement('span');
+    icon.textContent = '⚡';
+    icon.style.fontSize = '16px';
+    return icon;
+  },
+
+  order: 20,
 });

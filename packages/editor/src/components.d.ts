@@ -26,6 +26,7 @@ declare module 'vue' {
     IconTrash: typeof import('~icons/heroicons/trash')['default']
     LayersPanel: typeof import('./components/LayersPanel.vue')['default']
     Panels: typeof import('./components/Panels.vue')['default']
+    RenderFunctionWrapper: typeof import('./components/RenderFunctionWrapper.vue')['default']
     Sidebar: typeof import('./components/Sidebar.vue')['default']
   }
 }
