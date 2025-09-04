@@ -7,3 +7,17 @@ export interface SidebarPanel {
   icon?: Component | string | (() => HTMLElement);
   order?: number;
 }
+
+export interface HeaderActionButton {
+  text: string;
+  variant?: 'default' | 'primary' | 'destructive' | 'secondary' | 'accent';
+  onClick: () => void;
+}
+
+export interface HeaderAction {
+  id?: string;
+  slot: 'left' | 'center' | 'right';
+  render?: Component | string | (() => HTMLElement);
+  button?: HeaderActionButton;
+  order?: number;
+}

@@ -2,6 +2,10 @@
  * Internationalization (i18n) grouped string definitions for the editor
  */
 export interface I18n {
+  header: {
+    undo: string;
+    redo: string;
+  };
   block: {
     show: string;
     hide: string;
@@ -39,6 +43,7 @@ export type I18nConfig = DeepPartial<I18n>;
  * Type for translation keys using dot notation
  */
 export type TranslationKey =
+  | `header.${keyof I18n['header']}`
   | `block.${keyof I18n['block']}`
   | `layers.${keyof I18n['layers']}`
   | `blocksPopover.${keyof I18n['blocksPopover']}`;

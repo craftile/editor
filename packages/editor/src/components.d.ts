@@ -15,6 +15,14 @@ declare module 'vue' {
     ConfigurationPanels: typeof import('./components/ConfigurationPanels.vue')['default']
     Editor: typeof import('./components/Editor.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
+    HeaderActionRenderer: typeof import('./components/HeaderActionRenderer.vue')['default']
+    HeaderBackButton: typeof import('./components/header/BackButton.vue')['default']
+    HeaderRedoButton: typeof import('./components/header/RedoButton.vue')['default']
+    HeaderTitle: typeof import('./components/header/Title.vue')['default']
+    HeaderUndoButton: typeof import('./components/header/UndoButton.vue')['default']
+    IconArrowLeft: typeof import('~icons/heroicons/arrow-left')['default']
+    IconArrowUturnLeft: typeof import('~icons/heroicons/arrow-uturn-left')['default']
+    IconArrowUturnRight: typeof import('~icons/heroicons/arrow-uturn-right')['default']
     IconChevronDown: typeof import('~icons/heroicons/chevron-down')['default']
     IconChevronRight: typeof import('~icons/heroicons/chevron-right')['default']
     IconEye: typeof import('~icons/heroicons/eye')['default']
@@ -28,5 +36,6 @@ declare module 'vue' {
     Panels: typeof import('./components/Panels.vue')['default']
     RenderFunctionWrapper: typeof import('./components/RenderFunctionWrapper.vue')['default']
     Sidebar: typeof import('./components/Sidebar.vue')['default']
+    UiButton: typeof import('./components/ui/Button.vue')['default']
   }
 }

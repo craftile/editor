@@ -8,6 +8,7 @@ import type { I18n, I18nConfig } from './types';
 import { createI18n } from './composables/i18n';
 import { EventBus } from '@craftile/event-bus';
 import type { InsertBlockContext } from './composables/blocks-popover';
+import { registerDefaultHeaderActions } from './defaults/header-actions';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -39,6 +40,8 @@ export class CraftileEditor {
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;
+
+    registerDefaultHeaderActions(this.ui);
 
     this.setup();
   }
