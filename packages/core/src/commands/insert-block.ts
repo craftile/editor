@@ -65,12 +65,12 @@ export class InsertBlockCommand implements Command {
       }
     } else {
       // Insert as top-level block (to the specified region)
-      const targetRegionName = this.regionName || this.page.regions![0].name;
-      let targetRegion = this.page.regions!.find((r) => r.name === targetRegionName);
+      const targetRegionName = this.regionName || this.page.regions[0].name;
+      let targetRegion = this.page.regions.find((r) => r.name === targetRegionName);
 
       if (!targetRegion) {
         targetRegion = { name: targetRegionName, blocks: [] };
-        this.page.regions!.push(targetRegion);
+        this.page.regions.push(targetRegion);
       }
 
       if (this.index !== undefined && this.index >= 0 && this.index <= targetRegion.blocks.length) {
@@ -87,7 +87,7 @@ export class InsertBlockCommand implements Command {
       block: this.insertedBlock,
       parentId: this.parentId,
       index: this.actualIndex,
-      regionName: this.regionName || this.page.regions![0].name,
+      regionName: this.regionName || this.page.regions[0].name,
     });
   }
 
@@ -104,8 +104,8 @@ export class InsertBlockCommand implements Command {
         parent.children.splice(this.actualIndex, 1);
       }
     } else {
-      const targetRegionName = this.regionName || this.page.regions![0].name;
-      const targetRegion = this.page.regions?.find((r) => r.name === targetRegionName);
+      const targetRegionName = this.regionName || this.page.regions[0].name;
+      const targetRegion = this.page.regions.find((r) => r.name === targetRegionName);
 
       if (targetRegion && this.actualIndex !== undefined) {
         targetRegion.blocks.splice(this.actualIndex, 1);

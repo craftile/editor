@@ -94,7 +94,7 @@ export function useBlocksEngine(
     regions: [{ name: 'main', blocks: [] }],
   });
   const blocks = computed(() => pageState.value.blocks);
-  const regions = computed(() => pageState.value.regions!);
+  const regions = computed(() => pageState.value.regions);
 
   const canUndo = ref(engine.canUndo());
   const canRedo = ref(engine.canRedo());

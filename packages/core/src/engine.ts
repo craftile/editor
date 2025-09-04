@@ -208,12 +208,12 @@ export class Engine extends EventBus<EngineEvents> {
 
     this.page = structuredClone(newPage);
 
-    if (!this.page.regions || this.page.regions.length === 0) {
+    if (this.page.regions.length === 0) {
       this.page.regions = [{ name: 'main', blocks: Object.keys(this.page.blocks) }];
     }
 
     // Initialize regions if not present
-    if (!this.page.regions || this.page.regions.length === 0) {
+    if (this.page.regions.length === 0) {
       this.page.regions = [
         {
           name: 'main',

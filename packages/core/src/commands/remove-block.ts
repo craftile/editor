@@ -39,7 +39,7 @@ export class RemoveBlockCommand implements Command {
         }
       }
     } else {
-      const region = this.page.regions!.find((r) => r.blocks.includes(this.blockId));
+      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         this.originalIndex = region.blocks.indexOf(this.blockId);
         this.regionName = region.name;
@@ -69,7 +69,7 @@ export class RemoveBlockCommand implements Command {
         parent.children.splice(this.originalIndex, 0, this.blockId);
       }
     } else if (this.regionName) {
-      const region = this.page.regions!.find((r) => r.name === this.regionName);
+      const region = this.page.regions.find((r) => r.name === this.regionName);
       if (region) {
         region.blocks.splice(this.originalIndex, 0, this.blockId);
       }

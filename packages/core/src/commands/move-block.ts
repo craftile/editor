@@ -57,7 +57,7 @@ export class MoveBlockCommand implements Command {
       }
     } else {
       // it is a region level block
-      const region = this.page.regions!.find((r) => r.blocks.includes(this.blockId));
+      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         this.originalIndex = region.blocks.indexOf(this.blockId);
         this.originalRegionName = region.name;
@@ -78,12 +78,12 @@ export class MoveBlockCommand implements Command {
     } else {
       this.blockToMove.parentId = undefined;
 
-      const regionName = this.targetRegionName || this.page.regions![0].name || 'main';
-      let targetRegion = this.page.regions!.find((r) => r.name === regionName);
+      const regionName = this.targetRegionName || this.page.regions[0].name || 'main';
+      let targetRegion = this.page.regions.find((r) => r.name === regionName);
 
       if (!targetRegion) {
         targetRegion = { name: regionName, blocks: [] };
-        this.page.regions!.push(targetRegion);
+        this.page.regions.push(targetRegion);
       }
 
       if (this.targetIndex !== undefined && this.targetIndex >= 0 && this.targetIndex <= targetRegion.blocks.length) {
@@ -118,7 +118,7 @@ export class MoveBlockCommand implements Command {
         }
       }
     } else {
-      const region = this.page.regions!.find((r) => r.blocks.includes(this.blockId));
+      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         const index = region.blocks.indexOf(this.blockId);
         if (index !== -1) {
@@ -135,7 +135,7 @@ export class MoveBlockCommand implements Command {
         originalParent.children.splice(this.originalIndex, 0, this.blockId);
       }
     } else if (this.originalRegionName) {
-      const region = this.page.regions!.find((r) => r.name === this.originalRegionName);
+      const region = this.page.regions.find((r) => r.name === this.originalRegionName);
       if (region) {
         region.blocks.splice(this.originalIndex, 0, this.blockId);
       }

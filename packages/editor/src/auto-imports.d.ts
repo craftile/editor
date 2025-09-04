@@ -9,6 +9,8 @@ declare global {
   const EffectScope: typeof import('vue')['EffectScope']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
+  const createI18n: typeof import('./composables/i18n')['createI18n']
+  const createTranslationFunction: typeof import('./composables/i18n')['createTranslationFunction']
   const customRef: typeof import('vue')['customRef']
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
@@ -52,14 +54,21 @@ declare global {
   const triggerRef: typeof import('vue')['triggerRef']
   const unref: typeof import('vue')['unref']
   const useAttrs: typeof import('vue')['useAttrs']
+  const useBlock: typeof import('./composables/block')['useBlock']
+  const useBlockLabel: typeof import('./composables/block-label')['useBlockLabel']
+  const useBlocksPopover: typeof import('./composables/blocks-popover')['useBlocksPopover']
   const useBreakpoints: typeof import('./composables/breakpoints')['useBreakpoints']
   const useCraftileEngine: typeof import('./composables/craftile-engine')['useCraftileEngine']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
+  const useEventBus: typeof import('./composables/event-bus')['useEventBus']
+  const useI18n: typeof import('./composables/i18n')['useI18n']
   const useId: typeof import('vue')['useId']
+  const useLayersPanel: typeof import('./composables/layers-panel')['useLayersPanel']
   const useModel: typeof import('vue')['useModel']
   const useSlots: typeof import('vue')['useSlots']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
+  const useUI: typeof import('./composables/ui')['useUI']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -70,6 +79,12 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { InsertBlockContext } from './composables/blocks-popover'
+  import('./composables/blocks-popover')
+  // @ts-ignore
+  export type { UseUIReturn } from './composables/ui'
+  import('./composables/ui')
 }
 
 // for vue template auto import
@@ -80,6 +95,8 @@ declare module 'vue' {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
+    readonly createI18n: UnwrapRef<typeof import('./composables/i18n')['createI18n']>
+    readonly createTranslationFunction: UnwrapRef<typeof import('./composables/i18n')['createTranslationFunction']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
     readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
@@ -123,14 +140,21 @@ declare module 'vue' {
     readonly triggerRef: UnwrapRef<typeof import('vue')['triggerRef']>
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
+    readonly useBlock: UnwrapRef<typeof import('./composables/block')['useBlock']>
+    readonly useBlockLabel: UnwrapRef<typeof import('./composables/block-label')['useBlockLabel']>
+    readonly useBlocksPopover: UnwrapRef<typeof import('./composables/blocks-popover')['useBlocksPopover']>
     readonly useBreakpoints: UnwrapRef<typeof import('./composables/breakpoints')['useBreakpoints']>
     readonly useCraftileEngine: UnwrapRef<typeof import('./composables/craftile-engine')['useCraftileEngine']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
+    readonly useEventBus: UnwrapRef<typeof import('./composables/event-bus')['useEventBus']>
+    readonly useI18n: UnwrapRef<typeof import('./composables/i18n')['useI18n']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
+    readonly useLayersPanel: UnwrapRef<typeof import('./composables/layers-panel')['useLayersPanel']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
+    readonly useUI: UnwrapRef<typeof import('./composables/ui')['useUI']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>

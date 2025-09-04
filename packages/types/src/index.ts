@@ -36,5 +36,5 @@ export interface Region {
 
 export interface Page {
   blocks: Record<string, Block>; // all blocks flatened by ID
-  regions?: Region[];
+  regions: Region[];
 }

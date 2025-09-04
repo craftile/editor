@@ -52,8 +52,8 @@ describe('RemoveBlockCommand', () => {
 
       expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount - 1);
       expect(page.blocks['block-1']).toBeUndefined();
-      expect(page.regions![0].blocks).not.toContain('block-1');
-      expect(page.regions![0].blocks).toEqual(['block-2']);
+      expect(page.regions[0].blocks).not.toContain('block-1');
+      expect(page.regions[0].blocks).toEqual(['block-2']);
 
       expect(emittedEvents).toHaveLength(1);
       expect(emittedEvents[0].event).toBe('block:remove');
@@ -98,7 +98,7 @@ describe('RemoveBlockCommand', () => {
       });
 
       const originalBlock = structuredClone(page.blocks['block-1']);
-      const originalRegionBlocks = [...page.regions![0].blocks];
+      const originalRegionBlocks = [...page.regions[0].blocks];
       const originalBlockCount = Object.keys(page.blocks).length;
 
       command.apply();
@@ -108,7 +108,7 @@ describe('RemoveBlockCommand', () => {
       expect(Object.keys(page.blocks)).toHaveLength(originalBlockCount);
       expect(page.blocks['block-1']).toBeDefined();
       expect(page.blocks['block-1']).toEqual(originalBlock);
-      expect(page.regions![0].blocks).toEqual(originalRegionBlocks);
+      expect(page.regions[0].blocks).toEqual(originalRegionBlocks);
     });
   });
 });

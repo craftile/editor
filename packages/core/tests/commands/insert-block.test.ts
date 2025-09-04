@@ -47,12 +47,12 @@ describe('InsertBlockCommand', () => {
       });
 
       const initialBlockCount = Object.keys(page.blocks).length;
-      const initialRegionLength = page.regions![0].blocks.length;
+      const initialRegionLength = page.regions[0].blocks.length;
 
       command.apply();
 
       expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount + 1);
-      expect(page.regions![0].blocks).toHaveLength(initialRegionLength + 1);
+      expect(page.regions[0].blocks).toHaveLength(initialRegionLength + 1);
 
       const insertedId = command.getBlockId();
       const insertedBlock = page.blocks[insertedId];
@@ -83,7 +83,7 @@ describe('InsertBlockCommand', () => {
       command.apply();
 
       const insertedId = command.getBlockId();
-      expect(page.regions![0].blocks[1]).toBe(insertedId);
+      expect(page.regions[0].blocks[1]).toBe(insertedId);
 
       expect(emittedEvents).toHaveLength(1);
       expect(emittedEvents[0].event).toBe('block:insert');
@@ -134,7 +134,7 @@ describe('InsertBlockCommand', () => {
       });
 
       const initialBlockCount = Object.keys(page.blocks).length;
-      const initialRegionBlocks = [...page.regions![0].blocks];
+      const initialRegionBlocks = [...page.regions[0].blocks];
 
       command.apply();
       const insertedId = command.getBlockId();
@@ -145,7 +145,7 @@ describe('InsertBlockCommand', () => {
       command.revert();
       expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount);
       expect(page.blocks[insertedId]).toBeUndefined();
-      expect(page.regions![0].blocks).toEqual(initialRegionBlocks);
+      expect(page.regions[0].blocks).toEqual(initialRegionBlocks);
 
       expect(emittedEvents).toHaveLength(2);
       expect(emittedEvents[1].event).toBe('block:remove');

@@ -62,11 +62,11 @@ describe('MoveBlockCommand', () => {
         emit: mockEmit,
       });
 
-      expect(page.regions![0].blocks).toEqual(['block-1', 'block-2', 'block-3']);
+      expect(page.regions[0].blocks).toEqual(['block-1', 'block-2', 'block-3']);
 
       command.apply();
 
-      expect(page.regions![0].blocks).toEqual(['block-2', 'block-3', 'block-1']);
+      expect(page.regions[0].blocks).toEqual(['block-2', 'block-3', 'block-1']);
 
       expect(emittedEvents).toHaveLength(1);
       expect(emittedEvents[0].event).toBe('block:move');
@@ -83,8 +83,8 @@ describe('MoveBlockCommand', () => {
 
       command.apply();
 
-      expect(page.regions![0].blocks).toEqual(['block-2', 'block-3']);
-      expect(page.regions![1].blocks).toEqual(['block-1', 'parent-a']);
+      expect(page.regions[0].blocks).toEqual(['block-2', 'block-3']);
+      expect(page.regions[1].blocks).toEqual(['block-1', 'parent-a']);
       expect(page.blocks['block-1']).toBeDefined();
     });
 
@@ -98,7 +98,7 @@ describe('MoveBlockCommand', () => {
 
       command.apply();
 
-      expect(page.regions![0].blocks).toEqual(['block-2', 'block-3']);
+      expect(page.regions[0].blocks).toEqual(['block-2', 'block-3']);
       expect(page.blocks['parent-a'].children).toContain('block-1');
       expect(page.blocks['block-1'].parentId).toBe('parent-a');
     });
@@ -112,7 +112,7 @@ describe('MoveBlockCommand', () => {
 
       command.apply();
 
-      expect(page.regions![0].blocks).toEqual(['block-1', 'child-1', 'block-2', 'block-3']);
+      expect(page.regions[0].blocks).toEqual(['block-1', 'child-1', 'block-2', 'block-3']);
       expect(page.blocks['block-2'].children).not.toContain('child-1');
       expect(page.blocks['child-1'].parentId).toBeUndefined();
       expect(page.blocks['child-1']).toBeDefined();
@@ -136,7 +136,7 @@ describe('MoveBlockCommand', () => {
 
   describe('Command Revert', () => {
     it('should revert region reordering', () => {
-      const originalOrder = [...page.regions![0].blocks];
+      const originalOrder = [...page.regions[0].blocks];
 
       const command = new MoveBlockCommand(page, {
         blockId: 'block-1',
@@ -145,15 +145,15 @@ describe('MoveBlockCommand', () => {
       });
 
       command.apply();
-      expect(page.regions![0].blocks).not.toEqual(originalOrder);
+      expect(page.regions[0].blocks).not.toEqual(originalOrder);
 
       command.revert();
-      expect(page.regions![0].blocks).toEqual(originalOrder);
+      expect(page.regions[0].blocks).toEqual(originalOrder);
     });
 
     it('should revert cross-region movement', () => {
-      const originalMainBlocks = [...page.regions![0].blocks];
-      const originalSidebarBlocks = [...page.regions![1].blocks];
+      const originalMainBlocks = [...page.regions[0].blocks];
+      const originalSidebarBlocks = [...page.regions[1].blocks];
 
       const command = new MoveBlockCommand(page, {
         blockId: 'block-1',
@@ -163,11 +163,11 @@ describe('MoveBlockCommand', () => {
       });
 
       command.apply();
-      expect(page.regions![0].blocks).not.toEqual(originalMainBlocks);
+      expect(page.regions[0].blocks).not.toEqual(originalMainBlocks);
 
       command.revert();
-      expect(page.regions![0].blocks).toEqual(originalMainBlocks);
-      expect(page.regions![1].blocks).toEqual(originalSidebarBlocks);
+      expect(page.regions[0].blocks).toEqual(originalMainBlocks);
+      expect(page.regions[1].blocks).toEqual(originalSidebarBlocks);
     });
   });
 });

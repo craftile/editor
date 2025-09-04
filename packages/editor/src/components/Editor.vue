@@ -35,5 +35,7 @@
         </aside>
       </main>
     </div>
+
+    <BlocksPopover />
   </div>
 </template>

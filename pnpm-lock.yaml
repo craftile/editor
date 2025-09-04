@@ -97,6 +97,9 @@ importers:
       '@craftile/editor':
         specifier: workspace:*
         version: link:../packages/editor
+      '@craftile/types':
+        specifier: workspace:*
+        version: link:../packages/types
     devDependencies:
       typescript:
         specifier: ~5.8.3

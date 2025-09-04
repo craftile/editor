@@ -13,8 +13,8 @@
   --color-gray-900: var(--color-gray-900, oklch(37% 0.013 285.805));
   --color-gray-950: var(--color-gray-050, oklch(37% 0.013 285.805));
 
-  --color-accent: var(--color-accent, oklch(0 0 0));
-  --color-accent-foreground: var(--color-accent-foreground, oklch(1 0 0));
+  --color-accent: var(--color-accent, oklch(54.6% 0.245 262.881));
+  --color-accent-foreground: var(--color-accent-foreground, oklch(93.2% 0.032 255.585));
 }
 
 @layer base {
@@ -24,5 +24,11 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, oklch(92% 0.004 286.32));
+  }
+}
+
+@layer components {
+  .ghost-block {
+    @apply opacity-30 bg-accent/20 border-2 border-dashed border-accent/80 rounded-md;
   }
 }

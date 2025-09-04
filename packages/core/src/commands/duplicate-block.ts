@@ -122,14 +122,14 @@ export class DuplicateBlockCommand implements Command {
         this.insertIndex = 0;
       }
     } else {
-      const region = this.page.regions!.find((r) => r.blocks.includes(this.blockId));
+      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         const index = region.blocks.indexOf(this.blockId);
         this.regionName = region.name;
         this.insertIndex = index + 1;
       } else {
-        this.regionName = this.page.regions![0].name || 'main';
-        this.insertIndex = this.page.regions![0].blocks.length || 0;
+        this.regionName = this.page.regions[0].name || 'main';
+        this.insertIndex = this.page.regions[0].blocks.length || 0;
       }
     }
   }
@@ -147,11 +147,11 @@ export class DuplicateBlockCommand implements Command {
 
       targetParent.children.splice(this.insertIndex, 0, this.duplicatedBlockId);
     } else {
-      let targetRegion = this.page.regions!.find((r) => r.name === this.regionName);
+      let targetRegion = this.page.regions.find((r) => r.name === this.regionName);
 
       if (!targetRegion) {
         targetRegion = { name: this.regionName || 'main', blocks: [] };
-        this.page.regions!.push(targetRegion);
+        this.page.regions.push(targetRegion);
       }
 
       targetRegion.blocks.splice(this.insertIndex, 0, this.duplicatedBlockId);

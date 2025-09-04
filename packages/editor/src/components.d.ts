@@ -8,9 +8,23 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddBlockBtn: typeof import('./components/AddBlockBtn.vue')['default']
+    BlockItem: typeof import('./components/BlockItem.vue')['default']
+    BlocksPopover: typeof import('./components/BlocksPopover.vue')['default']
+    CollapseAllIcon: typeof import('./components/CollapseAllIcon.vue')['default']
     ConfigurationPanels: typeof import('./components/ConfigurationPanels.vue')['default']
     Editor: typeof import('./components/Editor.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
+    IconChevronDown: typeof import('~icons/heroicons/chevron-down')['default']
+    IconChevronRight: typeof import('~icons/heroicons/chevron-right')['default']
+    IconEye: typeof import('~icons/heroicons/eye')['default']
+    IconEyeSlash: typeof import('~icons/heroicons/eye-slash')['default']
+    IconLockClosed: typeof import('~icons/heroicons/lock-closed')['default']
+    IconPlus: typeof import('~icons/heroicons/plus')['default']
+    IconSquare3Stack3d: typeof import('~icons/heroicons/square3-stack3d')['default']
+    IconSquaresPlus: typeof import('~icons/heroicons/squares-plus')['default']
+    IconTrash: typeof import('~icons/heroicons/trash')['default']
+    LayersPanel: typeof import('./components/LayersPanel.vue')['default']
     Panels: typeof import('./components/Panels.vue')['default']
     Sidebar: typeof import('./components/Sidebar.vue')['default']
   }

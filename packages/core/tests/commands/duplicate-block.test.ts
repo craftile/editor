@@ -46,12 +46,12 @@ describe('DuplicateBlockCommand', () => {
     });
 
     const initialBlockCount = Object.keys(page.blocks).length;
-    const initialRegionLength = page.regions![0].blocks.length;
+    const initialRegionLength = page.regions[0].blocks.length;
 
     command.apply();
 
     expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount + 1);
-    expect(page.regions![0].blocks).toHaveLength(initialRegionLength + 1);
+    expect(page.regions[0].blocks).toHaveLength(initialRegionLength + 1);
 
     const duplicatedId = command.getDuplicatedBlockId();
     const duplicatedBlock = page.blocks[duplicatedId];
@@ -107,7 +107,7 @@ describe('DuplicateBlockCommand', () => {
     });
 
     const initialBlockCount = Object.keys(page.blocks).length;
-    const initialRegionBlocks = [...page.regions![0].blocks];
+    const initialRegionBlocks = [...page.regions[0].blocks];
 
     command.apply();
     const duplicatedId = command.getDuplicatedBlockId();
@@ -116,6 +116,6 @@ describe('DuplicateBlockCommand', () => {
     command.revert();
     expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount);
     expect(page.blocks[duplicatedId]).toBeUndefined();
-    expect(page.regions![0].blocks).toEqual(initialRegionBlocks);
+    expect(page.regions[0].blocks).toEqual(initialRegionBlocks);
   });
 });

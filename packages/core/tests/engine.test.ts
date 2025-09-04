@@ -99,7 +99,7 @@ describe('Engine', () => {
       expect(blockId).toBeDefined();
       expect(page.blocks[blockId]).toBeDefined();
       expect(page.blocks[blockId].type).toBe('text');
-      expect(page.regions![0].blocks).toContain(blockId);
+      expect(page.regions[0].blocks).toContain(blockId);
     });
 
     it('should remove block', () => {
@@ -113,13 +113,13 @@ describe('Engine', () => {
     });
 
     it('should move block', () => {
-      const initialOrder = [...engine.getPage().regions![0].blocks];
+      const initialOrder = [...engine.getPage().regions[0].blocks];
 
       engine.moveBlock('block-1', { targetIndex: 1 });
 
       const page = engine.getPage();
-      expect(page.regions![0].blocks).not.toEqual(initialOrder);
-      expect(page.regions![0].blocks).toContain('block-1');
+      expect(page.regions[0].blocks).not.toEqual(initialOrder);
+      expect(page.regions[0].blocks).toContain('block-1');
     });
 
     it('should toggle block', () => {

@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@craftile/editor": "workspace:*"
+    "@craftile/editor": "workspace:*",
+    "@craftile/types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "~5.8.3",
