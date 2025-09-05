@@ -189,6 +189,10 @@ export class Engine extends EventBus<EngineEvents> {
     return command.getDuplicatedBlockId();
   }
 
+  getBlockById(blockId: string): Block | undefined {
+    return this.page.blocks[blockId];
+  }
+
   /**
    * Get current page state
    */

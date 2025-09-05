@@ -12,7 +12,9 @@
   const { block: blockData, children, hasChildren, canHaveChildren, nextSibling, toggle, remove, moveChild } = useBlock(props.blockId);
   const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayersPanel();
   const { getBlockLabelReactive } = useBlockLabel();
+  const { selectedBlockId, selectBlock } = useSelectedBlock();
 
+  const isSelected = computed(() => selectedBlockId.value === props.blockId);
   const isExpanded = computed(() => isExpandedFn(props.blockId));
   const isStatic = computed(() => blockData.value?.static === true);
   const blockDisplayName = getBlockLabelReactive(props.blockId);
@@ -52,11 +54,13 @@
   >
     <div
       :data-block-id="blockData.id"
-      class="flex items-center h-8 text-sm hover:bg-gray-50 cursor-pointer rounded-md group transition-all duration-200"
+      :data-selected="isSelected ? 'true' : undefined"
+      class="flex items-center h-8 text-sm hover:bg-gray-50 data-selected:bg-accent/10 data-selected:border data-selected:border-accent/20 data-selected:hover:bg-accent/10 cursor-pointer rounded-md group transition-all duration-200"
       :class="{
         'text-gray-700': !blockData.disabled,
         'text-gray-400': blockData.disabled
       }"
+      @click="selectBlock(blockData.id)"
     >
       <!-- Block Drag Handle -->
       <!-- <div

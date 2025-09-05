@@ -1,3 +1,4 @@
+import type { EventBus } from '@craftile/event-bus';
 import type { HeaderAction, SidebarPanel } from './../types/ui';
 
 export interface UIState {
@@ -6,21 +7,25 @@ export interface UIState {
 
   headerActions: HeaderAction[];
 
+  selectedBlockId: string | null;
   layersPanel: {
     expandedBlocks: Set<string>;
   };
 }
 
 export class UIManager {
+  private events: EventBus;
   public readonly state: UIState;
 
-  constructor() {
+  constructor(events: EventBus) {
+    this.events = events;
     this.state = reactive({
       activeSidebarPanel: 'layers',
       sidebarPanels: [],
 
       headerActions: [],
 
+      selectedBlockId: null,
       layersPanel: {
         expandedBlocks: new Set<string>(),
       },
@@ -29,6 +34,16 @@ export class UIManager {
 
   private generateId(prefix: string): string {
     return prefix + '-' + (Date.now().toString(36) + Math.random().toString(36).substr(2));
+  }
+
+  setSelectedBlock(blockId: string | null): void {
+    this.state.selectedBlockId = blockId;
+    this.events.emit('ui:block:select', { blockId });
+  }
+
+  clearSelectedBlock(): void {
+    this.state.selectedBlockId = null;
+    this.events.emit('ui:block:clear-selection', { blockId: null });
   }
 
   registerSidebarPanel(config: SidebarPanel): void {

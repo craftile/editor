@@ -37,10 +37,10 @@ export class CraftileEditor {
   constructor(options: CraftileEditorOptions = {}) {
     this.engine = new Engine({ blockSchemas: options.blockSchemas, page: options.initialPage });
 
-    this.ui = new UIManager();
-    this.i18n = createI18n(options.i18n);
     this.events = new EventBus();
+    this.i18n = createI18n(options.i18n);
     this.devices = new DevicesManager(options.devices);
+    this.ui = new UIManager(this.events);
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;
