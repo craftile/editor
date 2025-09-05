@@ -9,6 +9,7 @@ import { createI18n } from './composables/i18n';
 import { EventBus } from '@craftile/event-bus';
 import type { InsertBlockContext } from './composables/blocks-popover';
 import { registerDefaultHeaderActions } from './defaults/header-actions';
+import { DevicesManager, type DevicesManagerOptions } from './managers/devices';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -16,6 +17,7 @@ export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBloc
 export interface CraftileEditorOptions {
   blockSchemas?: BlockSchema[];
   initialPage?: Page;
+  devices?: DevicesManagerOptions;
   i18n?: I18nConfig;
   blockLabelFunction?: BlockLabelFunction;
   blockFilterFunction?: BlockFilterFunction;
@@ -26,6 +28,7 @@ export class CraftileEditor {
   public readonly ui: UIManager;
   public readonly i18n: I18n;
   public readonly events: EventBus;
+  public readonly devices: DevicesManager;
   public readonly blockLabelFunction?: BlockLabelFunction;
   public readonly blockFilterFunction?: BlockFilterFunction;
 
@@ -37,6 +40,7 @@ export class CraftileEditor {
     this.ui = new UIManager();
     this.i18n = createI18n(options.i18n);
     this.events = new EventBus();
+    this.devices = new DevicesManager(options.devices);
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;

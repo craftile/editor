@@ -4,6 +4,12 @@ export const en: I18n = {
   header: {
     undo: 'Undo',
     redo: 'Redo',
+    auto: 'Auto',
+    apply: 'Apply',
+    devicePreview: 'Device Preview',
+    customDeviceSize: 'Custom Size',
+    deviceWidthPx: 'Width (px)',
+    savedCustomDevices: 'Saved custom devices',
   },
   block: {
     show: 'Show',
@@ -23,5 +29,8 @@ export const en: I18n = {
     tabSaved: 'Saved',
     noBlocksAvailable: 'No blocks available',
     noBlocksFound: 'No blocks found',
+  },
+  common: {
+    custom: 'Custom',
   },
 };

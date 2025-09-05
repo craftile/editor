@@ -5,6 +5,12 @@ export interface I18n {
   header: {
     undo: string;
     redo: string;
+    auto: string;
+    apply: string;
+    devicePreview: string;
+    customDeviceSize: string;
+    deviceWidthPx: string;
+    savedCustomDevices?: string;
   };
   block: {
     show: string;
@@ -24,6 +30,9 @@ export interface I18n {
     tabSaved: string;
     noBlocksAvailable: string;
     noBlocksFound: string;
+  };
+  common: {
+    custom: string;
   };
 }
 
@@ -46,4 +55,5 @@ export type TranslationKey =
   | `header.${keyof I18n['header']}`
   | `block.${keyof I18n['block']}`
   | `layers.${keyof I18n['layers']}`
-  | `blocksPopover.${keyof I18n['blocksPopover']}`;
+  | `blocksPopover.${keyof I18n['blocksPopover']}`
+  | `common.${keyof I18n['common']}`;

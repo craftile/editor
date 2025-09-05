@@ -61,6 +61,7 @@ declare global {
   const useCraftileEngine: typeof import('./composables/craftile-engine')['useCraftileEngine']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
+  const useDeviceMode: typeof import('./composables/device-mode')['useDeviceMode']
   const useEventBus: typeof import('./composables/event-bus')['useEventBus']
   const useI18n: typeof import('./composables/i18n')['useI18n']
   const useId: typeof import('vue')['useId']
@@ -147,6 +148,7 @@ declare module 'vue' {
     readonly useCraftileEngine: UnwrapRef<typeof import('./composables/craftile-engine')['useCraftileEngine']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
+    readonly useDeviceMode: UnwrapRef<typeof import('./composables/device-mode')['useDeviceMode']>
     readonly useEventBus: UnwrapRef<typeof import('./composables/event-bus')['useEventBus']>
     readonly useI18n: UnwrapRef<typeof import('./composables/i18n')['useI18n']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
