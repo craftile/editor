@@ -17,6 +17,10 @@ export interface I18n {
     hide: string;
     duplicate: string;
     remove: string;
+    moveToNext: string;
+    moveToPrevious: string;
+    enable: string;
+    disable: string;
   };
   layers: {
     title: string;
@@ -31,8 +35,13 @@ export interface I18n {
     noBlocksAvailable: string;
     noBlocksFound: string;
   };
+  configPanels: {
+    properties: string;
+    selectedBlock: string;
+  };
   common: {
     custom: string;
+    close: string;
   };
 }
 
@@ -56,4 +65,5 @@ export type TranslationKey =
   | `block.${keyof I18n['block']}`
   | `layers.${keyof I18n['layers']}`
   | `blocksPopover.${keyof I18n['blocksPopover']}`
+  | `configPanels.${keyof I18n['configPanels']}`
   | `common.${keyof I18n['common']}`;

@@ -84,9 +84,6 @@ declare global {
   // @ts-ignore
   export type { InsertBlockContext } from './composables/blocks-popover'
   import('./composables/blocks-popover')
-  // @ts-ignore
-  export type { UseUIReturn } from './composables/ui'
-  import('./composables/ui')
 }
 
 // for vue template auto import

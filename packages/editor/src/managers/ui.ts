@@ -1,11 +1,11 @@
 import type { EventBus } from '@craftile/event-bus';
-import type { HeaderAction, SidebarPanel } from './../types/ui';
+import type { ConfigurationPanel, HeaderAction, SidebarPanel } from './../types/ui';
 
 export interface UIState {
   activeSidebarPanel: string;
   sidebarPanels: SidebarPanel[];
-
   headerActions: HeaderAction[];
+  configurationPanels: ConfigurationPanel[];
 
   selectedBlockId: string | null;
   layersPanel: {
@@ -22,8 +22,8 @@ export class UIManager {
     this.state = reactive({
       activeSidebarPanel: 'layers',
       sidebarPanels: [],
-
       headerActions: [],
+      configurationPanels: [],
 
       selectedBlockId: null,
       layersPanel: {
@@ -101,6 +101,30 @@ export class UIManager {
     const index = this.state.headerActions.findIndex((action) => action.id === actionId);
     if (index >= 0) {
       this.state.headerActions.splice(index, 1);
+    }
+  }
+
+  registerConfigurationPanel(config: ConfigurationPanel): void {
+    const finalConfig = {
+      ...config,
+      render: typeof config.render === 'object' ? markRaw(config.render) : config.render,
+      icon: config.icon && typeof config.icon === 'object' ? markRaw(config.icon) : config.icon,
+    };
+
+    const existingIndex = this.state.configurationPanels.findIndex((panel) => panel.id === config.id);
+    if (existingIndex >= 0) {
+      this.state.configurationPanels[existingIndex] = finalConfig;
+    } else {
+      this.state.configurationPanels.push(finalConfig);
+    }
+
+    this.state.configurationPanels.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }
+
+  removeConfigurationPanel(panelId: string): void {
+    const index = this.state.configurationPanels.findIndex((panel) => panel.id === panelId);
+    if (index >= 0) {
+      this.state.configurationPanels.splice(index, 1);
     }
   }
 }

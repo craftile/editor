@@ -10,6 +10,7 @@ import { EventBus } from '@craftile/event-bus';
 import type { InsertBlockContext } from './composables/blocks-popover';
 import { registerDefaultHeaderActions } from './defaults/header-actions';
 import { DevicesManager, type DevicesManagerOptions } from './managers/devices';
+import { registerDefaultConfigurationPanels } from './defaults/configuration-panels';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -46,6 +47,7 @@ export class CraftileEditor {
     this.blockFilterFunction = options.blockFilterFunction;
 
     registerDefaultHeaderActions(this.ui);
+    registerDefaultConfigurationPanels(this.ui);
 
     this.setup();
   }

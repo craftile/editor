@@ -3,7 +3,7 @@
   import '../index.css';
 
   const { isExtraExtraLarge } = useBreakpoints();
-  const hasSelection = ref(false);
+  const { hasSelection } = useSelectedBlock();
 </script>
 
 <template>
@@ -20,7 +20,7 @@
           v-if="hasSelection && !isExtraExtraLarge"
           class="absolute left-14 top-0 h-full w-75 z-10"
         >
-          <ConfigurationPanels />
+          <ConfigurationPanels is-overlay />
         </div>
 
         <div class="flex-1 p-3 bg-gray-100 overflow-auto preview-container flex justify-center">

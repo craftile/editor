@@ -16,6 +16,10 @@ export const en: I18n = {
     hide: 'Hide',
     duplicate: 'Duplicate',
     remove: 'Remove',
+    moveToNext: 'Move to Next',
+    moveToPrevious: 'Move to Previous',
+    enable: 'Enable',
+    disable: 'Disable',
   },
   layers: {
     title: 'Layers',
@@ -30,7 +34,12 @@ export const en: I18n = {
     noBlocksAvailable: 'No blocks available',
     noBlocksFound: 'No blocks found',
   },
+  configPanels: {
+    properties: 'Properties',
+    selectedBlock: 'Select a block to edit its properties',
+  },
   common: {
     custom: 'Custom',
+    close: 'Close',
   },
 };

@@ -21,3 +21,11 @@ export interface HeaderAction {
   button?: HeaderActionButton;
   order?: number;
 }
+
+export interface ConfigurationPanel {
+  id: string;
+  title: string;
+  icon?: Component | string | (() => HTMLElement);
+  render: Component | string | (() => HTMLElement);
+  order?: number;
+}

@@ -1,23 +1,7 @@
-import { type ComputedRef } from 'vue';
-
 import type { CraftileEditor } from '../editor';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
-import type { HeaderAction, SidebarPanel } from '../types/ui';
 
-export interface UseUIReturn {
-  sidebarPanels: ComputedRef<SidebarPanel[]>;
-  activeSidebarPanel: ComputedRef<string>;
-  registerSidebarPanel: (panel: SidebarPanel) => void;
-  removeSidebarPanel: (panelId: string) => void;
-
-  headerActions: ComputedRef<HeaderAction[]>;
-  registerHeaderAction: (action: HeaderAction) => void;
-  removeHeaderAction: (actionId: string) => void;
-
-  setActiveSidebarPanel: (panel: string) => void;
-}
-
-export function useUI(): UseUIReturn {
+export function useUI() {
   const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
 
   if (!editor) {
@@ -38,5 +22,9 @@ export function useUI(): UseUIReturn {
     headerActions: computed(() => editor.ui.state.headerActions),
     registerHeaderAction: editor.ui.registerHeaderAction.bind(editor.ui),
     removeHeaderAction: editor.ui.removeHeaderAction.bind(editor.ui),
+
+    configurationPanels: computed(() => editor.ui.state.configurationPanels),
+    registerConfigurationPanel: editor.ui.registerConfigurationPanel.bind(editor.ui),
+    removeConfigurationPanel: editor.ui.removeConfigurationPanel.bind(editor.ui),
   };
 }
