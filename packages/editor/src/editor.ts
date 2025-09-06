@@ -11,6 +11,8 @@ import type { InsertBlockContext } from './composables/blocks-popover';
 import { registerDefaultHeaderActions } from './defaults/header-actions';
 import { DevicesManager, type DevicesManagerOptions } from './managers/devices';
 import { registerDefaultConfigurationPanels } from './defaults/configuration-panels';
+import { PluginsManager } from './managers/plugins';
+import type { CraftileEditorPlugin } from './types/plugin';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -20,6 +22,7 @@ export interface CraftileEditorOptions {
   initialPage?: Page;
   devices?: DevicesManagerOptions;
   i18n?: I18nConfig;
+  plugins?: CraftileEditorPlugin[];
   blockLabelFunction?: BlockLabelFunction;
   blockFilterFunction?: BlockFilterFunction;
 }
@@ -32,6 +35,7 @@ export class CraftileEditor {
   public readonly devices: DevicesManager;
   public readonly blockLabelFunction?: BlockLabelFunction;
   public readonly blockFilterFunction?: BlockFilterFunction;
+  public readonly plugins: PluginsManager;
 
   private vueApp: App | null = null;
 
@@ -42,23 +46,28 @@ export class CraftileEditor {
     this.i18n = createI18n(options.i18n);
     this.devices = new DevicesManager(options.devices);
     this.ui = new UIManager(this.events);
+    this.plugins = new PluginsManager(this);
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;
 
-    registerDefaultHeaderActions(this.ui);
-    registerDefaultConfigurationPanels(this.ui);
+    options.plugins?.forEach((plugin) => this.plugins.register(plugin));
 
     this.setup();
   }
 
   private setup() {
+    registerDefaultHeaderActions(this.ui);
+    registerDefaultConfigurationPanels(this.ui);
+
     this.vueApp = createApp({
       setup: () => {
         provide(CRAFTILE_EDITOR_SYMBOL, this);
         return () => h(Editor);
       },
     });
+
+    this.plugins.setupPlugins(this.vueApp);
   }
 
   mount(element: string | HTMLElement): void {

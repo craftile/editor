@@ -1,9 +1,16 @@
-import { createCraftileEditor } from '@craftile/editor';
+import { createCraftileEditor, type CraftileEditorPlugin } from '@craftile/editor';
 import { blockSchemas } from './blockSchemas';
+
+const TestPlugin: CraftileEditorPlugin = ({ editor }) => {
+  editor.engine.on('block:insert', ({ block }) => {
+    console.log(`new block type ${block.type} inserted`);
+  });
+};
 
 const editor = createCraftileEditor({
   el: '#app',
   blockSchemas,
+  plugins: [TestPlugin],
   initialPage: {
     blocks: {
       // Header region blocks
