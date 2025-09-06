@@ -45,6 +45,8 @@ declare module 'vue' {
     LayersPanel: typeof import('./components/LayersPanel.vue')['default']
     Panels: typeof import('./components/Panels.vue')['default']
     PropertiesPanel: typeof import('./components/PropertiesPanel.vue')['default']
+    PropertyField: typeof import('./components/PropertyField.vue')['default']
+    PropertyFieldRenderWrapper: typeof import('./components/PropertyFieldRenderWrapper.vue')['default']
     RenderFunctionWrapper: typeof import('./components/RenderFunctionWrapper.vue')['default']
     Sidebar: typeof import('./components/Sidebar.vue')['default']
     UiButton: typeof import('./components/ui/Button.vue')['default']

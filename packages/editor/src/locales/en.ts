@@ -37,9 +37,12 @@ export const en: I18n = {
   configPanels: {
     properties: 'Properties',
     selectedBlock: 'Select a block to edit its properties',
+    noProperties: 'This block has no editable properties',
+    unknownFieldType: 'Unknown field type',
   },
   common: {
     custom: 'Custom',
     close: 'Close',
+    default: 'Default',
   },
 };

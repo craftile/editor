@@ -1,11 +1,12 @@
 import type { EventBus } from '@craftile/event-bus';
-import type { ConfigurationPanel, HeaderAction, SidebarPanel } from './../types/ui';
+import type { ConfigurationPanel, HeaderAction, PropertyFieldConfig, SidebarPanel } from './../types/ui';
 
 export interface UIState {
   activeSidebarPanel: string;
   sidebarPanels: SidebarPanel[];
   headerActions: HeaderAction[];
   configurationPanels: ConfigurationPanel[];
+  propertyFields: PropertyFieldConfig[];
 
   selectedBlockId: string | null;
   layersPanel: {
@@ -24,6 +25,7 @@ export class UIManager {
       sidebarPanels: [],
       headerActions: [],
       configurationPanels: [],
+      propertyFields: [],
 
       selectedBlockId: null,
       layersPanel: {
@@ -125,6 +127,20 @@ export class UIManager {
     const index = this.state.configurationPanels.findIndex((panel) => panel.id === panelId);
     if (index >= 0) {
       this.state.configurationPanels.splice(index, 1);
+    }
+  }
+
+  registerPropertyField(config: PropertyFieldConfig): void {
+    const finalConfig = {
+      ...config,
+      render: typeof config.render === 'object' ? markRaw(config.render) : config.render,
+    };
+
+    const existingIndex = this.state.propertyFields.findIndex((field) => field.type === config.type);
+    if (existingIndex >= 0) {
+      this.state.propertyFields[existingIndex] = finalConfig;
+    } else {
+      this.state.propertyFields.push(finalConfig);
     }
   }
 }

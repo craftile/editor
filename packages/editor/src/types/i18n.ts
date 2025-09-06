@@ -38,10 +38,13 @@ export interface I18n {
   configPanels: {
     properties: string;
     selectedBlock: string;
+    noProperties: string;
+    unknownFieldType: string;
   };
   common: {
     custom: string;
     close: string;
+    default: string;
   };
 }
 

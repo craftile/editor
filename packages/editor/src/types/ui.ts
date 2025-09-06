@@ -1,3 +1,4 @@
+import type { PropertyField } from '@craftile/types';
 import type { Component } from 'vue';
 
 export interface SidebarPanel {
@@ -28,4 +29,16 @@ export interface ConfigurationPanel {
   icon?: Component | string | (() => HTMLElement);
   render: Component | string | (() => HTMLElement);
   order?: number;
+}
+
+export interface FieldRenderProps {
+  field: PropertyField;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  onBlur?: () => void;
+}
+
+export interface PropertyFieldConfig {
+  type: string;
+  render: Component | string | ((props: FieldRenderProps) => HTMLElement);
 }

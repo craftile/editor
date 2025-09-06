@@ -26,5 +26,8 @@ export function useUI() {
     configurationPanels: computed(() => editor.ui.state.configurationPanels),
     registerConfigurationPanel: editor.ui.registerConfigurationPanel.bind(editor.ui),
     removeConfigurationPanel: editor.ui.removeConfigurationPanel.bind(editor.ui),
+
+    propertyFields: computed(() => editor.ui.state.propertyFields),
+    registerPropertyField: editor.ui.registerPropertyField.bind(editor.ui),
   };
 }
