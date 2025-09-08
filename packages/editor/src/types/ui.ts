@@ -40,5 +40,5 @@ export interface FieldRenderProps {
 
 export interface PropertyFieldConfig {
   type: string;
-  render: Component | string | ((props: FieldRenderProps) => HTMLElement);
+  render: string | Component | ((props: FieldRenderProps) => HTMLElement);
 }

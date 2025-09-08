@@ -97,6 +97,9 @@ importers:
       '@craftile/editor':
         specifier: workspace:*
         version: link:../packages/editor
+      '@craftile/plugin-common-properties':
+        specifier: workspace:*
+        version: link:../plugins/common-properties
       '@craftile/types':
         specifier: workspace:*
         version: link:../packages/types
@@ -107,6 +110,45 @@ importers:
       vite:
         specifier: ^7.1.2
         version: 7.1.3(@types/node@24.3.0)
+
+  plugins/common-properties:
+    dependencies:
+      '@ark-ui/vue':
+        specifier: ^5.16.0
+        version: 5.16.0(vue@3.5.17)
+      '@craftile/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@craftile/editor':
+        specifier: workspace:*
+        version: link:../../packages/editor
+      '@craftile/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@iconify-json/heroicons':
+        specifier: ^1.2.2
+        version: 1.2.2
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.0
+        version: 6.0.0(vite@7.1.3)(vue@3.5.17)
+      typescript:
+        specifier: ~5.8.3
+        version: 5.8.3
+      unplugin-icons:
+        specifier: ^22.1.0
+        version: 22.1.0
+      unplugin-vue-components:
+        specifier: ^28.8.0
+        version: 28.8.0(vue@3.5.17)
+      vite:
+        specifier: ^7.0.0
+        version: 7.1.3(@types/node@24.3.0)
+      vite-plugin-dts:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/node@24.3.0)(typescript@5.8.3)(vite@7.1.3)
+      vue:
+        specifier: ^3.5.17
+        version: 3.5.17(typescript@5.8.3)
 
 packages:
 

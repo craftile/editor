@@ -1,12 +1,13 @@
-import type { Block, BlockSchema, Page } from '@craftile/types';
-import { Engine } from '@craftile/core';
 import { createApp, h, provide, type App } from 'vue';
+import { Engine } from '@craftile/core';
+import { EventBus } from '@craftile/event-bus';
+import type { Block, BlockSchema, Page } from '@craftile/types';
+
 import Editor from './components/Editor.vue';
 import { CRAFTILE_EDITOR_SYMBOL } from './constants';
 import { UIManager } from './managers/ui';
 import type { I18n, I18nConfig } from './types';
 import { createI18n } from './composables/i18n';
-import { EventBus } from '@craftile/event-bus';
 import type { InsertBlockContext } from './composables/blocks-popover';
 import { registerDefaultHeaderActions } from './defaults/header-actions';
 import { DevicesManager, type DevicesManagerOptions } from './managers/devices';

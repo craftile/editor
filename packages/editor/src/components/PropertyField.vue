@@ -1,21 +1,26 @@
 <script setup lang="ts">
   import type { PropertyField } from '@craftile/types';
-  import type { PropertyFieldConfig } from '../types/ui';
   import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
 
   interface Props {
     field: PropertyField;
-    renderer?: PropertyFieldConfig['render'];
     modelValue: any;
   }
 
-  defineProps<Props>();
+  const props = defineProps<Props>();
 
   const emit = defineEmits<{
     'update:modelValue': [value: any];
   }>();
 
   const { t } = useI18n();
+  const { propertyFields: propertyFieldConfigs } = useUI();
+
+
+  const fieldRenderer = computed(() => {
+    const config = propertyFieldConfigs.value.find(config => config.type === props.field.type);
+    return config?.render;
+  })
 
   const handleInput = (value: any) => {
     emit('update:modelValue', value);
@@ -25,8 +30,8 @@
   <div>
     <!-- Vue Component Rendering -->
     <component
-      v-if="isVueComponent(renderer) || isComponentString(renderer)"
-      :is="renderer"
+      v-if="isVueComponent(fieldRenderer) || isComponentString(fieldRenderer)"
+      :is="fieldRenderer"
       :field="field"
       :model-value="modelValue"
       @update:model-value="handleInput"
@@ -34,8 +39,8 @@
 
     <!-- Framework-Agnostic Render Function -->
     <PropertyFieldRenderWrapper
-      v-else-if="isHtmlRenderFunction(renderer)"
-      :render-fn="renderer"
+      v-else-if="isHtmlRenderFunction(fieldRenderer)"
+      :render-fn="fieldRenderer"
       :field="field"
       :value="modelValue"
       :on-change="handleInput"

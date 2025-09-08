@@ -4,7 +4,6 @@
   const { t } = useI18n();
   const { selectedBlock } = useSelectedBlock();
   const { engine, setBlockProperty } = useCraftileEngine();
-  const { propertyFields: propertyFieldConfigs } = useUI();
 
   const propertyFields = computed(() => {
     if (!selectedBlock.value) {
@@ -68,11 +67,6 @@
 
     setBlockProperty(selectedBlock.value.id, propertyId, value);
   }
-
-  function getFieldRenderer(fieldType: string) {
-    const config = propertyFieldConfigs.value.find(config => config.type === fieldType);
-    return config?.render || null;
-  }
 </script>
 
 <template>
@@ -119,7 +113,6 @@
           v-for="field in propertyFields"
           :key="field.id"
           :field="field"
-          :renderer="getFieldRenderer(field.type)!"
           :model-value="getPropertyValue(field.id)"
           @update:model-value="updateProperty(field.id, $event)"
         />
