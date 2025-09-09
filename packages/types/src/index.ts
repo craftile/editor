@@ -38,3 +38,7 @@ export interface Page {
   blocks: Record<string, Block>; // all blocks flatened by ID
   regions: Region[];
 }
+
+export interface WindowMessages {
+  'craftile.preview.ready': {};
+}

@@ -14,6 +14,7 @@ import { DevicesManager, type DevicesManagerOptions } from './managers/devices';
 import { registerDefaultConfigurationPanels } from './defaults/configuration-panels';
 import { PluginsManager } from './managers/plugins';
 import type { CraftileEditorPlugin } from './types/plugin';
+import { PreviewManager } from './managers/preview';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -34,6 +35,7 @@ export class CraftileEditor {
   public readonly i18n: I18n;
   public readonly events: EventBus;
   public readonly devices: DevicesManager;
+  public readonly preview: PreviewManager;
   public readonly blockLabelFunction?: BlockLabelFunction;
   public readonly blockFilterFunction?: BlockFilterFunction;
   public readonly plugins: PluginsManager;
@@ -46,6 +48,7 @@ export class CraftileEditor {
     this.events = new EventBus();
     this.i18n = createI18n(options.i18n);
     this.devices = new DevicesManager(options.devices);
+    this.preview = new PreviewManager();
     this.ui = new UIManager(this.events);
     this.plugins = new PluginsManager(this);
 

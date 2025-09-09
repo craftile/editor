@@ -67,6 +67,7 @@ declare global {
   const useId: typeof import('vue')['useId']
   const useLayersPanel: typeof import('./composables/layers-panel')['useLayersPanel']
   const useModel: typeof import('vue')['useModel']
+  const usePreview: typeof import('./composables/preview')['usePreview']
   const useSelectedBlock: typeof import('./composables/selected-block')['useSelectedBlock']
   const useSlots: typeof import('vue')['useSlots']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
@@ -152,6 +153,7 @@ declare module 'vue' {
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
     readonly useLayersPanel: UnwrapRef<typeof import('./composables/layers-panel')['useLayersPanel']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
+    readonly usePreview: UnwrapRef<typeof import('./composables/preview')['usePreview']>
     readonly useSelectedBlock: UnwrapRef<typeof import('./composables/selected-block')['useSelectedBlock']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>

@@ -24,7 +24,7 @@
         </div>
 
         <div class="flex-1 p-3 bg-gray-100 overflow-auto preview-container flex justify-center">
-          <div class="">Preview Caanvas</div>
+          <PreviewCanvas />
         </div>
 
         <aside

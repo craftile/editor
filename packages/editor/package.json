@@ -38,6 +38,7 @@
     "@ark-ui/vue": "^5.16.0",
     "@craftile/core": "workspace:*",
     "@craftile/event-bus": "workspace:*",
+    "@craftile/messenger": "workspace:*",
     "@craftile/types": "workspace:*",
     "@iconify-json/heroicons": "^1.2.2",
     "@tailwindcss/vite": "^4.1.11",

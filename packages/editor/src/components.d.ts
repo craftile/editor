@@ -44,6 +44,7 @@ declare module 'vue' {
     IconXMark: typeof import('~icons/heroicons/x-mark')['default']
     LayersPanel: typeof import('./components/LayersPanel.vue')['default']
     Panels: typeof import('./components/Panels.vue')['default']
+    PreviewCanvas: typeof import('./components/PreviewCanvas.vue')['default']
     PropertiesPanel: typeof import('./components/PropertiesPanel.vue')['default']
     PropertyField: typeof import('./components/PropertyField.vue')['default']
     PropertyFieldRenderWrapper: typeof import('./components/PropertyFieldRenderWrapper.vue')['default']

@@ -1,0 +1,27 @@
+{
+  "name": "@craftile/messenger",
+  "version": "0.1.0",
+  "description": "A type wrapper of window.postMessage for iframe/parent communication",
+  "type": "module",
+  "types": "src/index.ts",
+  "exports": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "craftile",
+    "messenger",
+    "postMessage",
+    "events"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eldo Magan",
+      "email": "magan.eldo@gmail.com"
+    }
+  ]
+}

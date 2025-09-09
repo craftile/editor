@@ -282,3 +282,5 @@ editor.ui.registerSidebarPanel({
 
   order: 20,
 });
+
+editor.preview.loadUrl('http://localhost:5173/');
