@@ -1,11 +1,16 @@
 import { createCraftileEditor } from '@craftile/editor';
 import CommonPropertiesPlugin from '@craftile/plugin-common-properties';
+import StaticBlocksRenderer from '@craftile/plugin-static-blocks-renderer';
 import { blockSchemas } from './blockSchemas';
+import { blockRenderers } from './blockRenderers';
 
 const editor = createCraftileEditor({
   el: '#app',
   blockSchemas,
-  plugins: [CommonPropertiesPlugin],
+  plugins: [
+    CommonPropertiesPlugin,
+    StaticBlocksRenderer({ blockRenderers, scripts: ['https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'] }),
+  ],
   initialPage: {
     blocks: {
       // Header region blocks
@@ -282,5 +287,3 @@ editor.ui.registerSidebarPanel({
 
   order: 20,
 });
-
-editor.preview.loadUrl('http://localhost:5173/');

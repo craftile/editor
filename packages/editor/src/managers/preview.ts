@@ -58,7 +58,7 @@ export class PreviewManager {
     }
   }
 
-  sendMessage<T extends keyof WindowMessages>(type: T, payload: WindowMessages[T] = {}) {
+  sendMessage<T extends keyof WindowMessages>(type: T, payload: WindowMessages[T]) {
     if (this.state.isIframeReady) {
       this.messenger.send(type, payload);
     } else {

@@ -11,6 +11,7 @@
   "dependencies": {
     "@craftile/editor": "workspace:*",
     "@craftile/plugin-common-properties": "workspace:*",
+    "@craftile/plugin-static-blocks-renderer": "workspace:*",
     "@craftile/types": "workspace:*"
   },
   "devDependencies": {
