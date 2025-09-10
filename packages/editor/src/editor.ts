@@ -15,6 +15,7 @@ import { registerDefaultConfigurationPanels } from './defaults/configuration-pan
 import { PluginsManager } from './managers/plugins';
 import type { CraftileEditorPlugin } from './types/plugin';
 import { PreviewManager } from './managers/preview';
+import { watchEngineUpdates } from './watch-engine-updates';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -27,6 +28,7 @@ export interface CraftileEditorOptions {
   plugins?: CraftileEditorPlugin[];
   blockLabelFunction?: BlockLabelFunction;
   blockFilterFunction?: BlockFilterFunction;
+  previewUpdateDelay?: number;
 }
 
 export class CraftileEditor {
@@ -36,9 +38,10 @@ export class CraftileEditor {
   public readonly events: EventBus;
   public readonly devices: DevicesManager;
   public readonly preview: PreviewManager;
+  public readonly plugins: PluginsManager;
   public readonly blockLabelFunction?: BlockLabelFunction;
   public readonly blockFilterFunction?: BlockFilterFunction;
-  public readonly plugins: PluginsManager;
+  public readonly previewUpdateDelay?: number;
 
   private vueApp: App | null = null;
 
@@ -54,6 +57,7 @@ export class CraftileEditor {
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;
+    this.previewUpdateDelay = options.previewUpdateDelay;
 
     options.plugins?.forEach((plugin) => this.plugins.register(plugin));
 
@@ -67,11 +71,28 @@ export class CraftileEditor {
     this.vueApp = createApp({
       setup: () => {
         provide(CRAFTILE_EDITOR_SYMBOL, this);
+
+        const stopWatching = this.setupEngineWatcher(this.previewUpdateDelay ?? 150);
+        onBeforeUnmount(stopWatching);
+
         return () => h(Editor);
       },
     });
 
     this.plugins.setupPlugins(this.vueApp);
+  }
+
+  private setupEngineWatcher(debounceMs: number) {
+    return watchEngineUpdates(this.engine, {
+      debounceMs,
+      onUpdates: (updates) => {
+        // Send updates to preview iframe
+        this.preview.sendMessage('craftile.editor.updates', updates);
+
+        // Emit event for plugins
+        this.events.emit('updates', updates);
+      },
+    });
   }
 
   mount(element: string | HTMLElement): void {

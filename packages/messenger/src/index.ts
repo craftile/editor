@@ -7,6 +7,7 @@ export class WindowMessenger<Messages extends Record<string, any>> {
   private handlers = new Map<keyof Messages, Function[]>();
   private targetWindow: Window;
   private targetOrigin: string;
+  private fallbackHandler?: (data: any, event: MessageEvent) => void;
 
   constructor(targetWindow: Window, targetOrigin: string = '*') {
     this.targetWindow = targetWindow;
@@ -26,6 +27,8 @@ export class WindowMessenger<Messages extends Record<string, any>> {
 
     if (handlers) {
       handlers.forEach((handler) => handler(message.payload, event));
+    } else if (this.fallbackHandler) {
+      this.fallbackHandler(event.data, event);
     }
   }
 
@@ -50,6 +53,10 @@ export class WindowMessenger<Messages extends Record<string, any>> {
         }
       }
     };
+  }
+
+  registerFallbackHandler(handler: (data: any, event: MessageEvent) => void) {
+    this.fallbackHandler = handler;
   }
 }
 

@@ -39,6 +39,7 @@
   "dependencies": {
     "@craftile/core": "workspace:*",
     "@craftile/editor": "workspace:*",
+    "@craftile/preview-client-html": "workspace:*",
     "@craftile/types": "workspace:*",
     "typescript": "~5.8.3",
     "vite": "^7.0.0",

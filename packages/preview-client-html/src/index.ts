@@ -1,0 +1,599 @@
+import { PreviewClient } from '@craftile/preview-client';
+import type { Block, MoveInstruction, Region, UpdatesEvent, WindowMessages } from '@craftile/types';
+import morphdom from 'morphdom';
+
+type MorphdomFunction = typeof morphdom;
+export type MorphdomOptions = Parameters<MorphdomFunction>[2];
+
+interface InsertionPoint {
+  parent: Node;
+  before: Node | null;
+}
+
+interface RegionComments {
+  begin: Comment;
+  end: Comment;
+}
+
+interface PositionInfo {
+  parentId?: string;
+  regionName?: string;
+  position?: number;
+  afterId?: string;
+  beforeId?: string;
+}
+
+export interface HtmlPreviewClientOptions {
+  morphdom?: MorphdomOptions;
+}
+
+export default class RawHtmlRenderer {
+  private previewClient: PreviewClient;
+  private morphdomOptions: MorphdomOptions;
+  private elementCache = new Map<string, HTMLElement>();
+  private regionCommentsCache = new Map<string, RegionComments>();
+
+  constructor(previewClient?: PreviewClient, options?: HtmlPreviewClientOptions) {
+    this.previewClient = previewClient || new PreviewClient();
+    this.morphdomOptions = options?.morphdom || {};
+
+    // Handle generated effects (HTML/CSS/JS updates)
+    this.previewClient.on('updates.effects', this.handleEffects.bind(this));
+
+    // Handle direct editor updates like move/disable/enable operations
+    this.previewClient.on('craftile.editor.updates', this.handleDirectUpdates.bind(this));
+
+    this.cacheRegionComments();
+  }
+
+  static init(previewClient?: PreviewClient, options?: HtmlPreviewClientOptions): RawHtmlRenderer {
+    return new RawHtmlRenderer(previewClient, options);
+  }
+
+  private getElementCached(blockId: string): HTMLElement | null {
+    if (this.elementCache.has(blockId)) {
+      const element = this.elementCache.get(blockId)!;
+
+      if (element.isConnected) {
+        return element;
+      }
+
+      this.elementCache.delete(blockId);
+    }
+
+    const element = document.querySelector(`[data-block="${blockId}"]`) as HTMLElement;
+
+    if (element) {
+      this.elementCache.set(blockId, element);
+    }
+
+    return element;
+  }
+
+  private cacheRegionComments(): void {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT, null);
+    let node: Comment | null;
+    const pendingRegions = new Map<string, Comment>();
+
+    while ((node = walker.nextNode() as Comment)) {
+      const text = node.textContent?.trim();
+      if (!text) {
+        continue;
+      }
+
+      if (text.startsWith('BEGIN region: ')) {
+        const regionName = text.substring('BEGIN region: '.length);
+        pendingRegions.set(regionName, node);
+      } else if (text.startsWith('END region: ')) {
+        const regionName = text.substring('END region: '.length);
+        const beginComment = pendingRegions.get(regionName);
+        if (beginComment) {
+          this.regionCommentsCache.set(regionName, {
+            begin: beginComment,
+            end: node,
+          });
+          pendingRegions.delete(regionName);
+        }
+      }
+    }
+  }
+
+  private invalidateCache(changes: UpdatesEvent['changes']): void {
+    [...changes.updated, ...changes.removed].forEach((blockId) => {
+      this.elementCache.delete(blockId);
+    });
+  }
+
+  private handleEffects(data: WindowMessages['updates.effects']): void {
+    const { effects, blocks, regions, changes } = data;
+
+    if (!effects) {
+      return;
+    }
+
+    this.invalidateCache(changes);
+
+    if (effects.html) {
+      this.handleHtmlEffects(effects.html, { blocks, regions, changes });
+    }
+  }
+
+  private handleDirectUpdates(data: WindowMessages['craftile.editor.updates']) {
+    const { changes } = data;
+
+    if (changes.moved) {
+      this.handleMoves(data);
+    }
+
+    if (changes.updated.length > 0) {
+      this.handleDisabledBlocks(data);
+    }
+
+    if (changes.removed.length > 0) {
+      this.handleRemoves(data);
+    }
+  }
+
+  private handleMoves(updates: UpdatesEvent) {
+    const { blocks, changes } = updates;
+
+    for (const [blockId, moveInstruction] of Object.entries(updates.changes.moved)) {
+      // Skip move if target parent is being updated (parent html effect will contain the block at correct position)
+      if (moveInstruction?.toParent && changes.updated?.includes(moveInstruction?.toParent)) {
+        continue;
+      }
+
+      if (!this.isValidMoveInstruction(moveInstruction)) {
+        console.warn(`Invalid move instruction for block ${blockId}:`, moveInstruction);
+        continue;
+      }
+
+      const block = blocks[blockId];
+      this.moveBlockUsingDOM(block, moveInstruction);
+    }
+  }
+
+  private handleDisabledBlocks(updates: UpdatesEvent): void {
+    const { blocks, changes } = updates;
+
+    for (const blockId of changes.updated) {
+      const block = blocks[blockId];
+
+      if (!block) {
+        continue;
+      }
+
+      const blockElement = this.getElementCached(blockId);
+      const isCurrentlyInDOM = !!blockElement;
+
+      if (block.disabled && isCurrentlyInDOM) {
+        // Block was disabled - remove from DOM immediately
+        this.removeBlock(block.id);
+      } else if (!block.disabled && !isCurrentlyInDOM) {
+        // Block was enabled but not in DOM - will be handled by html effect
+      }
+    }
+  }
+
+  private handleRemoves(updates: UpdatesEvent): void {
+    const { changes } = updates;
+
+    for (const blockId of changes.removed) {
+      this.removeBlock(blockId);
+    }
+  }
+
+  private handleHtmlEffects(htmlEffects: Record<string, string>, updates: UpdatesEvent) {
+    const { blocks, regions, changes } = updates;
+
+    // Process added blocks
+    for (const blockId of changes.added) {
+      const html = htmlEffects[blockId];
+      if (!html) {
+        continue;
+      }
+
+      const block = blocks[blockId];
+      if (!block) {
+        console.warn(`Block data not found for ${blockId}`);
+        continue;
+      }
+
+      if (block.disabled) {
+        console.debug(`Skipping disabled block ${blockId} during add operation`);
+        continue;
+      }
+
+      const positionInfo = this.calculatePosition(block, regions, blocks);
+      this.insertBlock(block, html, positionInfo);
+    }
+
+    // Process updated blocks
+    for (const blockId of changes.updated) {
+      const html = htmlEffects[blockId];
+      if (!html) {
+        continue;
+      }
+
+      const block = blocks[blockId];
+      if (!block) {
+        console.warn(`Block data not found for ${blockId}`);
+        continue;
+      }
+
+      if (block.disabled) {
+        continue;
+      }
+
+      const blockElement = this.getElementCached(blockId);
+      const isCurrentlyInDOM = !!blockElement;
+
+      if (!isCurrentlyInDOM) {
+        // this happen when was disabled and then re-enabled. we add it back to the dom
+        const positionInfo = this.calculatePosition(block, regions, blocks);
+        this.insertBlock(block, html, positionInfo);
+
+        // TODO: notify inspector to track this new element
+      } else {
+        this.updateBlockHtml(block, html);
+      }
+    }
+  }
+
+  private isValidMoveInstruction(instruction: MoveInstruction): boolean {
+    const hasTarget = !!(instruction.toParent || instruction.toRegion);
+    const hasValidIndex = instruction.toIndex === undefined || instruction.toIndex >= 0;
+    return hasTarget && hasValidIndex;
+  }
+
+  private removeBlock(blockId: string): void {
+    const blockElement = this.getElementCached(blockId);
+
+    if (blockElement) {
+      this.previewClient.emit('block.remove.before', {
+        blockId,
+        element: blockElement,
+      });
+
+      blockElement.remove();
+      this.elementCache.delete(blockId);
+
+      this.previewClient.emit('block.remove.after', {
+        blockId,
+        element: blockElement,
+      });
+    } else {
+      console.warn(`Block ${blockId} not found for removal`);
+    }
+  }
+
+  private moveBlockUsingDOM(block: Block, moveInstruction: MoveInstruction) {
+    const blockElement = this.getElementCached(block.id);
+    const { toParent, toRegion, toIndex } = moveInstruction;
+
+    if (!blockElement) {
+      console.warn(`Block element ${block.id} not found for move operation`);
+      return;
+    }
+
+    this.previewClient.emit('block.move.before', {
+      blockId: block.id,
+      blockType: block.type,
+      block,
+      element: blockElement,
+      toParent,
+      toRegion,
+      toIndex,
+    });
+
+    if (toParent) {
+      const parentElement = this.getElementCached(toParent);
+
+      if (!parentElement) {
+        console.error(`Parent element ${toParent} not found for move operation`);
+        return;
+      }
+
+      this.insertElementInContainer(blockElement, parentElement, block.id, toIndex);
+    } else if (toRegion) {
+      const insertionPoint = this.findRegionInsertionPoint(toRegion, toIndex, undefined, undefined, block.id);
+
+      if (!insertionPoint) {
+        console.error(`Failed to find insertion point for region: ${toRegion}`);
+        return;
+      }
+
+      insertionPoint.parent.insertBefore(blockElement, insertionPoint.before);
+    }
+
+    this.previewClient.emit('block.move.after', {
+      blockId: block.id,
+      blockType: block.type,
+      block,
+      element: blockElement,
+      toParent,
+      toRegion,
+      toIndex,
+    });
+  }
+
+  private insertElementInContainer(
+    element: HTMLElement,
+    container: HTMLElement,
+    elementId: string,
+    index?: number
+  ): void {
+    const children = Array.from(container.children);
+    const otherChildren = children.filter((child) => child.getAttribute('data-block') !== elementId);
+    const insertBefore = index !== undefined && index < otherChildren.length ? otherChildren[index] : null;
+
+    container.insertBefore(element, insertBefore);
+  }
+
+  private insertBlock(block: Block, html: string, positionInfo: PositionInfo): void {
+    if (this.getElementCached(block.id)) {
+      return;
+    }
+
+    this.previewClient.emit('block.insert.before', {
+      blockId: block.id,
+      blockType: block.type,
+      block,
+      html,
+      positionInfo,
+    });
+
+    const newElement = this.parseHtmlElement(html, block.id);
+    if (!newElement) {
+      return;
+    }
+
+    const { parentId, regionName, position, afterId, beforeId } = positionInfo;
+
+    if (parentId) {
+      const parentElement = this.getElementCached(parentId);
+
+      if (!parentElement) {
+        console.error(`Parent element ${parentId} not found for block ${block.id}`);
+        return;
+      }
+
+      this.insertElementByPosition(newElement, parentElement, position, afterId, beforeId);
+    } else if (regionName) {
+      const insertionPoint = this.findRegionInsertionPoint(regionName, position, afterId, beforeId);
+      if (!insertionPoint) {
+        console.error(`Failed to find insertion point for region: ${regionName}`);
+        return;
+      }
+
+      insertionPoint.parent.insertBefore(newElement, insertionPoint.before);
+    } else {
+      // Fallback to body (should not happen with proper data)
+      console.warn(`No parent or region specified for block ${block.id}, inserting into body`);
+      document.body.appendChild(newElement);
+    }
+
+    this.elementCache.set(block.id, newElement);
+
+    this.previewClient.emit('block.insert.after', {
+      blockId: block.id,
+      blockType: block.type,
+      block,
+      html,
+      positionInfo,
+    });
+  }
+
+  private updateBlockHtml(block: Block, html: string): void {
+    if (!html) {
+      console.warn(`No HTML provided for block ${block.id}`);
+      return;
+    }
+
+    const blockElement = this.getElementCached(block.id);
+    if (!blockElement) {
+      console.warn(`Block element ${block.id} not found for HTML update`);
+      return;
+    }
+
+    this.previewClient.emit('block.update.before', {
+      blockId: block.id,
+      blockType: block.type,
+      block,
+      element: blockElement,
+      html,
+    });
+
+    morphdom(blockElement, html, this.morphdomOptions);
+
+    // Element may have changed after morphdom, invalidate cache
+    this.elementCache.delete(block.id);
+
+    this.previewClient.emit('block.update.after', {
+      blockId: block.id,
+      blockType: block.type,
+      block,
+      element: blockElement,
+      html,
+    });
+  }
+
+  private insertElementByPosition(
+    element: HTMLElement,
+    parentElement: HTMLElement,
+    position?: number,
+    afterId?: string,
+    beforeId?: string
+  ): void {
+    let insertBefore: Element | null = null;
+
+    if (beforeId) {
+      insertBefore = this.getElementCached(beforeId);
+    } else if (afterId) {
+      const afterElement = this.getElementCached(afterId);
+      if (afterElement) {
+        insertBefore = afterElement.nextElementSibling;
+      }
+    } else if (typeof position === 'number') {
+      const children = Array.from(parentElement.children);
+      insertBefore = children[position] || null;
+    }
+
+    parentElement.insertBefore(element, insertBefore);
+  }
+
+  private findRegionInsertionPoint(
+    regionName: string,
+    position?: number,
+    afterId?: string,
+    beforeId?: string,
+    excludeBlockId?: string
+  ): InsertionPoint | null {
+    const regionComments = this.regionCommentsCache.get(regionName);
+    if (!regionComments) {
+      console.error(`Region comments not found for region: ${regionName}`);
+      return null;
+    }
+
+    const { begin: beginComment, end: endComment } = regionComments;
+
+    let insertBefore: Node | null = null;
+
+    if (beforeId) {
+      // Insert before specific block
+      const beforeElement = this.getElementCached(beforeId);
+      if (beforeElement) {
+        insertBefore = beforeElement;
+      }
+    } else if (afterId) {
+      // Insert after specific block
+      const afterElement = this.getElementCached(afterId);
+      if (afterElement && afterElement.nextSibling) {
+        insertBefore = afterElement.nextSibling;
+      }
+    } else if (typeof position === 'number') {
+      // Insert at specific position
+      insertBefore = this.findPositionInRegion(beginComment, endComment, position, excludeBlockId);
+    }
+
+    // If no specific insertion point found, insert before the end comment
+    if (!insertBefore) {
+      insertBefore = endComment;
+    }
+
+    return {
+      parent: beginComment.parentNode!,
+      before: insertBefore,
+    };
+  }
+
+  private findPositionInRegion(
+    beginComment: Comment,
+    endComment: Comment,
+    position: number,
+    excludeBlockId?: string
+  ): Node | null {
+    const regionBlocks: Element[] = [];
+    let currentNode = beginComment.nextSibling;
+
+    while (currentNode && currentNode !== endComment) {
+      if (currentNode.nodeType === Node.ELEMENT_NODE && (currentNode as Element).hasAttribute('data-block')) {
+        const blockId = (currentNode as Element).getAttribute('data-block');
+        if (!excludeBlockId || blockId !== excludeBlockId) {
+          regionBlocks.push(currentNode as Element);
+        }
+      }
+
+      currentNode = currentNode.nextSibling;
+    }
+
+    return position < regionBlocks.length ? regionBlocks[position] : null;
+  }
+
+  private calculatePosition(block: Block, regions: Region[], blocks: Record<string, Block>): PositionInfo {
+    if (block.parentId) {
+      const parentBlock = blocks[block.parentId];
+      if (!parentBlock) {
+        console.warn(`Block data not found for block ${block.id}`);
+      }
+
+      const position = parentBlock.children.indexOf(block.id);
+      if (position === -1) {
+        console.warn(`Block ${block.id} not found in parent ${block.parentId} children`);
+        return { parentId: block.parentId };
+      }
+
+      const { afterId, beforeId } = this.findAdjacentSiblings(parentBlock.children, position, blocks);
+
+      return {
+        parentId: block.parentId,
+        position,
+        afterId,
+        beforeId,
+      };
+    } else {
+      // Block is at region level - find position in region
+      for (const region of regions) {
+        const position = region.blocks.indexOf(block.id);
+        if (position !== -1) {
+          const { afterId, beforeId } = this.findAdjacentSiblings(region.blocks, position, blocks);
+          return {
+            regionName: region.name,
+            position,
+            afterId,
+            beforeId,
+          };
+        }
+      }
+
+      return {};
+    }
+  }
+
+  private findAdjacentSiblings(
+    siblings: string[],
+    currentIndex: number,
+    blocks: Record<string, Block>
+  ): { afterId?: string; beforeId?: string } {
+    let afterId: string | undefined;
+    let beforeId: string | undefined;
+
+    // find the first enabled block before current block
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      const siblingBlock = blocks[siblings[i]];
+      if (siblingBlock && !siblingBlock.disabled) {
+        afterId = siblings[i];
+        break;
+      }
+    }
+
+    // find the first enabled block after current block
+    for (let i = currentIndex + 1; i < siblings.length; i++) {
+      const siblingBlock = blocks[siblings[i]];
+      if (siblingBlock && !siblingBlock.disabled) {
+        beforeId = siblings[i];
+        break;
+      }
+    }
+
+    return { afterId, beforeId };
+  }
+
+  private parseHtmlElement(html: string, blockId: string): HTMLElement | null {
+    if (!html.trim()) {
+      console.error(`Empty HTML provided for block ${blockId}`);
+      return null;
+    }
+
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    const newElement = temp.firstElementChild as HTMLElement;
+
+    if (!newElement) {
+      console.error(`Invalid HTML for block ${blockId}: no element found`);
+      return null;
+    }
+
+    return newElement;
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@craftile/preview-client-html",
+  "version": "0.1.0",
+  "description": "HTML preview client for static block rendering in Craftile",
+  "type": "module",
+  "keywords": [
+    "craftile",
+    "preview",
+    "html",
+    "static",
+    "rendering"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eldo Magan",
+      "email": "magan.eldo@gmail.com"
+    }
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./html.cdn.js": "./dist/html.cdn.js"
+  },
+  "scripts": {
+    "build": "tsc && vite build && vite build --mode cdn",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@craftile/preview-client": "workspace:*",
+    "@craftile/types": "workspace:*",
+    "morphdom": "^2.7.5",
+    "jsdom": "^25.0.1",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.2.4"
+  }
+}

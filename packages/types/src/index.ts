@@ -39,6 +39,40 @@ export interface Page {
   regions: Region[];
 }
 
+export interface MoveInstruction {
+  toRegion?: string;
+  toParent?: string;
+  toIndex: number;
+}
+
+export interface UpdatesEvent {
+  blocks: Record<string, Block>;
+  regions: Region[];
+  changes: {
+    added: string[];
+    updated: string[];
+    removed: string[];
+    moved: Record<string, MoveInstruction>;
+  };
+}
+
 export interface WindowMessages {
   'craftile.preview.ready': {};
+
+  'craftile.preview.page-data': {
+    pageData: {
+      blocks: Record<string, Block>;
+      regions?: Region[];
+    };
+  };
+
+  'craftile.editor.updates': UpdatesEvent;
+  'updates.effects': UpdatesEvent & {
+    effects?: {
+      html?: Record<string, string>;
+      css?: string[];
+      js?: string[];
+      moved?: Record<string, MoveInstruction>;
+    };
+  };
 }

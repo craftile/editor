@@ -1,5 +1,8 @@
 import type { CraftileEditorPlugin } from '@craftile/editor';
-import type { Block } from '@craftile/types';
+import type { Block, UpdatesEvent } from '@craftile/types';
+
+// Import the HTML preview client CDN code
+import previewClientCode from '@craftile/preview-client-html/html.cdn.js?raw';
 
 export interface BlockRenderer {
   (props: { id: string; props: Record<string, any>; block: Block; editorAttributes: string; children: string }): string;
@@ -15,6 +18,7 @@ export default (options: StaticBlocksRendererOptions = {}): CraftileEditorPlugin
   return ({ editor }) => {
     const renderCache = new Map<string, string>();
 
+    editor.events.on('updates', handleUpdates);
     loadInitialPreview();
 
     function generateEditorAttributes(blockId: string): string {
@@ -101,9 +105,69 @@ ${customStyles}
 ${regionsHtml}
 
 ${customScripts}
+<script>
+${previewClientCode}
+window.HtmlPreviewClient.init();
+</script>
 </body>
 </html>
       `.trim();
+    }
+
+    function hasChanges(updates: UpdatesEvent): boolean {
+      return (
+        updates.changes.added.length > 0 ||
+        updates.changes.updated.length > 0 ||
+        updates.changes.removed.length > 0 ||
+        Object.keys(updates.changes.moved || {}).length > 0
+      );
+    }
+
+    function handleUpdates(updates: UpdatesEvent) {
+      if (!hasChanges(updates)) {
+        return;
+      }
+
+      // Compute HTML effects for changed blocks
+      const effects = computeEffects(updates);
+
+      // Send effects to preview client
+      editor.preview.sendMessage('updates.effects', { ...updates, effects });
+    }
+
+    function computeEffects(updates: UpdatesEvent) {
+      const dirtyBlocks = [...updates.changes.added, ...updates.changes.updated];
+
+      if (dirtyBlocks.length === 0) {
+        return { html: {} };
+      }
+
+      const blocks = editor.engine.getPage().blocks;
+      const effects: { html: Record<string, string> } = {
+        html: {},
+      };
+
+      updates.changes.removed.forEach((blockId: string) => {
+        clearBlockFromCache(blockId);
+      });
+
+      dirtyBlocks.forEach((blockId: string) => {
+        const block = blocks[blockId];
+
+        if (block) {
+          effects.html[blockId] = renderBlock(block, blocks);
+        }
+      });
+
+      return effects;
+    }
+
+    function clearBlockFromCache(blockId: string) {
+      for (const key of renderCache.keys()) {
+        if (key.startsWith(`${blockId}:`)) {
+          renderCache.delete(key);
+        }
+      }
     }
   };
 };
