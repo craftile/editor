@@ -16,6 +16,7 @@ import { PluginsManager } from './managers/plugins';
 import type { CraftileEditorPlugin } from './types/plugin';
 import { PreviewManager } from './managers/preview';
 import { watchEngineUpdates } from './watch-engine-updates';
+import { InspectorManager } from './managers/inspector';
 
 export type BlockLabelFunction = (block: Block, schema: BlockSchema | undefined) => string;
 export type BlockFilterFunction = (blockSchema: BlockSchema, context: InsertBlockContext) => boolean;
@@ -39,6 +40,7 @@ export class CraftileEditor {
   public readonly devices: DevicesManager;
   public readonly preview: PreviewManager;
   public readonly plugins: PluginsManager;
+  public readonly inspector: InspectorManager;
   public readonly blockLabelFunction?: BlockLabelFunction;
   public readonly blockFilterFunction?: BlockFilterFunction;
   public readonly previewUpdateDelay?: number;
@@ -54,6 +56,7 @@ export class CraftileEditor {
     this.preview = new PreviewManager();
     this.ui = new UIManager(this.events);
     this.plugins = new PluginsManager(this);
+    this.inspector = new InspectorManager(this.events, this.preview, this.ui);
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;

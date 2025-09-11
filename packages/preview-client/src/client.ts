@@ -1,14 +1,18 @@
 import type { WindowMessages } from '@craftile/types';
 import { createParentMessenger, WindowMessenger } from '@craftile/messenger';
 import { EventBus } from '@craftile/event-bus';
+import { Inspector } from './inspector';
 
 export class PreviewClient extends EventBus {
   private messenger: WindowMessenger<WindowMessages>;
+  // @ts-ignore
+  private inspector: Inspector;
 
   constructor() {
     super();
 
     this.messenger = createParentMessenger(window.origin);
+    this.inspector = new Inspector(this.messenger);
 
     this.initialize();
   }

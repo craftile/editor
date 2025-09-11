@@ -65,6 +65,7 @@ declare global {
   const useEventBus: typeof import('./composables/event-bus')['useEventBus']
   const useI18n: typeof import('./composables/i18n')['useI18n']
   const useId: typeof import('vue')['useId']
+  const useInspector: typeof import('./composables/inspector')['useInspector']
   const useLayersPanel: typeof import('./composables/layers-panel')['useLayersPanel']
   const useModel: typeof import('vue')['useModel']
   const usePreview: typeof import('./composables/preview')['usePreview']
@@ -151,6 +152,7 @@ declare module 'vue' {
     readonly useEventBus: UnwrapRef<typeof import('./composables/event-bus')['useEventBus']>
     readonly useI18n: UnwrapRef<typeof import('./composables/i18n')['useI18n']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
+    readonly useInspector: UnwrapRef<typeof import('./composables/inspector')['useInspector']>
     readonly useLayersPanel: UnwrapRef<typeof import('./composables/layers-panel')['useLayersPanel']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
     readonly usePreview: UnwrapRef<typeof import('./composables/preview')['usePreview']>

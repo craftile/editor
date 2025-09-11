@@ -4,6 +4,7 @@
     primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
     secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
     accent: 'bg-accent text-accent-foreground hover:bg-accent/90',
+    sutble: 'bg-accent-foreground text-accent shadow',
     destructive: 'bg-red-600 text-white hover:bg-red-700',
   } as const
 

@@ -10,7 +10,9 @@ export interface I18n {
     devicePreview: string;
     customDeviceSize: string;
     deviceWidthPx: string;
-    savedCustomDevices?: string;
+    savedCustomDevices: string;
+    enableInspector: string;
+    disableInspector: string;
   };
   block: {
     show: string;
@@ -42,6 +44,7 @@ export interface I18n {
     unknownFieldType: string;
   };
   common: {
+    block: string;
     custom: string;
     close: string;
     default: string;

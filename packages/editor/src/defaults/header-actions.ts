@@ -4,6 +4,7 @@ import BackButton from '../components/header/BackButton.vue';
 import RedoButton from '../components/header/RedoButton.vue';
 import Title from '../components/header/Title.vue';
 import UndoButton from '../components/header/UndoButton.vue';
+import ToggleInspector from '../components/header/ToggleInspector.vue';
 
 export function registerDefaultHeaderActions(ui: UIManager) {
   // Left side actions
@@ -27,6 +28,13 @@ export function registerDefaultHeaderActions(ui: UIManager) {
     slot: 'right',
     render: DeviceModeSwitcher,
     order: -40,
+  });
+
+  ui.registerHeaderAction({
+    id: 'inspection-mode',
+    slot: 'right',
+    render: ToggleInspector,
+    order: -30,
   });
 
   ui.registerHeaderAction({

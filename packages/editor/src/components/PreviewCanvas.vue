@@ -1,7 +1,10 @@
 <script setup lang="ts">
   const { currentDeviceData } = useDeviceMode();
-  const { currentPreviewUrl, registerFrame } = usePreview();
+  const { currentPreviewUrl, registerFrame, sendMessage } = usePreview();
+  const { updateIframeRect } = useInspector();
+  const { open: openBlocksPopover, getInsertionContext } = useBlocksPopover();
 
+  const canvasContainer = ref<HTMLElement>();
   const previewWrapper = ref<HTMLElement>();
 
   const currentDeviceWidth = computed(() => currentDeviceData.value?.width);
@@ -52,9 +55,50 @@
     };
   });
 
+  const updateIframePosition = () => {
+    if (canvasContainer.value) {
+      const rect = canvasContainer.value.getBoundingClientRect();
+      updateIframeRect(rect);
+    }
+  };
+
   const onFrameLoad = (event: Event) => {
     registerFrame(event.target as HTMLIFrameElement);
+    updateIframePosition();
   };
+
+  const handleOverlayButtonHover = (blockId: string) => {
+    sendMessage('craftile.inspector.overlay-button-enter', { blockId })
+  }
+
+  const handleOverlayButtonLeave = (blockId: string) => {
+    sendMessage('craftile.inspector.overlay-button-leave', { blockId })
+  }
+
+
+  const handleInsertBefore = (targetBlockId: string, event: MouseEvent) => {
+    const context = getInsertionContext(targetBlockId, 'before');
+    openBlocksPopover({
+      anchor: event.target as HTMLElement,
+      context
+    });
+  };
+
+  const handleInsertAfter = (targetBlockId: string, event: MouseEvent) => {
+    const context = getInsertionContext(targetBlockId, 'after');
+    openBlocksPopover({
+      anchor: event.target as HTMLElement,
+      context
+    });
+  };
+
+  onMounted(() => {
+    window.addEventListener('scroll', updateIframePosition);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', updateIframePosition);
+  });
 </script>
 
 <template>
@@ -73,6 +117,15 @@
         class="w-full h-full border-0 preview-iframe"
         @load="onFrameLoad"
       />
+
+      <HoveredBlockOverlay
+        @button-enter="handleOverlayButtonHover"
+        @button-leave="handleOverlayButtonLeave"
+        @insert-before="handleInsertBefore"
+        @insert-after="handleInsertAfter"
+      />
+
+      <SelectedBlockOverlay />
     </div>
   </div>
 </template>

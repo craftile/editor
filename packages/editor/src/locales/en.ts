@@ -10,6 +10,8 @@ export const en: I18n = {
     customDeviceSize: 'Custom Size',
     deviceWidthPx: 'Width (px)',
     savedCustomDevices: 'Saved custom devices',
+    enableInspector: 'Enable inspection mode',
+    disableInspector: 'Disable inspection mode',
   },
   block: {
     show: 'Show',
@@ -41,6 +43,7 @@ export const en: I18n = {
     unknownFieldType: 'Unknown field type',
   },
   common: {
+    block: 'Block',
     custom: 'Custom',
     close: 'Close',
     default: 'Default',

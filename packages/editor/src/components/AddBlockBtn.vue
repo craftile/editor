@@ -1,10 +1,7 @@
 <script setup lang="ts">
-  import type { InsertBlockContext } from '../composables/blocks-popover';
-
   const props = defineProps<{ blockId: string }>();
 
-  const { getBlockById, regions } = useCraftileEngine();
-  const { open: openBlocksPopover } = useBlocksPopover();
+  const { open: openBlocksPopover, getInsertionContext } = useBlocksPopover();
 
   const el = ref<HTMLElement | null>(null);
 
@@ -12,40 +9,9 @@
     if (el.value) {
       openBlocksPopover({
         anchor: el.value,
-        context: getInsertionContext()
+        context: getInsertionContext(props.blockId, 'after')
       });
     }
-  }
-
-  function getInsertionContext(): InsertBlockContext {
-    const currentBlock = getBlockById(props.blockId);
-
-
-    // If the block has a parent, insert as sibling after this block
-    if (currentBlock && currentBlock.parentId) {
-      const parent = getBlockById(currentBlock.parentId);
-      if (parent) {
-        const siblingIndex = parent.children.indexOf(props.blockId);
-        return {
-          parentId: currentBlock.parentId,
-          index: siblingIndex + 1
-        };
-      }
-    }
-
-    // Otherwise, find which region contains this block and insert after it
-    for (const region of regions.value) {
-      const blockIndex = region.blocks.indexOf(props.blockId);
-      if (blockIndex !== -1) {
-        return {
-          regionName: region.name,
-          index: blockIndex + 1
-        };
-      }
-    }
-
-    // Fallback: insert at end of main region
-    return { regionName: 'main' };
   }
 </script>
 

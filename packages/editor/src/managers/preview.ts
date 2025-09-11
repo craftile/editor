@@ -12,6 +12,7 @@ export class PreviewManager {
   public readonly state: PreviewState;
   private messenger!: WindowMessenger<WindowMessages>;
   private readyListenerInitialized = false;
+  private readyCallbacks: Function[] = [];
 
   constructor() {
     this.state = reactive({
@@ -51,6 +52,7 @@ export class PreviewManager {
     if (!this.readyListenerInitialized) {
       this.messenger.listen('craftile.preview.ready', () => {
         this.state.isIframeReady = true;
+        this.runReadyCallbacks();
         this.flushMessageQueue();
       });
 
@@ -58,7 +60,7 @@ export class PreviewManager {
     }
   }
 
-  sendMessage<T extends keyof WindowMessages>(type: T, payload: WindowMessages[T]) {
+  sendMessage<T extends keyof WindowMessages>(type: T, payload?: WindowMessages[T]) {
     if (this.state.isIframeReady) {
       this.messenger.send(type, payload);
     } else {
@@ -68,6 +70,15 @@ export class PreviewManager {
 
   onMessage<T extends keyof WindowMessages>(type: T, handler: (data: WindowMessages[T], event: MessageEvent) => void) {
     return this.messenger.listen(type, handler);
+  }
+
+  onReady(fn: () => void) {
+    this.readyCallbacks.push(fn);
+  }
+
+  runReadyCallbacks() {
+    this.readyCallbacks.forEach((cb) => cb.call(this));
+    this.readyCallbacks = [];
   }
 
   private flushMessageQueue(): void {

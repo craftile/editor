@@ -1,6 +1,6 @@
 export interface TypedMessage<T = any> {
   type: string;
-  payload: T;
+  payload: T | undefined;
 }
 
 export class WindowMessenger<Messages extends Record<string, any>> {
@@ -32,7 +32,7 @@ export class WindowMessenger<Messages extends Record<string, any>> {
     }
   }
 
-  send<K extends keyof Messages>(type: K, payload: Messages[K]): void {
+  send<K extends keyof Messages>(type: K, payload?: Messages[K]): void {
     const message: TypedMessage<Messages[K]> = { type: type as string, payload };
     this.targetWindow.postMessage(message, this.targetOrigin);
   }

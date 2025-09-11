@@ -75,4 +75,31 @@ export interface WindowMessages {
       moved?: Record<string, MoveInstruction>;
     };
   };
+
+  'craftile.inspector.enable': void;
+  'craftile.inspector.disable': void;
+  'craftile.preview.click': void;
+  'craftile.preview.block-leave': void;
+  'craftile.preview.block-hover': {
+    blockId: string;
+    blockRect: DOMRect;
+    parentRect?: DOMRect;
+    scrollTop: number;
+    scrollLeft: number;
+    parentFlexDirection: 'row' | 'column';
+  };
+  'craftile.preview.block-select': {
+    blockId: string;
+    blockRect: DOMRect;
+    scrollTop: number;
+    scrollLeft: number;
+  };
+  'craftile.preview.update-selected-block': {
+    blockId: string;
+    blockRect: DOMRect;
+    scrollTop: number;
+    scrollLeft: number;
+  };
+  'craftile.inspector.overlay-button-enter': { blockId: string };
+  'craftile.inspector.overlay-button-leave': { blockId: string };
 }
