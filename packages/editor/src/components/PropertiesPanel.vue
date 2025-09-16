@@ -91,7 +91,7 @@
               </Accordion.ItemIndicator>
             </Accordion.ItemTrigger>
             <Accordion.ItemContent class="overflow-hidden">
-              <div class="p-3">
+              <div class="p-3 space-y-4">
                 <PropertyField
                   v-for="field in group.fields"
                   :key="field.id"
@@ -106,9 +106,8 @@
       </template>
       <div
         v-else
-        class="p-4"
+        class="p-4 space-y-4"
       >
-        <h4 class="text-sm font-medium text-gray-900 mb-3">{{ t('configPanels.properties') }}</h4>
         <PropertyField
           v-for="field in propertyFields"
           :key="field.id"

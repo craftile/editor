@@ -5,9 +5,10 @@ export const blockSchemas: BlockSchema[] = [
     type: 'text',
     properties: [
       { id: 'content', type: 'text', label: 'Content', default: 'Enter text...' },
+      { id: 'booleanField', type: 'boolean', label: 'Boolean field', default: true, variant: 'switch' },
       {
         id: 'fontSize',
-        type: 'select',
+        type: 'radio',
         label: 'Font Size',
         default: 'md',
         options: [
@@ -17,6 +18,8 @@ export const blockSchemas: BlockSchema[] = [
           { value: 'xl', label: 'Extra Large' },
         ],
       },
+      { id: 'rangeField', type: 'range', label: 'Range field', default: 50 },
+
       { id: 'color', type: 'color', label: 'Color', default: '#000000' },
     ],
     accepts: [],
@@ -37,6 +40,7 @@ export const blockSchemas: BlockSchema[] = [
         type: 'select',
         label: 'Style',
         default: 'primary',
+        variant: 'segment',
         options: [
           { value: 'primary', label: 'Primary' },
           { value: 'secondary', label: 'Secondary' },

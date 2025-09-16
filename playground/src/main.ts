@@ -88,6 +88,8 @@ const editor = createCraftileEditor({
           content: 'Welcome to Craftile Editor!',
           fontSize: 'lg',
           color: '#1f2937',
+          booleanField: true,
+          rangeField: 50,
         },
         children: [],
       },
@@ -239,6 +241,7 @@ const editor = createCraftileEditor({
   },
 });
 
+editor.engine.on('block:property:set', console.log);
 editor.ui.registerSidebarPanel({
   title: 'Render Panel',
   render: () => {

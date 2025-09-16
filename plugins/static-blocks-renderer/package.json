@@ -25,6 +25,8 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
+      "source": "./src/index.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
@@ -36,7 +38,7 @@
     "dev": "tsc && vite build --watch",
     "build": "tsc && vite build"
   },
-  "dependencies": {
+  "devDependencies": {
     "@craftile/core": "workspace:*",
     "@craftile/editor": "workspace:*",
     "@craftile/preview-client-html": "workspace:*",

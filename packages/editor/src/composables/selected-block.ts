@@ -13,7 +13,7 @@ export function useSelectedBlock() {
   const hasSelection = computed(() => !!editor.ui.state.selectedBlockId);
   const selectedBlockId = computed(() => editor.ui.state.selectedBlockId);
   const selectedBlock = computed(() =>
-    editor.ui.state.selectedBlockId ? editor.engine.getBlockById(editor.ui.state.selectedBlockId) : null
+    editor.ui.state.selectedBlockId ? blocks.value[editor.ui.state.selectedBlockId] || null : null
   );
 
   const selectBlock = (blockId: string | null) => {

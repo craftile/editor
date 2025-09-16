@@ -33,7 +33,8 @@
     "@craftile/types": "workspace:*"
   },
   "devDependencies": {
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vue": "^3.0.0"
   },
   "peerDependencies": {
     "vue": "^3.0.0"

@@ -4,6 +4,10 @@ import dts from 'vite-plugin-dts';
 import Icons from 'unplugin-icons/vite';
 import Components from 'unplugin-vue-components/vite';
 import IconsResolver from 'unplugin-icons/resolver';
+import tailwindcss from '@tailwindcss/vite';
+
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
+import PrefixWrap from 'postcss-prefixwrap';
 
 export default defineConfig({
   plugins: [
@@ -15,6 +19,13 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
     vue(),
+    tailwindcss(),
+    cssInjectedByJsPlugin({
+      jsAssetsFilterFunction: function customJsAssetsfilterFunction(outputChunk) {
+        return outputChunk.fileName.startsWith('index');
+      },
+    }),
+
     Icons({
       compiler: 'vue3',
       autoInstall: true,
@@ -24,6 +35,13 @@ export default defineConfig({
       resolvers: [IconsResolver({ prefix: false, alias: { icon: 'heroicons' } })],
     }),
   ],
+
+  css: {
+    postcss: {
+      plugins: [PrefixWrap('.__craftile')],
+    },
+  },
+
   build: {
     lib: {
       entry: 'src/index.ts',
