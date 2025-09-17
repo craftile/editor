@@ -1,7 +1,9 @@
 <script setup lang="ts">
+  import type { CraftileEditor } from '../editor';
+
   interface Props {
-    renderFn: ((context?: any) => HTMLElement) | (() => HTMLElement);
-    context?: any;
+    renderFn: ((context?: { editor: CraftileEditor }) => HTMLElement) | (() => HTMLElement);
+    context?: { editor: CraftileEditor };
     class?: string;
   }
 

@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { Tabs } from '@ark-ui/vue';
   import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
+  import type { CraftileEditor } from '../editor';
+  import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 
   interface Props {
     isOverlay?: boolean;
@@ -10,6 +12,7 @@
     isOverlay: false
   });
 
+  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
   const { t } = useI18n();
   const { configurationPanels } = useUI();
   const { hasSelection } = useSelectedBlock();
@@ -48,11 +51,13 @@
             <component
               v-if="panel.icon && (isVueComponent(panel.icon) || isComponentString(panel.icon))"
               :is="panel.icon"
+              :editor="editor"
               class="w-3 h-3"
             />
             <RenderFunctionWrapper
               v-else-if="panel.icon && isHtmlRenderFunction(panel.icon)"
               :render-fn="panel.icon"
+              :context="{ editor! }"
               class="w-3 h-3"
             />
             {{ panel.title }}
@@ -67,11 +72,13 @@
             <component
               v-if="isVueComponent(panel.render) || isComponentString(panel.render)"
               :is="panel.render"
+              :editor="editor"
               :key="panel.id"
             />
             <RenderFunctionWrapper
               v-else-if="isHtmlRenderFunction(panel.render)"
               :render-fn="panel.render"
+              :context="{ editor! }"
               class="h-full"
             />
           </Tabs.Content>
@@ -85,11 +92,13 @@
         <component
           v-if="isVueComponent(activePanel.render) || isComponentString(activePanel.render)"
           :is="activePanel.render"
+          :editor="editor"
         />
 
         <RenderFunctionWrapper
           v-else-if="isHtmlRenderFunction(activePanel.render)"
           :render-fn="activePanel.render"
+          :context="{ editor! }"
         />
       </div>
     </template>

@@ -2,9 +2,13 @@
   import { useUI } from '../composables/ui';
   import { useI18n } from '../composables/i18n';
   import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
+  import type { CraftileEditor } from '../editor';
+  import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 
   const { t } = useI18n();
   const { activeSidebarPanel, setActiveSidebarPanel, sidebarPanels } = useUI();
+
+  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
 </script>
 
 <template>
@@ -39,11 +43,13 @@
         <component
           v-if="panel.icon && (isVueComponent(panel.icon) || isComponentString(panel.icon))"
           :is="panel.icon"
+          :editor="editor"
           class="w-5 h-5"
         />
         <RenderFunctionWrapper
           v-else-if="panel.icon && isHtmlRenderFunction(panel.icon)"
           :render-fn="panel.icon"
+          :context="{ editor! }"
           class="w-5 h-5"
         />
 

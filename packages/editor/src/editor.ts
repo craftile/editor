@@ -67,6 +67,27 @@ export class CraftileEditor {
     this.setup();
   }
 
+  /**
+   * Shortcut method to get the current selected block
+   */
+  getActiveBlock(): Block | undefined {
+    return this.ui.state.selectedBlockId ? this.engine.getBlockById(this.ui.state.selectedBlockId) : undefined;
+  }
+
+  getBlockProperty(blockId: string, propertyKey: string) {
+    const block = this.engine.getBlockById(blockId);
+
+    if (!block) {
+      return null;
+    }
+
+    return block.properties[propertyKey];
+  }
+
+  setBlockProperty(blockId: string, propertyKey: string, propertyValue: any): void {
+    return this.engine.setBlockProperty(blockId, propertyKey, propertyValue);
+  }
+
   private setup() {
     registerDefaultHeaderActions(this.ui);
     registerDefaultConfigurationPanels(this.ui);
