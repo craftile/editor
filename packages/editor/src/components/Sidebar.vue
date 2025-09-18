@@ -8,7 +8,7 @@
   const { t } = useI18n();
   const { activeSidebarPanel, setActiveSidebarPanel, sidebarPanels } = useUI();
 
-  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
+  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
 </script>
 
 <template>
@@ -30,7 +30,7 @@
 
       <button
         v-for="panel in sidebarPanels"
-        :key="panel.id"
+        :key="'panel-icon-' + panel.id"
         @click="setActiveSidebarPanel(panel.id!)"
         :class="[
           'aspect-square flex items-center justify-center rounded-md cursor-pointer transition-colors text-sm font-medium',
@@ -49,7 +49,6 @@
         <RenderFunctionWrapper
           v-else-if="panel.icon && isHtmlRenderFunction(panel.icon)"
           :render-fn="panel.icon"
-          :context="{ editor! }"
           class="w-5 h-5"
         />
 

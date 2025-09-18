@@ -1,4 +1,4 @@
-import { createCraftileEditor } from '@craftile/editor';
+import { createCraftileEditor, type UiRenderFunctionContext } from '@craftile/editor';
 import CommonPropertiesPlugin from '@craftile/plugin-common-properties';
 import StaticBlocksRenderer from '@craftile/plugin-static-blocks-renderer';
 import { blockSchemas } from './blockSchemas';
@@ -244,7 +244,7 @@ const editor = createCraftileEditor({
 editor.engine.on('block:property:set', console.log);
 editor.ui.registerSidebarPanel({
   title: 'Render Panel',
-  render: () => {
+  render: ({ editor }: UiRenderFunctionContext) => {
     const div = document.createElement('div');
     div.style.height = '100%';
     div.style.padding = '16px';
@@ -271,7 +271,8 @@ editor.ui.registerSidebarPanel({
     button.onmouseover = () => (button.style.backgroundColor = '#2563eb');
     button.onmouseout = () => (button.style.backgroundColor = '#3b82f6');
     button.onclick = () => {
-      alert('Render function button clicked!');
+      // alert('Render function button clicked!');
+      editor.ui.toast('Render function button clicked!');
     };
 
     div.appendChild(title);

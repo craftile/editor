@@ -1,12 +1,12 @@
 <script setup lang="ts">
+  import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
   import type { CraftileEditor } from '../editor';
 
   interface Props {
     renderFn: ((context?: { editor: CraftileEditor }) => HTMLElement) | (() => HTMLElement);
-    context?: { editor: CraftileEditor };
-    class?: string;
   }
 
+  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
   const props = defineProps<Props>();
 
   const containerRef = ref<HTMLElement>();
@@ -18,7 +18,7 @@
 
     containerRef.value.innerHTML = '';
 
-    const element = props.renderFn(props.context);
+    const element = props.renderFn({ editor });
 
     containerRef.value.appendChild(element);
   };
@@ -27,14 +27,11 @@
     renderContent();
   });
 
-  watch(() => props.context, () => {
-    renderContent();
-  }, { deep: true });
+  // watch(() => [editor.ui.state, editor.preview.state], () => {
+  //   renderContent();
+  // }, { deep: true });
 </script>
 
 <template>
-  <div
-    ref="containerRef"
-    :class="props.class"
-  />
+  <div ref="containerRef" />
 </template>

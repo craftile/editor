@@ -46,6 +46,12 @@
   }
 </script>
 
+<script lang="ts">
+  export default {
+    inheritAttrs: false
+  }
+</script>
+
 <template>
   <Popover.Root
     v-model:open="showDropdown"

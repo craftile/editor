@@ -13,6 +13,7 @@ export function useUI() {
   };
 
   return {
+    toaster: editor.ui.toaster,
     sidebarPanels: computed(() => editor.ui.state.sidebarPanels),
     activeSidebarPanel: computed(() => editor.ui.state.activeSidebarPanel),
     registerSidebarPanel: editor.ui.registerSidebarPanel.bind(editor.ui),

@@ -37,5 +37,6 @@
     </div>
 
     <BlocksPopover />
+    <Toasts />
   </div>
 </template>

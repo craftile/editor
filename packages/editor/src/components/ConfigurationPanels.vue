@@ -12,7 +12,7 @@
     isOverlay: false
   });
 
-  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
+  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
   const { t } = useI18n();
   const { configurationPanels } = useUI();
   const { hasSelection } = useSelectedBlock();
@@ -57,7 +57,6 @@
             <RenderFunctionWrapper
               v-else-if="panel.icon && isHtmlRenderFunction(panel.icon)"
               :render-fn="panel.icon"
-              :context="{ editor! }"
               class="w-3 h-3"
             />
             {{ panel.title }}
@@ -78,7 +77,6 @@
             <RenderFunctionWrapper
               v-else-if="isHtmlRenderFunction(panel.render)"
               :render-fn="panel.render"
-              :context="{ editor! }"
               class="h-full"
             />
           </Tabs.Content>
@@ -98,7 +96,6 @@
         <RenderFunctionWrapper
           v-else-if="isHtmlRenderFunction(activePanel.render)"
           :render-fn="activePanel.render"
-          :context="{ editor! }"
         />
       </div>
     </template>

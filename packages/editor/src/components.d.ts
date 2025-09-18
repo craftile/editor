@@ -60,6 +60,7 @@ declare module 'vue' {
     RenderFunctionWrapper: typeof import('./components/RenderFunctionWrapper.vue')['default']
     SelectedBlockOverlay: typeof import('./components/SelectedBlockOverlay.vue')['default']
     Sidebar: typeof import('./components/Sidebar.vue')['default']
+    Toasts: typeof import('./components/Toasts.vue')['default']
     UiButton: typeof import('./components/ui/Button.vue')['default']
   }
 }

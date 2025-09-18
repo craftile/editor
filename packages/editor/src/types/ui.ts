@@ -1,11 +1,18 @@
+import { CraftileEditor } from './../editor';
 import type { PropertyField } from '@craftile/types';
 import type { Component } from 'vue';
+
+export interface UiRenderFunctionContext {
+  editor: CraftileEditor;
+}
+
+export type UiRenderFunction = Component | string | ((context: UiRenderFunctionContext) => HTMLElement);
 
 export interface SidebarPanel {
   id?: string;
   title: string;
-  render: Component | string | (() => HTMLElement);
-  icon?: Component | string | (() => HTMLElement);
+  render: UiRenderFunction;
+  icon?: UiRenderFunction;
   order?: number;
 }
 
@@ -18,7 +25,7 @@ export interface HeaderActionButton {
 export interface HeaderAction {
   id?: string;
   slot: 'left' | 'center' | 'right';
-  render?: Component | string | (() => HTMLElement);
+  render?: UiRenderFunction;
   button?: HeaderActionButton;
   order?: number;
 }
@@ -26,8 +33,8 @@ export interface HeaderAction {
 export interface ConfigurationPanel {
   id: string;
   title: string;
-  icon?: Component | string | (() => HTMLElement);
-  render: Component | string | (() => HTMLElement);
+  icon?: UiRenderFunction;
+  render: UiRenderFunction;
   order?: number;
 }
 

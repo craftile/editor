@@ -8,7 +8,7 @@
     action: HeaderAction;
   }>();
 
-  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
+  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
 </script>
 
 <template>
@@ -28,7 +28,6 @@
     <RenderFunctionWrapper
       v-else-if="isHtmlRenderFunction(action.render)"
       :render-fn="action.render"
-      :context="{ editor! }"
     />
   </KeepAlive>
 </template>

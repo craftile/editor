@@ -1,3 +1,4 @@
+import { createToaster } from '@ark-ui/vue/toast';
 import type { EventBus } from '@craftile/event-bus';
 import type { ConfigurationPanel, HeaderAction, PropertyFieldConfig, SidebarPanel } from './../types/ui';
 
@@ -17,6 +18,7 @@ export interface UIState {
 export class UIManager {
   private events: EventBus;
   public readonly state: UIState;
+  public readonly toaster: ReturnType<typeof createToaster>;
 
   constructor(events: EventBus) {
     this.events = events;
@@ -32,6 +34,12 @@ export class UIManager {
         expandedBlocks: new Set<string>(),
       },
     });
+
+    this.toaster = createToaster({
+      placement: 'bottom',
+      overlap: true,
+      gap: 16,
+    });
   }
 
   private generateId(prefix: string): string {
@@ -46,6 +54,14 @@ export class UIManager {
   clearSelectedBlock(): void {
     this.state.selectedBlockId = null;
     this.events.emit('ui:block:clear-selection', { blockId: null });
+  }
+
+  toast(titleOrOptions: string | Parameters<typeof this.toaster.create>[0]) {
+    if (typeof titleOrOptions === 'string') {
+      this.toaster.create({ description: titleOrOptions, type: 'info' });
+    } else {
+      this.toaster.create(titleOrOptions);
+    }
   }
 
   registerSidebarPanel(config: SidebarPanel): void {
