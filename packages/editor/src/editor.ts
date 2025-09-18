@@ -10,6 +10,7 @@ import type { I18n, I18nConfig } from './types';
 import { createI18n } from './composables/i18n';
 import type { InsertBlockContext } from './composables/blocks-popover';
 import { registerDefaultHeaderActions } from './defaults/header-actions';
+import { registerDefaultKeyboardShortcuts } from './defaults/keyboard-shortcuts';
 import { DevicesManager, type DevicesManagerOptions } from './managers/devices';
 import { registerDefaultConfigurationPanels } from './defaults/configuration-panels';
 import { PluginsManager } from './managers/plugins';
@@ -90,6 +91,7 @@ export class CraftileEditor {
 
   private setup() {
     registerDefaultHeaderActions(this.ui);
+    registerDefaultKeyboardShortcuts(this.ui);
     registerDefaultConfigurationPanels(this.ui);
 
     this.vueApp = createApp({

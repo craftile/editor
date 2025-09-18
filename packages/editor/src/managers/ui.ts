@@ -1,15 +1,23 @@
 import { createToaster } from '@ark-ui/vue/toast';
 import type { EventBus } from '@craftile/event-bus';
-import type { ConfigurationPanel, HeaderAction, ModalConfig, PropertyFieldConfig, SidebarPanel } from './../types/ui';
+import type {
+  ConfigurationPanel,
+  HeaderAction,
+  KeyboardShortcut,
+  ModalConfig,
+  PropertyFieldConfig,
+  SidebarPanel,
+} from './../types/ui';
 
 export interface UIState {
   activeSidebarPanel: string;
-  sidebarPanels: SidebarPanel[];
-  headerActions: HeaderAction[];
-  configurationPanels: ConfigurationPanel[];
-  modals: ModalConfig[];
+  sidebarPanels: Map<string, SidebarPanel>;
+  headerActions: Map<string, HeaderAction>;
+  configurationPanels: Map<string, ConfigurationPanel>;
+  modals: Map<string, ModalConfig>;
   openModals: string[];
-  propertyFields: PropertyFieldConfig[];
+  keyboardShortcuts: Map<string, KeyboardShortcut>;
+  propertyFields: Map<string, PropertyFieldConfig>;
 
   selectedBlockId: string | null;
   layersPanel: {
@@ -26,12 +34,13 @@ export class UIManager {
     this.events = events;
     this.state = reactive({
       activeSidebarPanel: 'layers',
-      sidebarPanels: [],
-      headerActions: [],
-      configurationPanels: [],
-      modals: [],
+      sidebarPanels: new Map(),
+      headerActions: new Map(),
+      configurationPanels: new Map(),
+      modals: new Map(),
       openModals: [],
-      propertyFields: [],
+      keyboardShortcuts: new Map(),
+      propertyFields: new Map(),
 
       selectedBlockId: null,
       layersPanel: {
@@ -76,21 +85,11 @@ export class UIManager {
       icon: config.icon && typeof config.icon === 'object' ? markRaw(config.icon) : config.icon,
     };
 
-    const existingIndex = this.state.sidebarPanels.findIndex((panel) => panel.id === finalConfig.id);
-    if (existingIndex >= 0) {
-      this.state.sidebarPanels[existingIndex] = finalConfig;
-    } else {
-      this.state.sidebarPanels.push(finalConfig);
-    }
-
-    this.state.sidebarPanels.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    this.state.sidebarPanels.set(finalConfig.id, finalConfig);
   }
 
   removeSidebarPanel(panelId: string): void {
-    const index = this.state.sidebarPanels.findIndex((panel) => panel.id === panelId);
-    if (index >= 0) {
-      this.state.sidebarPanels.splice(index, 1);
-    }
+    this.state.sidebarPanels.delete(panelId);
   }
 
   registerHeaderAction(config: HeaderAction): void {
@@ -108,22 +107,11 @@ export class UIManager {
       render: typeof config.render === 'object' ? markRaw(config.render) : config.render,
     };
 
-    const existingIndex = this.state.headerActions.findIndex((action) => action.id === finalConfig.id);
-
-    if (existingIndex >= 0) {
-      this.state.headerActions[existingIndex] = finalConfig;
-    } else {
-      this.state.headerActions.push(finalConfig);
-    }
-
-    this.state.headerActions.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    this.state.headerActions.set(finalConfig.id, finalConfig);
   }
 
   removeHeaderAction(actionId: string): void {
-    const index = this.state.headerActions.findIndex((action) => action.id === actionId);
-    if (index >= 0) {
-      this.state.headerActions.splice(index, 1);
-    }
+    this.state.headerActions.delete(actionId);
   }
 
   registerConfigurationPanel(config: ConfigurationPanel): void {
@@ -134,21 +122,11 @@ export class UIManager {
       icon: config.icon && typeof config.icon === 'object' ? markRaw(config.icon) : config.icon,
     };
 
-    const existingIndex = this.state.configurationPanels.findIndex((panel) => panel.id === config.id);
-    if (existingIndex >= 0) {
-      this.state.configurationPanels[existingIndex] = finalConfig;
-    } else {
-      this.state.configurationPanels.push(finalConfig);
-    }
-
-    this.state.configurationPanels.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    this.state.configurationPanels.set(finalConfig.id, finalConfig);
   }
 
   removeConfigurationPanel(panelId: string): void {
-    const index = this.state.configurationPanels.findIndex((panel) => panel.id === panelId);
-    if (index >= 0) {
-      this.state.configurationPanels.splice(index, 1);
-    }
+    this.state.configurationPanels.delete(panelId);
   }
 
   registerPropertyField(config: PropertyFieldConfig): void {
@@ -157,12 +135,11 @@ export class UIManager {
       render: typeof config.render === 'object' ? markRaw(config.render) : config.render,
     };
 
-    const existingIndex = this.state.propertyFields.findIndex((field) => field.type === config.type);
-    if (existingIndex >= 0) {
-      this.state.propertyFields[existingIndex] = finalConfig;
-    } else {
-      this.state.propertyFields.push(finalConfig);
-    }
+    this.state.propertyFields.set(config.type, finalConfig);
+  }
+
+  removePropertyField(type: string): void {
+    this.state.propertyFields.delete(type);
   }
 
   registerModal(config: ModalConfig): void {
@@ -172,21 +149,11 @@ export class UIManager {
       render: typeof config.render === 'object' ? markRaw(config.render) : config.render,
     };
 
-    const existingIndex = this.state.modals.findIndex((modal) => modal.id === finalConfig.id);
-    if (existingIndex >= 0) {
-      this.state.modals[existingIndex] = finalConfig;
-    } else {
-      this.state.modals.push(finalConfig);
-    }
+    this.state.modals.set(finalConfig.id, finalConfig);
   }
 
   unregisterModal(id: string): void {
-    const index = this.state.modals.findIndex((modal) => modal.id === id);
-
-    if (index >= 0) {
-      this.state.modals.splice(index, 1);
-    }
-
+    this.state.modals.delete(id);
     this.closeModal(id);
   }
 
@@ -203,5 +170,13 @@ export class UIManager {
       this.state.openModals.splice(index, 1);
       this.events.emit('ui:modal:close', { modalId: id });
     }
+  }
+
+  registerKeyboardShortcut(config: KeyboardShortcut): void {
+    this.state.keyboardShortcuts.set(config.key, config);
+  }
+
+  removeKeyboardShortcut(key: string): void {
+    this.state.keyboardShortcuts.delete(key);
   }
 }

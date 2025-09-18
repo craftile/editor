@@ -18,7 +18,7 @@
 
 
   const fieldRenderer = computed(() => {
-    const config = propertyFieldConfigs.value.find(config => config.type === props.field.type);
+    const config = propertyFieldConfigs.value.get(props.field.type);
     return config?.render;
   })
 

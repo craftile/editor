@@ -9,7 +9,7 @@
 
   const modals = computed(() => {
     return openModals.value.reduce((acc: Record<string, any>, id: string) => {
-      const modal = registeredModals.value.find(modal => modal.id === id);
+      const modal = registeredModals.value.get(id);
       if (modal) {
         acc[id] = modal;
       }

@@ -14,17 +14,26 @@ export function useUI() {
 
   return {
     toaster: editor.ui.toaster,
-    sidebarPanels: computed(() => editor.ui.state.sidebarPanels),
+    sidebarPanels: computed(() =>
+      Array.from(editor.ui.state.sidebarPanels.values())
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    ),
     activeSidebarPanel: computed(() => editor.ui.state.activeSidebarPanel),
     registerSidebarPanel: editor.ui.registerSidebarPanel.bind(editor.ui),
     removeSidebarPanel: editor.ui.removeSidebarPanel.bind(editor.ui),
     setActiveSidebarPanel,
 
-    headerActions: computed(() => editor.ui.state.headerActions),
+    headerActions: computed(() =>
+      Array.from(editor.ui.state.headerActions.values())
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    ),
     registerHeaderAction: editor.ui.registerHeaderAction.bind(editor.ui),
     removeHeaderAction: editor.ui.removeHeaderAction.bind(editor.ui),
 
-    configurationPanels: computed(() => editor.ui.state.configurationPanels),
+    configurationPanels: computed(() =>
+      Array.from(editor.ui.state.configurationPanels.values())
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    ),
     registerConfigurationPanel: editor.ui.registerConfigurationPanel.bind(editor.ui),
     removeConfigurationPanel: editor.ui.removeConfigurationPanel.bind(editor.ui),
 
@@ -35,5 +44,10 @@ export function useUI() {
 
     propertyFields: computed(() => editor.ui.state.propertyFields),
     registerPropertyField: editor.ui.registerPropertyField.bind(editor.ui),
+    removePropertyField: editor.ui.removePropertyField.bind(editor.ui),
+
+    keyboardShortcuts: computed(() => editor.ui.state.keyboardShortcuts),
+    registerKeyboardShortcut: editor.ui.registerKeyboardShortcut.bind(editor.ui),
+    removeKeyboardShortcut: editor.ui.removeKeyboardShortcut.bind(editor.ui),
   };
 }

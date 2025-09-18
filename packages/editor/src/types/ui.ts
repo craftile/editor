@@ -45,6 +45,11 @@ export interface ModalConfig {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 }
 
+export interface KeyboardShortcut {
+  key: string;
+  handler: (context: UiRenderFunctionContext) => void;
+}
+
 export interface FieldRenderProps {
   field: PropertyField;
   value: unknown;
