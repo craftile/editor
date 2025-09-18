@@ -31,11 +31,18 @@ export interface HeaderAction {
 }
 
 export interface ConfigurationPanel {
-  id: string;
+  id?: string;
   title: string;
   icon?: UiRenderFunction;
   render: UiRenderFunction;
   order?: number;
+}
+
+export interface ModalConfig {
+  id?: string;
+  title?: string;
+  render: UiRenderFunction;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 }
 
 export interface FieldRenderProps {

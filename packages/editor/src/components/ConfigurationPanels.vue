@@ -45,7 +45,7 @@
           <Tabs.Trigger
             v-for="panel in configurationPanels"
             :key="panel.id"
-            :value="panel.id"
+            :value="panel.id!"
             class="flex items-center gap-0.5 px-1.5 py-2 text-xs font-medium transition-colors text-gray-500 data-selected:border-b-2 data-selected:border-accent data-selected:text-accent hover:text-gray-700"
           >
             <component
@@ -66,7 +66,7 @@
           <Tabs.Content
             v-for="panel in configurationPanels"
             :key="panel.id"
-            :value="panel.id"
+            :value="panel.id!"
           >
             <component
               v-if="isVueComponent(panel.render) || isComponentString(panel.render)"

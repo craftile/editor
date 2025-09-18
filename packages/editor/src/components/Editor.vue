@@ -38,5 +38,6 @@
 
     <BlocksPopover />
     <Toasts />
+    <Modals />
   </div>
 </template>

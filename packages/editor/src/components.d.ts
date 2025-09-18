@@ -51,6 +51,7 @@ declare module 'vue' {
     IconTrash16Solid: typeof import('~icons/heroicons/trash16-solid')['default']
     IconXMark: typeof import('~icons/heroicons/x-mark')['default']
     LayersPanel: typeof import('./components/LayersPanel.vue')['default']
+    Modals: typeof import('./components/Modals.vue')['default']
     Panels: typeof import('./components/Panels.vue')['default']
     PreviewCanvas: typeof import('./components/PreviewCanvas.vue')['default']
     PreviewToolbarButton: typeof import('./components/PreviewToolbarButton.vue')['default']

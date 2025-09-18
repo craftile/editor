@@ -28,6 +28,11 @@ export function useUI() {
     registerConfigurationPanel: editor.ui.registerConfigurationPanel.bind(editor.ui),
     removeConfigurationPanel: editor.ui.removeConfigurationPanel.bind(editor.ui),
 
+    modals: computed(() => editor.ui.state.modals),
+    openModals: computed(() => editor.ui.state.openModals),
+    openModal: editor.ui.openModal.bind(editor.ui),
+    closeModal: editor.ui.closeModal.bind(editor.ui),
+
     propertyFields: computed(() => editor.ui.state.propertyFields),
     registerPropertyField: editor.ui.registerPropertyField.bind(editor.ui),
   };
