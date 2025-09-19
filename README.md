@@ -30,25 +30,69 @@ npm install @craftile/editor
 import { createCraftileEditor } from '@craftile/editor';
 
 const editor = createCraftileEditor({
-  el: '#editor',
+  el: '#app',
   blockSchemas: [
     {
       type: 'text',
-      name: 'Text Block',
-      properties: {
-        content: { type: 'textarea', default: 'Hello World!' },
-        fontSize: { type: 'select', options: ['sm', 'md', 'lg'], default: 'md' },
-        color: { type: 'color', default: '#000000' },
+      properties: [
+        { id: 'content', type: 'text', label: 'Content', default: 'Enter text...' },
+        {
+          id: 'fontSize',
+          type: 'radio',
+          label: 'Font Size',
+          default: 'md',
+          options: [
+            { value: 'sm', label: 'Small' },
+            { value: 'md', label: 'Medium' },
+            { value: 'lg', label: 'Large' },
+            { value: 'xl', label: 'Extra Large' },
+          ],
+        },
+        { id: 'color', type: 'color', label: 'Color', default: '#000000' },
+      ],
+      accepts: [],
+      meta: {
+        name: 'Text',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>',
+        category: 'Content',
+        description: 'Display text content with customizable styling',
       },
     },
     {
       type: 'button',
-      name: 'Button',
-      properties: {
-        text: { type: 'text', default: 'Click me' },
-        url: { type: 'text', default: '#' },
-        style: { type: 'select', options: ['primary', 'secondary'], default: 'primary' },
-        size: { type: 'select', options: ['small', 'medium', 'large'], default: 'medium' },
+      properties: [
+        { id: 'text', type: 'text', label: 'Button Text', default: 'Click me' },
+        { id: 'url', type: 'text', label: 'URL', default: '#' },
+        {
+          id: 'style',
+          type: 'select',
+          label: 'Style',
+          default: 'primary',
+          variant: 'segment',
+          options: [
+            { value: 'primary', label: 'Primary' },
+            { value: 'secondary', label: 'Secondary' },
+            { value: 'outline', label: 'Outline' },
+          ],
+        },
+        {
+          id: 'size',
+          type: 'select',
+          label: 'Size',
+          default: 'medium',
+          options: [
+            { value: 'small', label: 'Small' },
+            { value: 'medium', label: 'Medium' },
+            { value: 'large', label: 'Large' },
+          ],
+        },
+      ],
+      accepts: [],
+      meta: {
+        name: 'Button',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3V8a3 3 0 00-3-3H8zM6 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V8z"/><path d="M8 11a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1z"/></svg>',
+        category: 'Interactive',
+        description: 'Clickable button with customizable text and styling',
       },
     },
   ],
@@ -63,17 +107,26 @@ import CommonPropertiesPlugin from '@craftile/plugin-common-properties';
 import StaticBlocksRenderer from '@craftile/plugin-static-blocks-renderer';
 
 const editor = createCraftileEditor({
-  el: '#editor',
+  el: '#app',
   blockSchemas: [
-    /* your block schemas */
+    /** your block schemas */
   ],
   plugins: [
     CommonPropertiesPlugin,
     StaticBlocksRenderer({
       blockRenderers: {
-        text: (block) => `<p style="color: ${block.properties.color}">${block.properties.content}</p>`,
-        button: (block) => `<button class="${block.properties.style}">${block.properties.text}</button>`,
+        text: ({ props, editorAttributes }) => {
+          return `<div class="block" ${editorAttributes} style="color: ${props.color}">
+            ${props.content || ''}
+          </div>`;
+        },
+        button: ({ props, editorAttributes }) => {
+          return `<button class="block ${props.style}" ${editorAttributes}>
+            ${props.text || 'Button'}
+          </button>`;
+        },
       },
+      scripts: ['https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'],
     }),
   ],
   initialPage: {
