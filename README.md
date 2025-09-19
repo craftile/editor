@@ -7,8 +7,6 @@
 [![NPM Version](https://img.shields.io/npm/v/@craftile/editor)](https://www.npmjs.com/package/@craftile/editor)
 [![License](https://img.shields.io/github/license/craftile/editor)](https://github.com/craftile/editor/blob/main/LICENSE)
 
-[Demo](#demo) • [Documentation](#documentation) • [Examples](#examples)
-
 </div>
 
 ## ✨ Features
