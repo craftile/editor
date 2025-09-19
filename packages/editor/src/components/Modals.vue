@@ -1,54 +1,46 @@
 <script setup lang="ts">
-  import { Dialog } from '@ark-ui/vue';
-  import { isVueComponent, isComponentString, isHtmlRenderFunction } from '../utils';
-  import type { CraftileEditor } from '../editor';
-  import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
+import { Dialog } from '@ark-ui/vue';
+import { isVueComponent, isComponentString, isHtmlRenderFunction } from '../utils';
+import type { CraftileEditor } from '../editor';
+import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 
-  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
-  const { openModals, modals: registeredModals, closeModal } = useUI();
+const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
+const { openModals, modals: registeredModals, closeModal } = useUI();
 
-  const modals = computed(() => {
-    return openModals.value.reduce((acc: Record<string, any>, id: string) => {
-      const modal = registeredModals.value.get(id);
-      if (modal) {
-        acc[id] = modal;
-      }
-      return acc;
-    }, {});
-  });
-
-  const getSizeClasses = (size?: string) => {
-    const sizeMap = {
-      xs: 'max-w-xs',
-      sm: 'max-w-sm',
-      md: 'max-w-md',
-      lg: 'max-w-lg',
-      xl: 'max-w-xl',
-      '2xl': 'max-w-2xl',
-      full: 'max-w-[calc(100vw-2rem)] w-full max-h-[calc(100vh-2rem)] h-full',
-    };
-    return sizeMap[size as keyof typeof sizeMap] || 'max-w-md';
-  };
-
-  const handleOpenChange = (details: { open: boolean }, modalId: string) => {
-    if (!details.open) {
-      closeModal(modalId);
+const modals = computed(() => {
+  return openModals.value.reduce((acc: Record<string, any>, id: string) => {
+    const modal = registeredModals.value.get(id);
+    if (modal) {
+      acc[id] = modal;
     }
+    return acc;
+  }, {});
+});
+
+const getSizeClasses = (size?: string) => {
+  const sizeMap = {
+    xs: 'max-w-xs',
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+    full: 'max-w-[calc(100vw-2rem)] w-full max-h-[calc(100vh-2rem)] h-full',
   };
+  return sizeMap[size as keyof typeof sizeMap] || 'max-w-md';
+};
+
+const handleOpenChange = (details: { open: boolean }, modalId: string) => {
+  if (!details.open) {
+    closeModal(modalId);
+  }
+};
 </script>
 
 <template>
   <!-- Render each open modal as separate Dialog instances -->
-  <template
-    v-for="modalId in openModals"
-    :key="modalId"
-  >
-    <Dialog.Root
-      v-if="modals[modalId]"
-      :open="true"
-      @open-change="handleOpenChange($event, modalId)"
-      :modal="true"
-    >
+  <template v-for="modalId in openModals" :key="modalId">
+    <Dialog.Root v-if="modals[modalId]" :open="true" @open-change="handleOpenChange($event, modalId)" :modal="true">
       <Dialog.Backdrop class="fixed inset-0 bg-black/50 z-50" />
       <Dialog.Positioner class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <Dialog.Content
@@ -64,10 +56,7 @@
           </Dialog.CloseTrigger>
 
           <!-- Optional modal title -->
-          <div
-            v-if="modals[modalId].title"
-            class="border-b px-6 py-4 flex items-center justify-between"
-          >
+          <div v-if="modals[modalId].title" class="border-b px-6 py-4 flex items-center justify-between">
             <Dialog.Title class="text-lg font-semibold text-gray-900">
               {{ modals[modalId].title }}
             </Dialog.Title>

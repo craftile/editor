@@ -1,135 +1,135 @@
 <script setup lang="ts">
-  import { Popover } from '@ark-ui/vue/popover';
-  import { usePopover } from '@ark-ui/vue/popover';
-  import { Field } from '@ark-ui/vue/field';
-  import { Tabs } from '@ark-ui/vue/tabs';
-  import { Accordion } from '@ark-ui/vue/accordion';
+import { Popover } from '@ark-ui/vue/popover';
+import { usePopover } from '@ark-ui/vue/popover';
+import { Field } from '@ark-ui/vue/field';
+import { Tabs } from '@ark-ui/vue/tabs';
+import { Accordion } from '@ark-ui/vue/accordion';
 
-  import type { InsertBlockContext } from '../composables/blocks-popover';
-  import type { BlockSchema } from '@craftile/types';
+import type { InsertBlockContext } from '../composables/blocks-popover';
+import type { BlockSchema } from '@craftile/types';
 
-  const { t } = useI18n();
-  const eventBus = useEventBus();
-  const { engine, insertBlock } = useCraftileEngine();
-  const { getAllowedBlockSchemas } = useBlocksPopover();
-  const { setExpanded } = useLayersPanel();
+const { t } = useI18n();
+const eventBus = useEventBus();
+const { engine, insertBlock } = useCraftileEngine();
+const { getAllowedBlockSchemas } = useBlocksPopover();
+const { setExpanded } = useLayersPanel();
 
-  const anchorEl = ref<HTMLElement | null>(null);
-  const insertionContext = ref<InsertBlockContext | null>(null);
-  const searchQuery = ref('');
+const anchorEl = ref<HTMLElement | null>(null);
+const insertionContext = ref<InsertBlockContext | null>(null);
+const searchQuery = ref('');
 
-  const popover = usePopover({
-    id: 'blocks-popover',
-    portalled: true,
-    closeOnInteractOutside: true,
-    positioning: {
-      placement: 'left-start',
-      strategy: 'fixed',
-      slide: true,
-      offset: { crossAxis: -32 },
-      flip: ['left', 'right'],
-      fitViewport: true,
-      getAnchorRect: () => anchorEl.value?.getBoundingClientRect() ?? null,
-    },
-  });
+const popover = usePopover({
+  id: 'blocks-popover',
+  portalled: true,
+  closeOnInteractOutside: true,
+  positioning: {
+    placement: 'left-start',
+    strategy: 'fixed',
+    slide: true,
+    offset: { crossAxis: -32 },
+    flip: ['left', 'right'],
+    fitViewport: true,
+    getAnchorRect: () => anchorEl.value?.getBoundingClientRect() ?? null,
+  },
+});
 
-  const getBlockSchemaDisplayName = (schema: BlockSchema) => {
-    return schema.meta?.name || schema.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
-  };
+const getBlockSchemaDisplayName = (schema: BlockSchema) => {
+  return schema.meta?.name || schema.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
+};
 
-  const filteredBlockSchemas = computed(() => {
-    if (!insertionContext.value) {
-      return [];
+const filteredBlockSchemas = computed(() => {
+  if (!insertionContext.value) {
+    return [];
+  }
+
+  return getAllowedBlockSchemas(insertionContext.value);
+});
+
+const blocksByCategory = computed(() => {
+  const categories: Record<string, BlockSchema[]> = {};
+
+  filteredBlockSchemas.value.forEach((schema) => {
+    const category = schema.meta?.category || 'Other';
+
+    if (!categories[category]) {
+      categories[category] = [];
     }
 
-    return getAllowedBlockSchemas(insertionContext.value);
+    categories[category].push(schema);
   });
 
-  const blocksByCategory = computed(() => {
-    const categories: Record<string, BlockSchema[]> = {};
+  return categories;
+});
 
-    filteredBlockSchemas.value.forEach(schema => {
-      const category = schema.meta?.category || 'Other';
+const filteredBlocksByCategory = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
 
-      if (!categories[category]) {
-        categories[category] = [];
-      }
+  if (!query) {
+    return blocksByCategory.value;
+  }
 
-      categories[category].push(schema);
+  const filtered: Record<string, BlockSchema[]> = {};
+
+  Object.entries(blocksByCategory.value).forEach(([category, blocks]) => {
+    const matchingBlocks = blocks.filter((block) => {
+      const name = (block.meta?.name || block.type).toLowerCase();
+      const description = (block.meta?.description || '').toLowerCase();
+      return name.includes(query) || description.includes(query);
     });
 
-    return categories;
-  });
-
-  const filteredBlocksByCategory = computed(() => {
-    const query = searchQuery.value.trim().toLowerCase();
-
-    if (!query) {
-      return blocksByCategory.value;
+    if (matchingBlocks.length > 0) {
+      filtered[category] = matchingBlocks;
     }
-
-    const filtered: Record<string, BlockSchema[]> = {};
-
-    Object.entries(blocksByCategory.value).forEach(([category, blocks]) => {
-      const matchingBlocks = blocks.filter(block => {
-        const name = (block.meta?.name || block.type).toLowerCase();
-        const description = (block.meta?.description || '').toLowerCase();
-        return name.includes(query) || description.includes(query);
-      });
-
-      if (matchingBlocks.length > 0) {
-        filtered[category] = matchingBlocks;
-      }
-    });
-
-    return filtered;
   });
 
-  const handleBlockSelect = (blockType: string) => {
-    if (!insertionContext.value) {
-      return;
-    }
+  return filtered;
+});
 
-    const blockId = insertBlock(blockType, {
-      parentId: insertionContext.value.parentId!,
-      regionName: insertionContext.value.regionName!,
-      index: insertionContext.value.index!,
-    });
+const handleBlockSelect = (blockType: string) => {
+  if (!insertionContext.value) {
+    return;
+  }
 
-    // Auto-expand blocks that can have children
-    const schema = engine.getBlocksManager().get(blockType);
-
-    if (schema?.accepts && schema.accepts.length > 0) {
-      setExpanded(blockId, true);
-    }
-
-    close();
-  };
-
-  // Event handlers
-  const handleOpen = ({ anchor, context }: { anchor: HTMLElement; context?: InsertBlockContext }) => {
-    anchorEl.value = anchor;
-    insertionContext.value = context || null;
-    popover.value.setOpen(true);
-    popover.value.reposition();
-  };
-
-  const close = () => {
-    popover.value.setOpen(false);
-    insertionContext.value = null;
-    anchorEl.value = null;
-  };
-
-  // Lifecycle
-  onMounted(() => {
-    eventBus.on('blocks-popover:open', handleOpen);
-    eventBus.on('blocks-popover:close', close);
+  const blockId = insertBlock(blockType, {
+    parentId: insertionContext.value.parentId!,
+    regionName: insertionContext.value.regionName!,
+    index: insertionContext.value.index!,
   });
 
-  onUnmounted(() => {
-    eventBus.off('blocks-popover:open', handleOpen);
-    eventBus.off('blocks-popover:close', close);
-  });
+  // Auto-expand blocks that can have children
+  const schema = engine.getBlocksManager().get(blockType);
+
+  if (schema?.accepts && schema.accepts.length > 0) {
+    setExpanded(blockId, true);
+  }
+
+  close();
+};
+
+// Event handlers
+const handleOpen = ({ anchor, context }: { anchor: HTMLElement; context?: InsertBlockContext }) => {
+  anchorEl.value = anchor;
+  insertionContext.value = context || null;
+  popover.value.setOpen(true);
+  popover.value.reposition();
+};
+
+const close = () => {
+  popover.value.setOpen(false);
+  insertionContext.value = null;
+  anchorEl.value = null;
+};
+
+// Lifecycle
+onMounted(() => {
+  eventBus.on('blocks-popover:open', handleOpen);
+  eventBus.on('blocks-popover:close', close);
+});
+
+onUnmounted(() => {
+  eventBus.off('blocks-popover:open', handleOpen);
+  eventBus.off('blocks-popover:close', close);
+});
 </script>
 
 <template>
@@ -144,52 +144,32 @@
           />
         </Field.Root>
 
-        <Tabs.Root
-          class="flex-1 mt-2 flex-col overflow-y-hidden"
-          :defaultValue="'blocks'"
-        >
+        <Tabs.Root class="flex-1 mt-2 flex-col overflow-y-hidden" :defaultValue="'blocks'">
           <Tabs.List class="flex flex-none bg-gray-100 p-0.5 rounded">
-            <Tabs.Trigger
-              value="blocks"
-              class="flex-1 py-1.5 rounded data-selected:bg-white data-selected:shadow "
-            >
+            <Tabs.Trigger value="blocks" class="flex-1 py-1.5 rounded data-selected:bg-white data-selected:shadow">
               {{ t('blocksPopover.tabBlocks') }}
             </Tabs.Trigger>
-            <Tabs.Trigger
-              value="saved"
-              class="flex-1 py-1.5 rounded data-selected:bg-white data-selected:shadow "
-            >
+            <Tabs.Trigger value="saved" class="flex-1 py-1.5 rounded data-selected:bg-white data-selected:shadow">
               {{ t('blocksPopover.tabSaved') }}
             </Tabs.Trigger>
           </Tabs.List>
 
-          <Tabs.Content
-            value="blocks"
-            class="flex-1 overflow-hidden"
-          >
-            <div
-              v-if="Object.keys(filteredBlocksByCategory).length === 0"
-              class="text-center text-gray-500 py-8"
-            >
+          <Tabs.Content value="blocks" class="flex-1 overflow-hidden">
+            <div v-if="Object.keys(filteredBlocksByCategory).length === 0" class="text-center text-gray-500 py-8">
               <p v-if="searchQuery.trim()">{{ t('blocksPopover.noBlocksFound') }} "{{ searchQuery }}"</p>
               <p v-else>{{ t('blocksPopover.noBlocksAvailable') }}</p>
             </div>
-            <div
-              v-else
-              class="h-full overflow-y-auto"
-            >
-              <Accordion.Root
-                class="w-full"
-                :defaultValue="Object.keys(filteredBlocksByCategory)"
-                multiple
-              >
+            <div v-else class="h-full overflow-y-auto">
+              <Accordion.Root class="w-full" :defaultValue="Object.keys(filteredBlocksByCategory)" multiple>
                 <Accordion.Item
                   v-for="(blocks, category) in filteredBlocksByCategory"
                   :key="category"
                   :value="category"
                   class="border-b border-gray-100 last:border-b-0"
                 >
-                  <Accordion.ItemTrigger class="flex w-full items-center justify-between p-3 text-left hover:bg-gray-50 transition-colors">
+                  <Accordion.ItemTrigger
+                    class="flex w-full items-center justify-between p-3 text-left hover:bg-gray-50 transition-colors"
+                  >
                     <span class="text-sm font-medium text-gray-700">{{ category }}</span>
                     <Accordion.ItemIndicator class="transition-transform duration-200">
                       <icon-chevron-down class="w-4 h-4 text-gray-500" />

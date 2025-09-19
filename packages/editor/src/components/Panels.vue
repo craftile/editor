@@ -1,19 +1,16 @@
 <script setup lang="ts">
-  import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
-  import type { CraftileEditor } from '../editor';
-  import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
+import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
+import type { CraftileEditor } from '../editor';
+import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
 
-  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
-  const { activeSidebarPanel, sidebarPanels } = useUI();
-  const activePanel = computed(() => sidebarPanels.value.find(panel => panel.id === activeSidebarPanel.value));
+const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
+const { activeSidebarPanel, sidebarPanels } = useUI();
+const activePanel = computed(() => sidebarPanels.value.find((panel) => panel.id === activeSidebarPanel.value));
 </script>
 
 <template>
   <aside class="h-full w-75 border-r flex-none relative">
-    <LayersPanel
-      v-if="activeSidebarPanel === 'layers'"
-      class="h-full"
-    />
+    <LayersPanel v-if="activeSidebarPanel === 'layers'" class="h-full" />
 
     <template v-else-if="activePanel">
       <KeepAlive>

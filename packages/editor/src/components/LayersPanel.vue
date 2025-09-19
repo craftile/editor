@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import CollapseAllIcon from './CollapseAllIcon.vue';
+import CollapseAllIcon from './CollapseAllIcon.vue';
 
-  const { t } = useI18n();
-  const { regions } = useCraftileEngine();
-  const { collapseRegion } = useLayersPanel();
+const { t } = useI18n();
+const { regions } = useCraftileEngine();
+const { collapseRegion } = useLayersPanel();
 
-  // TODO: check the issue where region item is incorrectly inferred as true | Region
-  const regionList = computed(() => Array.isArray(regions.value) ? regions.value : []);
+// TODO: check the issue where region item is incorrectly inferred as true | Region
+const regionList = computed(() => (Array.isArray(regions.value) ? regions.value : []));
 </script>
 
 <template>
@@ -15,11 +15,7 @@
       <h2>{{ t('layers.header') }}</h2>
     </div>
     <div class="flex-1 overflow-y-auto">
-      <div
-        v-for="region in regionList"
-        :key="region.name"
-        class="not-last:border-b px-4 mt-2"
-      >
+      <div v-for="region in regionList" :key="region.name" class="not-last:border-b px-4 mt-2">
         <div class="flex items-center justify-between">
           <h3 class="text-sm capitalize">{{ region.name }}</h3>
           <button
@@ -32,12 +28,7 @@
           </button>
         </div>
         <div class="my-2">
-          <BlockItem
-            v-for="blockId in region.blocks"
-            :key="blockId"
-            :block-id="blockId"
-            :level="0"
-          />
+          <BlockItem v-for="blockId in region.blocks" :key="blockId" :block-id="blockId" :level="0" />
         </div>
       </div>
     </div>

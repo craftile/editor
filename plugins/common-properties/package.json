@@ -17,9 +17,6 @@
     }
   ],
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,9 +28,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsc && vite build --watch",
     "build": "tsc && vite build"
@@ -58,5 +55,12 @@
   },
   "peerDependencies": {
     "vue": "^3.5.17"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftile/editor.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

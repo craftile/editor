@@ -2,7 +2,6 @@
   "name": "@craftile/preview-client-html",
   "version": "0.1.0",
   "description": "HTML preview client for static block rendering in Craftile",
-  "type": "module",
   "keywords": [
     "craftile",
     "preview",
@@ -17,9 +16,7 @@
       "email": "magan.eldo@gmail.com"
     }
   ],
-  "files": [
-    "dist"
-  ],
+  "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,9 +29,11 @@
     },
     "./html.cdn.js": "./dist/html.cdn.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc && vite build && vite build --mode cdn",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc && vite build && vite build --mode cdn"
   },
   "devDependencies": {
     "@craftile/preview-client": "workspace:*",
@@ -45,5 +44,12 @@
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftile/editor.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

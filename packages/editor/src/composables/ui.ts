@@ -15,8 +15,7 @@ export function useUI() {
   return {
     toaster: editor.ui.toaster,
     sidebarPanels: computed(() =>
-      Array.from(editor.ui.state.sidebarPanels.values())
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      Array.from(editor.ui.state.sidebarPanels.values()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     ),
     activeSidebarPanel: computed(() => editor.ui.state.activeSidebarPanel),
     registerSidebarPanel: editor.ui.registerSidebarPanel.bind(editor.ui),
@@ -24,15 +23,13 @@ export function useUI() {
     setActiveSidebarPanel,
 
     headerActions: computed(() =>
-      Array.from(editor.ui.state.headerActions.values())
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      Array.from(editor.ui.state.headerActions.values()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     ),
     registerHeaderAction: editor.ui.registerHeaderAction.bind(editor.ui),
     removeHeaderAction: editor.ui.removeHeaderAction.bind(editor.ui),
 
     configurationPanels: computed(() =>
-      Array.from(editor.ui.state.configurationPanels.values())
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      Array.from(editor.ui.state.configurationPanels.values()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     ),
     registerConfigurationPanel: editor.ui.registerConfigurationPanel.bind(editor.ui),
     removeConfigurationPanel: editor.ui.removeConfigurationPanel.bind(editor.ui),

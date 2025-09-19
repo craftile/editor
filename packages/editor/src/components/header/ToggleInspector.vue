@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  const { t } = useI18n();
-  const { isEnabled, toggle } = useInspector();
+const { t } = useI18n();
+const { isEnabled, toggle } = useInspector();
 </script>
 
 <template>

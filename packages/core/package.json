@@ -2,6 +2,20 @@
   "name": "@craftile/core",
   "version": "0.1.0",
   "description": "Framework-agnostic block editor engine for Craftile",
+  "keywords": [
+    "craftile",
+    "block-editor",
+    "cms",
+    "editor",
+    "blocks"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Eldo Magan",
+      "email": "magan.eldo@gmail.com"
+    }
+  ],
   "type": "module",
   "types": "src/index.ts",
   "exports": {
@@ -14,20 +28,6 @@
   "scripts": {
     "test": "vitest"
   },
-  "keywords": [
-    "craftile",
-    "block-editor",
-    "cms",
-    "editor",
-    "blocks"
-  ],
-  "authors": [
-    {
-      "name": "Eldo Magan",
-      "email": "magan.eldo@gmail.com"
-    }
-  ],
-  "license": "MIT",
   "dependencies": {
     "@craftile/event-bus": "workspace:*",
     "@craftile/types": "workspace:*"
@@ -38,5 +38,12 @@
   },
   "peerDependencies": {
     "vue": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftile/editor.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

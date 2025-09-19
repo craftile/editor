@@ -1,8 +1,5 @@
 <template>
-  <UiButton
-    square
-    title="Back"
-  >
+  <UiButton square title="Back">
     <icon-arrow-left />
   </UiButton>
 </template>

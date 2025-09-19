@@ -1,27 +1,24 @@
 <script setup lang="ts">
-  import { RadioGroup } from '@ark-ui/vue/radio-group';
-  import type { PropertyField } from '@craftile/types';
+import { RadioGroup } from '@ark-ui/vue/radio-group';
+import type { PropertyField } from '@craftile/types';
 
-  // interface PropertyFieldOption {
-  //   value: any;
-  //   label?: string;
-  // }
+// interface PropertyFieldOption {
+//   value: any;
+//   label?: string;
+// }
 
-  interface Props {
-    field: PropertyField;
-  }
+interface Props {
+  field: PropertyField;
+}
 
-  defineProps<Props>();
+defineProps<Props>();
 
-  const value = defineModel<any>();
+const value = defineModel<any>();
 </script>
 
 <template>
-  <RadioGroup.Root
-    v-model="value"
-    class="relative gap-1 flex flex-col"
-  >
-    <RadioGroup.Label class="text-sm font-medium text-gray-700 ">
+  <RadioGroup.Root v-model="value" class="relative gap-1 flex flex-col">
+    <RadioGroup.Label class="text-sm font-medium text-gray-700">
       {{ field.label }}
     </RadioGroup.Label>
 

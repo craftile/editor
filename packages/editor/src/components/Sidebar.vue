@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import { useUI } from '../composables/ui';
-  import { useI18n } from '../composables/i18n';
-  import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
-  import type { CraftileEditor } from '../editor';
-  import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
+import { useUI } from '../composables/ui';
+import { useI18n } from '../composables/i18n';
+import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
+import type { CraftileEditor } from '../editor';
+import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 
-  const { t } = useI18n();
-  const { activeSidebarPanel, setActiveSidebarPanel, sidebarPanels } = useUI();
+const { t } = useI18n();
+const { activeSidebarPanel, setActiveSidebarPanel, sidebarPanels } = useUI();
 
-  const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
+const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
 </script>
 
 <template>
@@ -19,9 +19,7 @@
         @click="setActiveSidebarPanel('layers')"
         :class="[
           'aspect-square flex items-center justify-center rounded-md cursor-pointer transition-colors',
-          activeSidebarPanel === 'layers'
-            ? 'bg-accent-foreground text-accent'
-            : 'hover:bg-gray-100 text-gray-700'
+          activeSidebarPanel === 'layers' ? 'bg-accent-foreground text-accent' : 'hover:bg-gray-100 text-gray-700',
         ]"
         :title="t('layers.title')"
       >
@@ -34,9 +32,7 @@
         @click="setActiveSidebarPanel(panel.id!)"
         :class="[
           'aspect-square flex items-center justify-center rounded-md cursor-pointer transition-colors text-sm font-medium',
-          activeSidebarPanel === panel.id
-            ? 'bg-accent-foreground text-accent'
-            : 'hover:bg-gray-100 text-gray-700'
+          activeSidebarPanel === panel.id ? 'bg-accent-foreground text-accent' : 'hover:bg-gray-100 text-gray-700',
         ]"
         :title="panel.title"
       >

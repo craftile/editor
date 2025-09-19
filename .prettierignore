@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+*.log
+.changeset
+.husky
+.github
+auto-imports.d.ts
+components.d.ts

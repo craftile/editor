@@ -1,147 +1,144 @@
 <script setup lang="ts">
-  import { Menu } from '@ark-ui/vue';
+import { Menu } from '@ark-ui/vue';
 
-  interface Props {
-    isOverlay?: boolean;
+interface Props {
+  isOverlay?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isOverlay: false,
+});
+
+const { t } = useI18n();
+const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
+const { selectedBlock, clearSelection } = useSelectedBlock();
+const { getBlockLabel } = useBlockLabel();
+
+const blockDisplayName = computed(() => {
+  if (!selectedBlock.value) {
+    return '';
+  }
+  return getBlockLabel(selectedBlock.value.id);
+});
+
+const blockPositionInfo = computed(() => {
+  if (!selectedBlock.value) {
+    return null;
   }
 
-  const props = withDefaults(defineProps<Props>(), {
-    isOverlay: false
-  });
+  const page = engine.getPage();
+  const block = selectedBlock.value;
 
-  const { t } = useI18n();
-  const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
-  const { selectedBlock, clearSelection } = useSelectedBlock();
-  const { getBlockLabel } = useBlockLabel();
-
-  const blockDisplayName = computed(() => {
-    if (!selectedBlock.value) {
-      return '';
+  for (const region of page.regions) {
+    const blockIndex = region.blocks.indexOf(block.id);
+    if (blockIndex !== -1) {
+      return {
+        parentType: 'region',
+        parentId: region.name,
+        currentIndex: blockIndex,
+        siblingCount: region.blocks.length,
+      };
     }
-    return getBlockLabel(selectedBlock.value.id);
-  });
+  }
 
-  const blockPositionInfo = computed(() => {
-    if (!selectedBlock.value) {
-      return null;
-    }
-
-    const page = engine.getPage();
-    const block = selectedBlock.value;
-
-    for (const region of page.regions) {
-      const blockIndex = region.blocks.indexOf(block.id);
+  if (block.parentId) {
+    const parentBlock = page.blocks[block.parentId];
+    if (parentBlock) {
+      const blockIndex = parentBlock.children.indexOf(block.id);
       if (blockIndex !== -1) {
         return {
-          parentType: 'region',
-          parentId: region.name,
+          parentType: 'block',
+          parentId: block.parentId,
           currentIndex: blockIndex,
-          siblingCount: region.blocks.length
+          siblingCount: parentBlock.children.length,
         };
       }
     }
-
-    if (block.parentId) {
-      const parentBlock = page.blocks[block.parentId];
-      if (parentBlock) {
-        const blockIndex = parentBlock.children.indexOf(block.id);
-        if (blockIndex !== -1) {
-          return {
-            parentType: 'block',
-            parentId: block.parentId,
-            currentIndex: blockIndex,
-            siblingCount: parentBlock.children.length,
-          };
-        }
-      }
-    }
-
-    return null;
-  });
-
-  const canMoveToPrevious = computed(() => {
-    if (!selectedBlock.value || selectedBlock.value?.static) {
-      return false;
-    }
-
-    return blockPositionInfo.value && blockPositionInfo.value.currentIndex > 0;
-  });
-
-  const canMoveToNext = computed(() => {
-    if (!selectedBlock.value || selectedBlock.value?.static) {
-      return false;
-    }
-
-    return blockPositionInfo.value && blockPositionInfo.value.currentIndex < blockPositionInfo.value.siblingCount - 1;
-  });
-
-  function handleDuplicateBlock() {
-    duplicateBlock(selectedBlock.value!.id);
   }
 
-  function handleMoveToNext() {
-    if (!selectedBlock.value || !blockPositionInfo.value) {
-      return;
-    }
+  return null;
+});
 
-    const newIndex = blockPositionInfo.value.currentIndex + 1;
-
-    if (blockPositionInfo.value.parentType === 'region') {
-      moveBlock(selectedBlock.value.id, {
-        targetRegionName: blockPositionInfo.value.parentId,
-        targetIndex: newIndex
-      });
-    } else if (blockPositionInfo.value.parentType === 'block') {
-      moveBlock(selectedBlock.value.id, {
-        targetParentId: blockPositionInfo.value.parentId,
-        targetIndex: newIndex
-      });
-    }
+const canMoveToPrevious = computed(() => {
+  if (!selectedBlock.value || selectedBlock.value?.static) {
+    return false;
   }
 
-  function handleMoveToPrevious() {
-    if (!selectedBlock.value || !blockPositionInfo.value) {
-      return;
-    }
+  return blockPositionInfo.value && blockPositionInfo.value.currentIndex > 0;
+});
 
-    const newIndex = blockPositionInfo.value.currentIndex - 1;
-
-    if (blockPositionInfo.value.parentType === 'region') {
-      moveBlock(selectedBlock.value.id, {
-        targetRegionName: blockPositionInfo.value.parentId,
-        targetIndex: newIndex
-      });
-    } else if (blockPositionInfo.value.parentType === 'block') {
-      moveBlock(selectedBlock.value.id, {
-        targetParentId: blockPositionInfo.value.parentId,
-        targetIndex: newIndex
-      });
-    }
+const canMoveToNext = computed(() => {
+  if (!selectedBlock.value || selectedBlock.value?.static) {
+    return false;
   }
 
-  function handleToggleBlock() {
-    if (!selectedBlock.value) {
-      return;
-    }
+  return blockPositionInfo.value && blockPositionInfo.value.currentIndex < blockPositionInfo.value.siblingCount - 1;
+});
 
-    toggleBlock(selectedBlock.value.id);
+function handleDuplicateBlock() {
+  duplicateBlock(selectedBlock.value!.id);
+}
+
+function handleMoveToNext() {
+  if (!selectedBlock.value || !blockPositionInfo.value) {
+    return;
   }
 
-  function handleRemoveBlock() {
-    if (!selectedBlock.value || selectedBlock.value.static) {
-      return;
-    }
+  const newIndex = blockPositionInfo.value.currentIndex + 1;
 
-    removeBlock(selectedBlock.value.id);
-    clearSelection();
+  if (blockPositionInfo.value.parentType === 'region') {
+    moveBlock(selectedBlock.value.id, {
+      targetRegionName: blockPositionInfo.value.parentId,
+      targetIndex: newIndex,
+    });
+  } else if (blockPositionInfo.value.parentType === 'block') {
+    moveBlock(selectedBlock.value.id, {
+      targetParentId: blockPositionInfo.value.parentId,
+      targetIndex: newIndex,
+    });
   }
+}
+
+function handleMoveToPrevious() {
+  if (!selectedBlock.value || !blockPositionInfo.value) {
+    return;
+  }
+
+  const newIndex = blockPositionInfo.value.currentIndex - 1;
+
+  if (blockPositionInfo.value.parentType === 'region') {
+    moveBlock(selectedBlock.value.id, {
+      targetRegionName: blockPositionInfo.value.parentId,
+      targetIndex: newIndex,
+    });
+  } else if (blockPositionInfo.value.parentType === 'block') {
+    moveBlock(selectedBlock.value.id, {
+      targetParentId: blockPositionInfo.value.parentId,
+      targetIndex: newIndex,
+    });
+  }
+}
+
+function handleToggleBlock() {
+  if (!selectedBlock.value) {
+    return;
+  }
+
+  toggleBlock(selectedBlock.value.id);
+}
+
+function handleRemoveBlock() {
+  if (!selectedBlock.value || selectedBlock.value.static) {
+    return;
+  }
+
+  removeBlock(selectedBlock.value.id);
+  clearSelection();
+}
 </script>
 
 <template>
-  <div
-    v-if="selectedBlock"
-    class="border-b border-gray-200 bg-white px-3 py-2 flex-none"
-  >
+  <div v-if="selectedBlock" class="border-b border-gray-200 bg-white px-3 py-2 flex-none">
     <div class="flex items-center gap-2">
       <!-- Back Button (not visible on 2xl screens) -->
       <button
@@ -164,7 +161,9 @@
           <icon-ellipsis-vertical class="w-4 h-4 text-gray-600" />
         </Menu.Trigger>
         <Menu.Positioner>
-          <Menu.Content class="bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[160px] z-50 focus:outline-none">
+          <Menu.Content
+            class="bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[160px] z-50 focus:outline-none"
+          >
             <!-- Duplicate -->
             <Menu.Item
               value="duplicate"
@@ -204,14 +203,8 @@
               @select="handleToggleBlock"
               class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
             >
-              <icon-eye
-                v-if="selectedBlock.disabled"
-                class="w-4 h-4"
-              />
-              <icon-eye-slash
-                v-else
-                class="w-4 h-4"
-              />
+              <icon-eye v-if="selectedBlock.disabled" class="w-4 h-4" />
+              <icon-eye-slash v-else class="w-4 h-4" />
               {{ selectedBlock.disabled ? t('block.enable') : t('block.disable') }}
             </Menu.Item>
 

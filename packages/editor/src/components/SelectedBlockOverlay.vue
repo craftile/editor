@@ -1,71 +1,74 @@
 <script setup lang="ts">
-  interface Props {
-    zoomScale?: number;
+interface Props {
+  zoomScale?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  zoomScale: 1,
+});
+
+const { t } = useI18n();
+const { engine, getBlockById } = useCraftileEngine();
+const { isEnabled, selectedBlockRect, iframeRect } = useInspector();
+const { selectedBlock, canMoveToPrevious, canMoveToNext, moveToPrevious, moveToNext, duplicate, toggle, remove } =
+  useSelectedBlock();
+
+const toolbarElement = ref<HTMLElement>();
+const toolbarDimensions = ref({ width: 200, height: 42 }); // Default fallback values
+
+const isVisible = computed(() => {
+  return isEnabled.value && selectedBlockRect.value && iframeRect.value && !selectedBlock.value?.disabled;
+});
+
+const isStaticBlock = computed(() => {
+  return selectedBlock.value?.static === true;
+});
+
+const selectedBlockInfo = computed(() => {
+  if (!selectedBlock.value) {
+    return { name: t('common.block'), icon: '' };
   }
 
-  const props = withDefaults(defineProps<Props>(), {
-    zoomScale: 1
-  });
+  const block = getBlockById(selectedBlock.value.id);
+  if (!block) {
+    return { name: t('common.block'), icon: '' };
+  }
 
-  const { t } = useI18n();
-  const { engine, getBlockById } = useCraftileEngine();
-  const { isEnabled, selectedBlockRect, iframeRect } = useInspector();
-  const { selectedBlock, canMoveToPrevious, canMoveToNext, moveToPrevious, moveToNext, duplicate, toggle, remove } = useSelectedBlock()
+  const schema = engine.getBlockSchema(block.type);
+  return {
+    name: schema?.meta?.name || block.type || t('common.block'),
+    icon: schema?.meta?.icon || '',
+  };
+});
 
-  const toolbarElement = ref<HTMLElement>();
-  const toolbarDimensions = ref({ width: 200, height: 42 }); // Default fallback values
+const blockName = computed(() => selectedBlockInfo.value.name);
+const blockIcon = computed(() => selectedBlockInfo.value.icon);
 
-  const isVisible = computed(() => {
-    return isEnabled.value && selectedBlockRect.value && iframeRect.value && !selectedBlock.value?.disabled;
-  });
+const shouldShowLabel = computed(() => {
+  if (!selectedBlockRect.value || !blockName.value) return false;
 
-  const isStaticBlock = computed(() => {
-    return selectedBlock.value?.static === true;
-  });
+  // Estimate label width (rough calculation)
+  // Icon (14px) + gap (6px) + text + padding (20px)
+  const estimatedLabelWidth = 14 + 6 + blockName.value.length * 7 + 20;
+  return selectedBlockRect.value.width >= estimatedLabelWidth;
+});
 
-  const selectedBlockInfo = computed(() => {
-    if (!selectedBlock.value) {
-      return { name: t('common.block'), icon: '' };
-    }
+const wrapperStyle = computed(() => {
+  if (!selectedBlockRect.value || !iframeRect.value) return {};
 
-    const block = getBlockById(selectedBlock.value.id);
-    if (!block) {
-      return { name: t('common.block'), icon: '' };
-    }
+  return {
+    position: 'absolute' as const,
+    left: `${selectedBlockRect.value.left}px`,
+    top: `${selectedBlockRect.value.top}px`,
+    width: `${selectedBlockRect.value.width}px`,
+    height: `${selectedBlockRect.value.height}px`,
+  };
+});
 
-    const schema = engine.getBlockSchema(block.type);
-    return {
-      name: schema?.meta?.name || block.type || t('common.block'),
-      icon: schema?.meta?.icon || ''
-    };
-  });
-
-  const blockName = computed(() => selectedBlockInfo.value.name);
-  const blockIcon = computed(() => selectedBlockInfo.value.icon);
-
-  const shouldShowLabel = computed(() => {
-    if (!selectedBlockRect.value || !blockName.value) return false;
-
-    // Estimate label width (rough calculation)
-    // Icon (14px) + gap (6px) + text + padding (20px)
-    const estimatedLabelWidth = 14 + 6 + (blockName.value.length * 7) + 20;
-    return selectedBlockRect.value.width >= estimatedLabelWidth;
-  });
-
-  const wrapperStyle = computed(() => {
-    if (!selectedBlockRect.value || !iframeRect.value) return {};
-
-    return {
-      position: 'absolute' as const,
-      left: `${selectedBlockRect.value.left}px`,
-      top: `${selectedBlockRect.value.top}px`,
-      width: `${selectedBlockRect.value.width}px`,
-      height: `${selectedBlockRect.value.height}px`,
-    };
-  });
-
-  // Watch for toolbar element changes to get actual dimensions
-  watch([toolbarElement, isVisible], async () => {
+// Watch for toolbar element changes to get actual dimensions
+watch(
+  [toolbarElement, isVisible],
+  async () => {
     if (toolbarElement.value && isVisible.value) {
       await nextTick();
       if (toolbarElement.value) {
@@ -73,50 +76,46 @@
         toolbarDimensions.value = { width: rect.width, height: rect.height };
       }
     }
-  }, { immediate: true });
+  },
+  { immediate: true }
+);
 
-  const toolbarStyle = computed(() => {
-    if (!selectedBlockRect.value || !iframeRect.value) return {};
+const toolbarStyle = computed(() => {
+  if (!selectedBlockRect.value || !iframeRect.value) return {};
 
-    const blockRect = selectedBlockRect.value;
-    const canvasRect = iframeRect.value;
-    const { width: toolbarWidth, height: toolbarHeight } = toolbarDimensions.value;
-    const margin = 2; // Small margin from block edges
-    const zoomScale = props.zoomScale; // Explicit dependency on zoom scale
+  const blockRect = selectedBlockRect.value;
+  const canvasRect = iframeRect.value;
+  const { width: toolbarWidth, height: toolbarHeight } = toolbarDimensions.value;
+  const margin = 2; // Small margin from block edges
+  const zoomScale = props.zoomScale; // Explicit dependency on zoom scale
 
-    // Scale the block dimensions to compare with unscaled toolbar
-    const scaledBlockWidth = blockRect.width * zoomScale;
+  // Scale the block dimensions to compare with unscaled toolbar
+  const scaledBlockWidth = blockRect.width * zoomScale;
 
-    const shouldPositionBelow = blockRect.top - canvasRect.top < toolbarHeight + margin;
+  const shouldPositionBelow = blockRect.top - canvasRect.top < toolbarHeight + margin;
 
-    const top = shouldPositionBelow
-      ? blockRect.height + margin
-      : -((toolbarHeight + margin) / zoomScale);
+  const top = shouldPositionBelow ? blockRect.height + margin : -((toolbarHeight + margin) / zoomScale);
 
-    // Determine if toolbar should be positioned from left or right
-    // If toolbar fits within the scaled block width, position left, otherwise right
-    const shouldPositionLeft = scaledBlockWidth <= toolbarWidth;
+  // Determine if toolbar should be positioned from left or right
+  // If toolbar fits within the scaled block width, position left, otherwise right
+  const shouldPositionLeft = scaledBlockWidth <= toolbarWidth;
 
-    const style: any = {
-      position: 'absolute' as const,
-      top: `${top}px`,
-    };
+  const style: any = {
+    position: 'absolute' as const,
+    top: `${top}px`,
+  };
 
-    if (shouldPositionLeft) {
-      style.left = '0px';
-    } else {
-      style.right = '0px';
-    }
+  if (shouldPositionLeft) {
+    style.left = '0px';
+  } else {
+    style.right = '0px';
+  }
 
-    return style;
-  });
+  return style;
+});
 </script>
 <template>
-  <div
-    v-if="isVisible"
-    class="absolute inset-0 w-full h-full pointer-events-none z-10"
-    :style="wrapperStyle"
-  >
+  <div v-if="isVisible" class="absolute inset-0 w-full h-full pointer-events-none z-10" :style="wrapperStyle">
     <!-- Selected block label -->
     <div
       v-if="shouldShowLabel"
@@ -159,29 +158,17 @@
       </PreviewToolbarButton>
 
       <!-- Duplicate Button -->
-      <PreviewToolbarButton
-        :title="t('block.duplicate')"
-        @click="duplicate"
-      >
+      <PreviewToolbarButton :title="t('block.duplicate')" @click="duplicate">
         <icon-document-duplicate-16-solid />
       </PreviewToolbarButton>
 
       <!-- Disable Button -->
-      <PreviewToolbarButton
-        v-if="!isStaticBlock"
-        :title="t('block.disable')"
-        @click="toggle"
-      >
+      <PreviewToolbarButton v-if="!isStaticBlock" :title="t('block.disable')" @click="toggle">
         <icon-eye-slash-16-solid />
       </PreviewToolbarButton>
 
       <!-- Remove Button -->
-      <PreviewToolbarButton
-        v-if="!isStaticBlock"
-        variant="danger"
-        :title="t('block.remove')"
-        @click="remove"
-      >
+      <PreviewToolbarButton v-if="!isStaticBlock" variant="danger" :title="t('block.remove')" @click="remove">
         <icon-trash-16-solid />
       </PreviewToolbarButton>
     </div>

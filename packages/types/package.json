@@ -2,12 +2,6 @@
   "name": "@craftile/types",
   "version": "0.1.0",
   "description": "Shared TypeScript type definitions for Craftile Editor",
-  "type": "module",
-  "main": "src/index.ts",
-  "exports": "./src/index.ts",
-  "files": [
-    "src"
-  ],
   "keywords": [
     "craftile",
     "types",
@@ -15,14 +9,24 @@
     "editor",
     "shared"
   ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "license": "MIT",
   "authors": [
     {
       "name": "Eldo Magan",
       "email": "magan.eldo@gmail.com"
     }
-  ]
+  ],
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftile/editor.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

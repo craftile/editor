@@ -17,9 +17,6 @@
     }
   ],
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -31,9 +28,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsc && vite build --watch",
     "build": "tsc && vite build"
@@ -60,5 +57,12 @@
     "vite": "^7.0.0",
     "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-dts": "^4.5.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftile/editor.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

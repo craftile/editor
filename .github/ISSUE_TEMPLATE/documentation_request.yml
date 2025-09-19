@@ -1,0 +1,50 @@
+name: "Documentation Request"
+description: "Request for documentation to be added/altered"
+labels: ["needs triage", "documentation"]
+body:
+  - type: "markdown"
+    attributes:
+      value: |
+        Thanks for filing a documentation request!
+
+        If you have an idea for a new documentation topic, noticed that
+        something is not properly documented, or feel that something is
+        incorrect with the current documentation, you're in the right place!
+  - type: "input"
+    id: "subject"
+    attributes:
+      label: "Subject"
+      description: "What is the subject (API, component, concept, plugin) of this request?"
+      placeholder: "Block Schemas, Plugin Development"
+    validations:
+      required: true
+  - type: "textarea"
+    id: "description"
+    attributes:
+      label: "Description"
+      description: "What about the subject's documentation should be added or changed?"
+      placeholder: "Add a comprehensive guide on creating custom block schemas with examples"
+    validations:
+      required: true
+  - type: "dropdown"
+    id: "type"
+    attributes:
+      label: "Type of Documentation"
+      description: "What type of documentation improvement is this?"
+      options:
+        - "New guide/tutorial"
+        - "API documentation"
+        - "Example/code snippet"
+        - "Fix existing content"
+        - "Clarification needed"
+    validations:
+      required: true
+  - type: "textarea"
+    id: "additional-context"
+    attributes:
+      label: "Additional Context"
+      description: |
+        Any additional context that would help us understand what you're looking for:
+        - Your experience level with Craftile Editor
+        - What you were trying to accomplish
+        - Links to related documentation

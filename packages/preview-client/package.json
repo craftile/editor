@@ -2,29 +2,6 @@
   "name": "@craftile/preview-client",
   "version": "0.1.0",
   "description": "Browser client for Craftile editor preview iframe functionality",
-  "type": "module",
-  "files": [
-    "dist"
-  ],
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "source": "./src/index.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "dev": "vite build --watch",
-    "build": "rm -rf dist && tsc && vite build",
-    "preview": "vite preview"
-  },
   "keywords": [
     "craftile",
     "editor",
@@ -39,6 +16,26 @@
       "email": "magan.eldo@gmail.com"
     }
   ],
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "rm -rf dist && tsc && vite build",
+    "preview": "vite preview"
+  },
   "devDependencies": {
     "@craftile/event-bus": "workspace:*",
     "@craftile/messenger": "workspace:*",
@@ -46,5 +43,12 @@
     "typescript": "^5.8.4",
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/craftile/editor.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

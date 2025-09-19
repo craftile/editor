@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import type { PropertyField } from '@craftile/types';
-  import { Field } from '@ark-ui/vue/field';
+import type { PropertyField } from '@craftile/types';
+import { Field } from '@ark-ui/vue/field';
 
-  interface Props {
-    field: PropertyField;
-  }
+interface Props {
+  field: PropertyField;
+}
 
-  defineProps<Props>();
+defineProps<Props>();
 
-  const value = defineModel<string>();
+const value = defineModel<string>();
 </script>
 
 <template>

@@ -1,30 +1,29 @@
 <script setup lang="ts">
-  import type { PropertyField } from '@craftile/types';
-  import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
+import type { PropertyField } from '@craftile/types';
+import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
 
-  interface Props {
-    field: PropertyField;
-    modelValue: any;
-  }
+interface Props {
+  field: PropertyField;
+  modelValue: any;
+}
 
-  const props = defineProps<Props>();
+const props = defineProps<Props>();
 
-  const emit = defineEmits<{
-    'update:modelValue': [value: any];
-  }>();
+const emit = defineEmits<{
+  'update:modelValue': [value: any];
+}>();
 
-  const { t } = useI18n();
-  const { propertyFields: propertyFieldConfigs } = useUI();
+const { t } = useI18n();
+const { propertyFields: propertyFieldConfigs } = useUI();
 
+const fieldRenderer = computed(() => {
+  const config = propertyFieldConfigs.value.get(props.field.type);
+  return config?.render;
+});
 
-  const fieldRenderer = computed(() => {
-    const config = propertyFieldConfigs.value.get(props.field.type);
-    return config?.render;
-  })
-
-  const handleInput = (value: any) => {
-    emit('update:modelValue', value);
-  };
+const handleInput = (value: any) => {
+  emit('update:modelValue', value);
+};
 </script>
 <template>
   <div>
@@ -46,10 +45,7 @@
       :on-change="handleInput"
     />
 
-    <div
-      v-else
-      class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md"
-    >
+    <div v-else class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
       <p class="text-sm text-red-600">
         {{ t('configPanels.unknownFieldType') }} <code class="font-mono">{{ field.type }}</code>
       </p>
