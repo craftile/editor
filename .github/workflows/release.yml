@@ -8,6 +8,7 @@ on:
       - '.changeset/**'
       - 'packages/**'
       - 'plugins/**'
+      - '.github/workflows/release.yml'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -45,7 +46,7 @@ jobs:
           version: pnpm changeset:version
           commit: "chore: version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Send Discord notification
