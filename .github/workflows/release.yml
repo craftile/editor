@@ -53,7 +53,7 @@ jobs:
         if: steps.changesets.outputs.published == 'true'
         uses: Ilshidur/action-discord@master
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
           args: |
             🎉 **New Craftile Editor Release Published!**
