@@ -18,9 +18,11 @@ export class PreviewClient extends EventBus {
   }
 
   private initialize() {
-    document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => {
       this.messenger.send('craftile.preview.ready', {});
-      this.sendPageData();
+      setTimeout(() => {
+        this.sendPageData();
+      }, 0);
     });
 
     this.messenger.registerFallbackHandler((data: any) => {
