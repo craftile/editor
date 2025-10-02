@@ -1,5 +1,23 @@
 # @craftile/editor
 
+## 0.1.3
+
+### Patch Changes
+
+- [`2fa84ab`](https://github.com/craftile/editor/commit/2fa84ab1f63ae9f6492969e02577566d428b17a5) Thanks [@eldomagan](https://github.com/eldomagan)! - Add loading state support for header action buttons with toggleLoading API
+
+- [`e19e955`](https://github.com/craftile/editor/commit/e19e955fd0db37cee3e71796e69919486eb231a8) Thanks [@eldomagan](https://github.com/eldomagan)! - Hide tabs in blocks popover when there are no saved blocks and ensure tab content is scrollable
+
+- [`a091023`](https://github.com/craftile/editor/commit/a091023eb43efca95db039618e819456be4dfb56) Thanks [@eldomagan](https://github.com/eldomagan)! - Show button to insert blocks when a region is empty
+
+- [`3ac078f`](https://github.com/craftile/editor/commit/3ac078f0e875f634c3ef78edd38c3ce78b0c45b3) Thanks [@eldomagan](https://github.com/eldomagan)! - Add drag-and-drop sorting for region-level blocks
+
+- Updated dependencies []:
+  - @craftile/core@0.1.3
+  - @craftile/event-bus@0.1.3
+  - @craftile/messenger@0.1.3
+  - @craftile/types@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
