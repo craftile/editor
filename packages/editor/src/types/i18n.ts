@@ -29,6 +29,7 @@ export interface I18n {
     header: string;
     collapseAll: string;
     addBlockToBlock: string;
+    addBlockToRegion: string;
   };
   blocksPopover: {
     searchPlaceholder: string;

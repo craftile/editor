@@ -28,6 +28,7 @@ export const en: I18n = {
     header: 'Page content',
     collapseAll: 'Collapse all blocks',
     addBlockToBlock: 'Add block',
+    addBlockToRegion: 'Add block',
   },
   blocksPopover: {
     searchPlaceholder: 'Search blocks...',

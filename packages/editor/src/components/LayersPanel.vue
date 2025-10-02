@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
 import CollapseAllIcon from './CollapseAllIcon.vue';
+import type { InsertBlockContext } from '../composables/blocks-popover';
 
 const { t } = useI18n();
 const { regions, moveBlock } = useCraftileEngine();
 const { collapseRegion } = useLayersPanel();
+const { open: openBlocksPopover } = useBlocksPopover();
 
 // TODO: check the issue where region item is incorrectly inferred as true | Region
 const regionList = computed(() => (Array.isArray(regions.value) ? regions.value : []));
@@ -34,6 +36,20 @@ function onRegionBlockMove(event: any) {
   if (event.related && event.related.classList.contains('is-static')) {
     return false;
   }
+}
+
+function addBlockToRegion(event: Event, regionName: string) {
+  const button = event.target as HTMLElement;
+
+  const context: InsertBlockContext = {
+    regionName,
+    index: 0,
+  };
+
+  openBlocksPopover({
+    anchor: button,
+    context,
+  });
 }
 </script>
 
@@ -68,6 +84,17 @@ function onRegionBlockMove(event: any) {
           >
             <BlockItem v-for="blockId in region.blocks" :key="blockId" :block-id="blockId" :level="0" />
           </VueDraggable>
+
+          <!-- Show add block button when region is empty -->
+          <div v-if="region.blocks.length === 0" class="flex items-center justify-center py-2">
+            <button
+              @click="addBlockToRegion($event, region.name)"
+              class="flex w-full items-center gap-2 px-2 py-1 text-sm text-accent/90 hover:text-accent hover:bg-accent-foreground rounded-lg transition-colors cursor-pointer"
+            >
+              <icon-plus class="w-4 h-4" />
+              {{ t('layers.addBlockToRegion') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
