@@ -4,16 +4,33 @@ import type { CraftileEditor } from '../editor';
 import type { HeaderAction } from '../types/ui';
 import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
 
-defineProps<{
+const props = defineProps<{
   action: HeaderAction;
 }>();
 
 const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
+
+const loading = ref(false);
+
+const toggleLoading = () => {
+  loading.value = !loading.value;
+};
+
+const handleButtonClick = (event: MouseEvent) => {
+  if (props.action.button) {
+    props.action.button.onClick(event, { toggleLoading, editor });
+  }
+};
 </script>
 
 <template>
   <KeepAlive>
-    <UiButton v-if="action.button" :variant="action.button.variant || 'default'" @click="action.button.onClick">
+    <UiButton
+      v-if="action.button"
+      :variant="action.button.variant || 'default'"
+      :loading="loading"
+      @click="handleButtonClick"
+    >
       {{ action.button.text }}
     </UiButton>
     <component

@@ -13,6 +13,12 @@
   --color-gray-900: var(--color-gray-900, oklch(37% 0.013 285.805));
   --color-gray-950: var(--color-gray-050, oklch(37% 0.013 285.805));
 
+  --color-primary: var(--color-primary, oklch(14.7% 0.004 49.25));
+  --color-primary-foreground: var(--color-primary-foreground, oklch(98.5% 0 0));
+
+  --color-secondary: var(--color-secondary, oklch(92% 0.004 286.32));
+  --color-secondary-foreground: var(--color-secondary-foreground, oklch(37% 0.013 285.805));
+
   --color-accent: var(--color-accent, oklch(54.6% 0.245 262.881));
   --color-accent-foreground: var(--color-accent-foreground, oklch(93.2% 0.032 255.585));
 }

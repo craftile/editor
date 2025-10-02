@@ -8,15 +8,15 @@ const rightActions = computed(() => headerActions.value.filter((action) => actio
 
 <template>
   <header class="h-14 flex items-center justify-between relative z-50 px-4 border-b bg-white">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <HeaderActionRenderer v-for="action in leftActions" :key="action.id" :action="action" />
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <HeaderActionRenderer v-for="action in centerActions" :key="action.id" :action="action" />
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <HeaderActionRenderer v-for="action in rightActions" :key="action.id" :action="action" />
     </div>
   </header>

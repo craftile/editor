@@ -51,9 +51,10 @@ export default defineConfig({
     lib: {
       entry: {
         index: 'src/index.ts',
+        ui: 'src/ui.ts',
       },
       name: 'CraftileEditor',
-      formats: ['es', 'umd'],
+      formats: ['es'],
     },
     rollupOptions: {
       external: ['vue'],

@@ -16,10 +16,16 @@ export interface SidebarPanel {
   order?: number;
 }
 
+export interface HeaderActionButtonClickContext {
+  toggleLoading: () => void;
+  editor: CraftileEditor;
+}
+
 export interface HeaderActionButton {
   text: string;
   variant?: 'default' | 'primary' | 'destructive' | 'secondary' | 'accent';
-  onClick: () => void;
+  onClick: (event: MouseEvent, context: HeaderActionButtonClickContext) => void;
+  loading?: boolean;
 }
 
 export interface HeaderAction {

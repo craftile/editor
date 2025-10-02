@@ -10,6 +10,6 @@ const { isEnabled, toggle } = useInspector();
     square
     :title="isEnabled ? t('header.disableInspector') : t('header.enableInspector')"
   >
-    <icon-cursor-arrow-rays class="w-4 h-4" />
+    <InspectIcon class="w-4 h-4" />
   </UiButton>
 </template>

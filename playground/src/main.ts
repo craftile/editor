@@ -291,3 +291,29 @@ editor.ui.registerSidebarPanel({
 
   order: 20,
 });
+
+// Example of header action button with loading state
+editor.ui.registerHeaderAction({
+  id: 'save-button-demo',
+  slot: 'right',
+  button: {
+    text: 'Save',
+    variant: 'primary',
+    onClick: async (_event, { editor, toggleLoading }) => {
+      toggleLoading(); // Show loading spinner
+      try {
+        // Simulate async operation (e.g., saving to server)
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const page = editor.engine.getPage();
+        console.log('Page saved:', page);
+        editor.ui.toast({ description: 'Page saved successfully!', type: 'success' });
+      } catch (error) {
+        editor.ui.toast({ description: 'Failed to save page', type: 'error' });
+      } finally {
+        toggleLoading(); // Hide loading spinner
+      }
+    },
+  },
+  order: 100,
+});
