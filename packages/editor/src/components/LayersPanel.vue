@@ -1,12 +1,40 @@
 <script setup lang="ts">
+import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
 import CollapseAllIcon from './CollapseAllIcon.vue';
 
 const { t } = useI18n();
-const { regions } = useCraftileEngine();
+const { regions, moveBlock } = useCraftileEngine();
 const { collapseRegion } = useLayersPanel();
 
 // TODO: check the issue where region item is incorrectly inferred as true | Region
 const regionList = computed(() => (Array.isArray(regions.value) ? regions.value : []));
+
+function onRegionBlockDragEnd(event: SortableEvent, regionName: string) {
+  const { oldIndex, newIndex } = event;
+
+  if (typeof newIndex === 'undefined' || oldIndex === newIndex) {
+    return;
+  }
+
+  const region = regionList.value.find((r) => r.name === regionName);
+  if (!region) {
+    return;
+  }
+
+  const movedBlockId = region.blocks[oldIndex as number];
+
+  if (!movedBlockId) {
+    return;
+  }
+
+  moveBlock(movedBlockId, { targetRegionName: regionName, targetIndex: newIndex });
+}
+
+function onRegionBlockMove(event: any) {
+  if (event.related && event.related.classList.contains('is-static')) {
+    return false;
+  }
+}
 </script>
 
 <template>
@@ -28,7 +56,18 @@ const regionList = computed(() => (Array.isArray(regions.value) ? regions.value 
           </button>
         </div>
         <div class="my-2">
-          <BlockItem v-for="blockId in region.blocks" :key="blockId" :block-id="blockId" :level="0" />
+          <VueDraggable
+            :model-value="region.blocks"
+            :animation="200"
+            ghost-class="ghost-block"
+            chosen-class="chosen-block"
+            drag-class="drag-block"
+            filter=".is-static"
+            @end="(event) => onRegionBlockDragEnd(event, region.name)"
+            @move="onRegionBlockMove"
+          >
+            <BlockItem v-for="blockId in region.blocks" :key="blockId" :block-id="blockId" :level="0" />
+          </VueDraggable>
         </div>
       </div>
     </div>
