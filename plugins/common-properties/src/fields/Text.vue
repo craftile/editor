@@ -14,12 +14,12 @@ const value = defineModel<string>();
 <template>
   <Field.Root>
     <Field.Label class="block text-sm font-medium text-gray-700 mb-1">
-      {{ field.label || field.id }}
+      {{ field.label }}
     </Field.Label>
 
     <Field.Input
       v-model="value"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+      class="w-full h-9 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
       :placeholder="field.placeholder"
     />
   </Field.Root>

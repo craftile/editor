@@ -7,6 +7,7 @@ import Radio from './fields/Radio.vue';
 import './style.css';
 import Range from './fields/Range.vue';
 import Color from './fields/Color.vue';
+import Number from './fields/Number.vue';
 
 const CommonPropertiesPlugin: CraftileEditorPlugin = ({ editor }) => {
   const fields = {
@@ -17,6 +18,7 @@ const CommonPropertiesPlugin: CraftileEditorPlugin = ({ editor }) => {
     radio: Radio,
     range: Range,
     color: Color,
+    number: Number,
   };
 
   for (const [type, render] of Object.entries(fields)) {
