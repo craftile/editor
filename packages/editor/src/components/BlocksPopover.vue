@@ -3,7 +3,6 @@ import { Popover } from '@ark-ui/vue/popover';
 import { usePopover } from '@ark-ui/vue/popover';
 import { Field } from '@ark-ui/vue/field';
 import { Tabs } from '@ark-ui/vue/tabs';
-import { Accordion } from '@ark-ui/vue/accordion';
 
 import type { InsertBlockContext } from '../composables/blocks-popover';
 import type { BlockSchema } from '@craftile/types';
@@ -17,6 +16,10 @@ const { setExpanded } = useLayersPanel();
 const anchorEl = ref<HTMLElement | null>(null);
 const insertionContext = ref<InsertBlockContext | null>(null);
 const searchQuery = ref('');
+
+// TODO: Implement saved blocks functionality
+const savedBlocks = ref<BlockSchema[]>([]);
+const hasSavedBlocks = computed(() => savedBlocks.value.length > 0);
 
 const popover = usePopover({
   id: 'blocks-popover',
@@ -32,10 +35,6 @@ const popover = usePopover({
     getAnchorRect: () => anchorEl.value?.getBoundingClientRect() ?? null,
   },
 });
-
-const getBlockSchemaDisplayName = (schema: BlockSchema) => {
-  return schema.meta?.name || schema.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
-};
 
 const filteredBlockSchemas = computed(() => {
   if (!insertionContext.value) {
@@ -135,8 +134,8 @@ onUnmounted(() => {
 <template>
   <Popover.RootProvider :value="popover">
     <Popover.Positioner class="!z-[1100]">
-      <Popover.Content class="bg-white shadow rounded-md p-2 w-md h-[480px] border flex flex-col">
-        <Field.Root class="flex-none">
+      <Popover.Content class="bg-white shadow rounded-md w-md h-[480px] border flex flex-col">
+        <Field.Root class="flex-none p-2">
           <Field.Input
             v-model="searchQuery"
             class="rounded border w-full text-sm h-8 px-3 focus-visible:ring-2 focus-visible:border-transparent focus-visible:ring-accent focus-visible:outline-none"
@@ -144,8 +143,8 @@ onUnmounted(() => {
           />
         </Field.Root>
 
-        <Tabs.Root class="flex-1 mt-2 flex-col overflow-y-hidden" :defaultValue="'blocks'">
-          <Tabs.List class="flex flex-none bg-gray-100 p-0.5 rounded">
+        <Tabs.Root v-if="hasSavedBlocks" class="flex-1 flex flex-col overflow-hidden mt-2" :defaultValue="'blocks'">
+          <Tabs.List class="flex flex-none bg-gray-100 p-[2px] rounded mx-2">
             <Tabs.Trigger value="blocks" class="flex-1 py-1.5 rounded data-selected:bg-white data-selected:shadow">
               {{ t('blocksPopover.tabBlocks') }}
             </Tabs.Trigger>
@@ -154,54 +153,23 @@ onUnmounted(() => {
             </Tabs.Trigger>
           </Tabs.List>
 
-          <Tabs.Content value="blocks" class="flex-1 overflow-hidden">
-            <div v-if="Object.keys(filteredBlocksByCategory).length === 0" class="text-center text-gray-500 py-8">
-              <p v-if="searchQuery.trim()">{{ t('blocksPopover.noBlocksFound') }} "{{ searchQuery }}"</p>
-              <p v-else>{{ t('blocksPopover.noBlocksAvailable') }}</p>
-            </div>
-            <div v-else class="h-full overflow-y-auto">
-              <Accordion.Root class="w-full" :defaultValue="Object.keys(filteredBlocksByCategory)" multiple>
-                <Accordion.Item
-                  v-for="(blocks, category) in filteredBlocksByCategory"
-                  :key="category"
-                  :value="category"
-                  class="border-b border-gray-100 last:border-b-0"
-                >
-                  <Accordion.ItemTrigger
-                    class="flex w-full items-center justify-between p-3 text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <span class="text-sm font-medium text-gray-700">{{ category }}</span>
-                    <Accordion.ItemIndicator class="transition-transform duration-200">
-                      <icon-chevron-down class="w-4 h-4 text-gray-500" />
-                    </Accordion.ItemIndicator>
-                  </Accordion.ItemTrigger>
-                  <Accordion.ItemContent class="overflow-hidden">
-                    <div class="pb-2">
-                      <div class="grid grid-cols-2 gap-2 px-3">
-                        <button
-                          v-for="block in blocks"
-                          :key="block.type"
-                          @click="handleBlockSelect(block.type)"
-                          class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors text-left"
-                        >
-                          <div
-                            class="flex-none w-6 h-6 flex items-center justify-center text-gray-600"
-                            v-html="block.meta?.icon || ''"
-                          ></div>
-                          <div class="flex-1 min-w-0">
-                            <div class="font-medium text-sm text-gray-900 truncate">
-                              {{ getBlockSchemaDisplayName(block) }}
-                            </div>
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                  </Accordion.ItemContent>
-                </Accordion.Item>
-              </Accordion.Root>
-            </div>
+          <Tabs.Content value="blocks" class="flex-1 overflow-hidden mt-2">
+            <BlocksList
+              :blocks-by-category="filteredBlocksByCategory"
+              :search-query="searchQuery"
+              @block-select="handleBlockSelect"
+            />
           </Tabs.Content>
         </Tabs.Root>
+
+        <!-- Show blocks directly when no saved blocks -->
+        <div v-else class="flex-1 mt-2 overflow-hidden">
+          <BlocksList
+            :blocks-by-category="filteredBlocksByCategory"
+            :search-query="searchQuery"
+            @block-select="handleBlockSelect"
+          />
+        </div>
       </Popover.Content>
     </Popover.Positioner>
   </Popover.RootProvider>
