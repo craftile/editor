@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.1.6
+
+### Patch Changes
+
+- [`8b97773`](https://github.com/craftile/editor/commit/8b9777382fe1ebe46b31927d014e71c564730905) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix custom sidebar panel switching issue
+
+- Updated dependencies []:
+  - @craftile/core@0.1.6
+  - @craftile/event-bus@0.1.6
+  - @craftile/messenger@0.1.6
+  - @craftile/types@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes
