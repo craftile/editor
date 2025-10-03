@@ -37,6 +37,8 @@ export interface I18n {
     tabSaved: string;
     noBlocksAvailable: string;
     noBlocksFound: string;
+    hoverToSeeDetails: string;
+    noPreviewAvailable: string;
   };
   configPanels: {
     properties: string;

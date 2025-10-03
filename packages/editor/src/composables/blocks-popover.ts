@@ -15,6 +15,7 @@ export interface BlockSchemaOption {
   icon?: string;
   category?: string;
   description?: string;
+  previewImageUrl?: string;
 }
 
 export function useBlocksPopover() {
@@ -82,6 +83,7 @@ export function useBlocksPopover() {
             icon: preset.icon || schema.meta?.icon,
             category: preset.category || schema.meta?.category || 'Other',
             description: preset.description || schema.meta?.description,
+            previewImageUrl: preset.previewImageUrl || schema.meta?.previewImageUrl,
           });
         });
       } else {
@@ -93,6 +95,7 @@ export function useBlocksPopover() {
           icon: schema.meta?.icon,
           category: schema.meta?.category || 'Other',
           description: schema.meta?.description,
+          previewImageUrl: schema.meta?.previewImageUrl,
         });
       }
     }

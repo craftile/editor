@@ -36,6 +36,8 @@ export const en: I18n = {
     tabSaved: 'Saved',
     noBlocksAvailable: 'No blocks available',
     noBlocksFound: 'No blocks found',
+    hoverToSeeDetails: 'Hover over a block to see details',
+    noPreviewAvailable: 'No preview available',
   },
   configPanels: {
     properties: 'Properties',

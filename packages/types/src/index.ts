@@ -37,6 +37,7 @@ export interface BlockPreset {
   icon?: string;
   category?: string;
   description?: string;
+  previewImageUrl?: string;
 }
 
 export interface BlockSchema {

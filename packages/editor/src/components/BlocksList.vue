@@ -78,37 +78,36 @@ const clearHover = () => {
       </Accordion.Root>
     </div>
 
-    <div class="flex-1 p-4 bg-gray-50">
+    <div class="flex-1 p-2 bg-gray-50">
       <div v-if="hoveredOption" class="h-full flex flex-col">
-        <div class="flex items-start gap-3 mb-4">
+        <div class="flex items-start gap-2 mb-2">
           <div
             class="flex-none w-12 h-12 flex items-center justify-center text-gray-600 text-2xl bg-white rounded border"
             v-html="hoveredOption.icon || ''"
           ></div>
           <div class="flex-1">
-            <h3 class="font-semibold text-gray-900 mb-1">{{ hoveredOption.name }}</h3>
-            <div
-              v-if="hoveredOption.presetIndex !== undefined"
-              class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded mb-2"
-            >
-              <span>Preset</span>
-            </div>
-            <p v-if="hoveredOption.description" class="text-sm text-gray-600">
+            <h3 class="font-semibold text-base text-gray-900">{{ hoveredOption.name }}</h3>
+            <p v-if="hoveredOption.description" class="text-xs text-gray-600">
               {{ hoveredOption.description }}
             </p>
-            <p v-else class="text-sm text-gray-500 italic">No description available</p>
           </div>
         </div>
 
-        <div class="flex-1 bg-white rounded border p-4 flex items-center justify-center">
-          <div class="text-center text-gray-400 text-sm">
-            <div class="mb-2">Preview placeholder</div>
+        <div class="flex-1 bg-white rounded overflow-hidden flex items-center justify-center">
+          <img
+            v-if="hoveredOption.previewImageUrl"
+            :src="hoveredOption.previewImageUrl"
+            :alt="`Preview of ${hoveredOption.name}`"
+            class="w-full h-full object-contain"
+          />
+          <div v-else class="text-center text-gray-400 text-sm p-4">
+            <div class="mb-2">{{ t('blocksPopover.noPreviewAvailable') }}</div>
             <div class="text-xs">{{ hoveredOption.blockType }}</div>
           </div>
         </div>
       </div>
       <div v-else class="h-full flex items-center justify-center text-gray-400 text-sm">
-        Hover over a block to see details
+        {{ t('blocksPopover.hoverToSeeDetails') }}
       </div>
     </div>
   </div>

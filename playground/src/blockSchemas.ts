@@ -28,6 +28,7 @@ export const blockSchemas: BlockSchema[] = [
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>',
       category: 'Content',
       description: 'Display text content with customizable styling',
+      previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Text+Block',
     },
   },
   {
@@ -65,6 +66,7 @@ export const blockSchemas: BlockSchema[] = [
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3V8a3 3 0 00-3-3H8zM6 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V8z"/><path d="M8 11a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1z"/></svg>',
       category: 'Interactive',
       description: 'Clickable button with customizable text and styling',
+      previewImageUrl: 'https://placehold.co/400x240/3b82f6/ffffff?text=Button',
     },
   },
   {
@@ -81,6 +83,7 @@ export const blockSchemas: BlockSchema[] = [
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm16 2v8l-4-4-6 6-2-2-4 4V6h16z"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>',
       category: 'Media',
       description: 'Display images with configurable dimensions',
+      previewImageUrl: 'https://placehold.co/400x240/10b981/ffffff?text=Image',
     },
   },
   {
@@ -106,6 +109,7 @@ export const blockSchemas: BlockSchema[] = [
       {
         name: 'Empty Container',
         description: 'A blank container ready for your content',
+        previewImageUrl: 'https://placehold.co/400x240/f3f4f6/9ca3af?text=Empty+Container',
       },
       {
         name: 'Heading and Text',
@@ -114,6 +118,7 @@ export const blockSchemas: BlockSchema[] = [
           gap: 12,
           padding: 20,
         },
+        previewImageUrl: 'https://placehold.co/400x240/f3f4f6/1f2937?text=Heading+%26+Text',
         children: [
           {
             type: 'text',
@@ -141,6 +146,7 @@ export const blockSchemas: BlockSchema[] = [
           gap: 24,
           padding: 20,
         },
+        previewImageUrl: 'https://placehold.co/400x240/f3f4f6/3b82f6?text=Two+Columns',
         children: [
           {
             type: 'container',
@@ -216,6 +222,7 @@ export const blockSchemas: BlockSchema[] = [
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h16v12H4V6z"/><rect x="6" y="8" width="12" height="2" rx="1"/><rect x="6" y="12" width="8" height="2" rx="1"/></svg>',
       category: 'Layout',
       description: 'Card container that only accepts text and button blocks',
+      previewImageUrl: 'https://placehold.co/400x240/f3f4f6/6b7280?text=Card',
     },
   },
   // Custom field demos
