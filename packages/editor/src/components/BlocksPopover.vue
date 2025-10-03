@@ -130,7 +130,6 @@ const close = () => {
   anchorEl.value = null;
 };
 
-// Lifecycle
 onMounted(() => {
   eventBus.on('blocks-popover:open', handleOpen);
   eventBus.on('blocks-popover:close', close);
@@ -145,7 +144,7 @@ onUnmounted(() => {
 <template>
   <Popover.RootProvider :value="popover">
     <Popover.Positioner class="!z-[1100]">
-      <Popover.Content class="bg-white shadow rounded-md w-md h-[480px] border flex flex-col">
+      <Popover.Content class="bg-white shadow rounded-md w-[640px] h-[520px] border flex flex-col">
         <Field.Root class="flex-none p-2">
           <Field.Input
             v-model="searchQuery"
@@ -154,7 +153,7 @@ onUnmounted(() => {
           />
         </Field.Root>
 
-        <Tabs.Root v-if="hasSavedBlocks" class="flex-1 flex flex-col overflow-hidden mt-2" :defaultValue="'blocks'">
+        <Tabs.Root v-if="hasSavedBlocks" class="flex-1 flex flex-col overflow-hidden" :defaultValue="'blocks'">
           <Tabs.List class="flex flex-none bg-gray-100 p-[2px] rounded mx-2">
             <Tabs.Trigger value="blocks" class="flex-1 py-1.5 rounded data-selected:bg-white data-selected:shadow">
               {{ t('blocksPopover.tabBlocks') }}
@@ -174,7 +173,7 @@ onUnmounted(() => {
         </Tabs.Root>
 
         <!-- Show blocks directly when no saved blocks -->
-        <div v-else class="flex-1 mt-2 overflow-hidden">
+        <div v-else class="flex-1 overflow-hidden">
           <BlocksList
             :blocks-by-category="filteredBlocksByCategory"
             :search-query="searchQuery"

@@ -17,6 +17,16 @@ const { t } = useI18n();
 const sortedCategories = computed(() => {
   return Object.keys(props.blocksByCategory).sort((a, b) => a.localeCompare(b));
 });
+
+const hoveredOption = ref<BlockSchemaOption | null>(null);
+
+const handleHover = (option: BlockSchemaOption) => {
+  hoveredOption.value = option;
+};
+
+const clearHover = () => {
+  hoveredOption.value = null;
+};
 </script>
 
 <template>
@@ -24,45 +34,82 @@ const sortedCategories = computed(() => {
     <p v-if="searchQuery.trim()">{{ t('blocksPopover.noBlocksFound') }} "{{ searchQuery }}"</p>
     <p v-else>{{ t('blocksPopover.noBlocksAvailable') }}</p>
   </div>
-  <div v-else class="h-full overflow-y-auto">
-    <Accordion.Root class="w-full" :defaultValue="sortedCategories" multiple>
-      <Accordion.Item
-        v-for="category in sortedCategories"
-        :key="category"
-        :value="category"
-        class="border-b border-gray-100 last:border-b-0"
-      >
-        <Accordion.ItemTrigger
-          class="flex w-full items-center justify-between p-3 text-left hover:bg-gray-50 transition-colors"
+  <div v-else class="h-full flex">
+    <div class="w-60 border-r overflow-y-auto">
+      <Accordion.Root class="w-full" :defaultValue="sortedCategories" multiple>
+        <Accordion.Item
+          v-for="category in sortedCategories"
+          :key="category"
+          :value="category"
+          class="border-b border-gray-100 last:border-b-0"
         >
-          <span class="text-sm font-medium text-gray-700">{{ category }}</span>
-          <Accordion.ItemIndicator class="transition-transform duration-200">
-            <icon-chevron-down class="w-4 h-4 text-gray-500" />
-          </Accordion.ItemIndicator>
-        </Accordion.ItemTrigger>
-        <Accordion.ItemContent class="overflow-hidden">
-          <div class="pb-2">
-            <div class="grid grid-cols-2 gap-2 px-3">
+          <Accordion.ItemTrigger
+            class="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-gray-50 transition-colors"
+          >
+            <span class="text-xs font-medium text-gray-700">{{ category }}</span>
+            <Accordion.ItemIndicator class="transition-transform duration-200">
+              <icon-chevron-down class="w-3 h-3 text-gray-500" />
+            </Accordion.ItemIndicator>
+          </Accordion.ItemTrigger>
+          <Accordion.ItemContent class="overflow-hidden">
+            <div class="pb-1">
               <button
                 v-for="option in blocksByCategory[category]"
                 :key="option.blockType + '-' + (option.presetIndex ?? 'default')"
                 @click="emit('blockSelect', option)"
-                class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors text-left"
+                @mouseenter="handleHover(option)"
+                @mouseleave="clearHover"
+                class="flex items-center gap-2 px-3 py-2 w-full hover:bg-gray-50 transition-colors text-left"
+                :class="{ 'bg-gray-50': hoveredOption === option }"
               >
                 <div
-                  class="flex-none w-6 h-6 flex items-center justify-center text-gray-600"
+                  class="flex-none w-5 h-5 flex items-center justify-center text-gray-600 text-sm"
                   v-html="option.icon || ''"
                 ></div>
                 <div class="flex-1 min-w-0">
-                  <div class="font-medium text-sm text-gray-900 truncate">
+                  <div class="text-xs text-gray-900 truncate">
                     {{ option.name }}
                   </div>
                 </div>
               </button>
             </div>
+          </Accordion.ItemContent>
+        </Accordion.Item>
+      </Accordion.Root>
+    </div>
+
+    <div class="flex-1 p-4 bg-gray-50">
+      <div v-if="hoveredOption" class="h-full flex flex-col">
+        <div class="flex items-start gap-3 mb-4">
+          <div
+            class="flex-none w-12 h-12 flex items-center justify-center text-gray-600 text-2xl bg-white rounded border"
+            v-html="hoveredOption.icon || ''"
+          ></div>
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900 mb-1">{{ hoveredOption.name }}</h3>
+            <div
+              v-if="hoveredOption.presetIndex !== undefined"
+              class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded mb-2"
+            >
+              <span>Preset</span>
+            </div>
+            <p v-if="hoveredOption.description" class="text-sm text-gray-600">
+              {{ hoveredOption.description }}
+            </p>
+            <p v-else class="text-sm text-gray-500 italic">No description available</p>
           </div>
-        </Accordion.ItemContent>
-      </Accordion.Item>
-    </Accordion.Root>
+        </div>
+
+        <div class="flex-1 bg-white rounded border p-4 flex items-center justify-center">
+          <div class="text-center text-gray-400 text-sm">
+            <div class="mb-2">Preview placeholder</div>
+            <div class="text-xs">{{ hoveredOption.blockType }}</div>
+          </div>
+        </div>
+      </div>
+      <div v-else class="h-full flex items-center justify-center text-gray-400 text-sm">
+        Hover over a block to see details
+      </div>
+    </div>
   </div>
 </template>
