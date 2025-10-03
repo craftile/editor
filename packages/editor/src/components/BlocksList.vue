@@ -7,12 +7,16 @@ interface Props {
   searchQuery: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<{
   blockSelect: [option: BlockSchemaOption];
 }>();
 
 const { t } = useI18n();
+
+const sortedCategories = computed(() => {
+  return Object.keys(props.blocksByCategory).sort((a, b) => a.localeCompare(b));
+});
 </script>
 
 <template>
@@ -21,9 +25,9 @@ const { t } = useI18n();
     <p v-else>{{ t('blocksPopover.noBlocksAvailable') }}</p>
   </div>
   <div v-else class="h-full overflow-y-auto">
-    <Accordion.Root class="w-full" :defaultValue="Object.keys(blocksByCategory)" multiple>
+    <Accordion.Root class="w-full" :defaultValue="sortedCategories" multiple>
       <Accordion.Item
-        v-for="(blocks, category) in blocksByCategory"
+        v-for="category in sortedCategories"
         :key="category"
         :value="category"
         class="border-b border-gray-100 last:border-b-0"
@@ -40,7 +44,7 @@ const { t } = useI18n();
           <div class="pb-2">
             <div class="grid grid-cols-2 gap-2 px-3">
               <button
-                v-for="option in blocks"
+                v-for="option in blocksByCategory[category]"
                 :key="option.blockType + '-' + (option.presetIndex ?? 'default')"
                 @click="emit('blockSelect', option)"
                 class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors text-left"
