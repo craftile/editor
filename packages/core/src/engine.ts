@@ -4,6 +4,7 @@ import type { Block, BlockSchema, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
 import { InsertBlockCommand } from './commands/insert-block';
+import { InsertBlockFromPresetCommand } from './commands/insert-block-from-preset';
 import { RemoveBlockCommand } from './commands/remove-block';
 import { MoveBlockCommand } from './commands/move-block';
 import { ToggleBlockCommand } from './commands/toggle-block';
@@ -71,6 +72,64 @@ export class Engine extends EventBus<EngineEvents> {
       regionName: options?.regionName,
       index: options?.index,
       blockSchema,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+
+    return command.getBlockId();
+  }
+
+  /**
+   * Insert a new block from a preset into the page
+   *
+   * @param blockType - The type of block to insert (must be registered)
+   * @param presetIndex - Index of the preset in the block schema's presets array
+   * @param options - Optional configuration for block insertion
+   * @param options.parentId - ID of parent block (for nested blocks)
+   * @param options.regionName - Target region name (defaults to 'main')
+   * @param options.index - Position to insert at (defaults to end)
+   * @returns The ID of the newly inserted block
+   * @throws {Error} When block type is not registered, preset not found, or parent-child relationship is invalid
+   * @emits block:insert - When the block is successfully inserted
+   */
+  insertBlockFromPreset(
+    blockType: string,
+    presetIndex: number,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
+    }
+  ): string {
+    const blockSchema = this.blocksManager.get(blockType);
+    if (!blockSchema) {
+      throw new Error(`Block type '${blockType}' is not registered`);
+    }
+
+    if (!blockSchema.presets || !blockSchema.presets[presetIndex]) {
+      throw new Error(`Preset at index ${presetIndex} not found for block type '${blockType}'`);
+    }
+
+    if (options?.parentId) {
+      const parentBlock = this.page.blocks[options.parentId];
+      if (!parentBlock) {
+        throw new Error(`Parent block not found: ${options.parentId}`);
+      }
+
+      if (!this.blocksManager.canBeChild(blockType, parentBlock.type)) {
+        throw new Error(`Block type '${blockType}' cannot be a child of '${parentBlock.type}'`);
+      }
+    }
+
+    const command = new InsertBlockFromPresetCommand(this.page, {
+      blockType,
+      presetIndex,
+      parentId: options?.parentId,
+      regionName: options?.regionName,
+      index: options?.index,
+      blocksManager: this.blocksManager,
       emit: this.emit.bind(this),
     });
 

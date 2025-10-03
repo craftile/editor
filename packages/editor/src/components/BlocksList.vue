@@ -1,22 +1,18 @@
 <script setup lang="ts">
 import { Accordion } from '@ark-ui/vue/accordion';
-import type { BlockSchema } from '@craftile/types';
+import type { BlockSchemaOption } from '../composables/blocks-popover';
 
 interface Props {
-  blocksByCategory: Record<string, BlockSchema[]>;
+  blocksByCategory: Record<string, BlockSchemaOption[]>;
   searchQuery: string;
 }
 
 defineProps<Props>();
 const emit = defineEmits<{
-  blockSelect: [blockType: string];
+  blockSelect: [option: BlockSchemaOption];
 }>();
 
 const { t } = useI18n();
-
-const getBlockSchemaDisplayName = (schema: BlockSchema) => {
-  return schema.meta?.name || schema.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
-};
 </script>
 
 <template>
@@ -44,18 +40,18 @@ const getBlockSchemaDisplayName = (schema: BlockSchema) => {
           <div class="pb-2">
             <div class="grid grid-cols-2 gap-2 px-3">
               <button
-                v-for="block in blocks"
-                :key="block.type"
-                @click="emit('blockSelect', block.type)"
+                v-for="option in blocks"
+                :key="option.blockType + '-' + (option.presetIndex ?? 'default')"
+                @click="emit('blockSelect', option)"
                 class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors text-left"
               >
                 <div
                   class="flex-none w-6 h-6 flex items-center justify-center text-gray-600"
-                  v-html="block.meta?.icon || ''"
+                  v-html="option.icon || ''"
                 ></div>
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-sm text-gray-900 truncate">
-                    {{ getBlockSchemaDisplayName(block) }}
+                    {{ option.name }}
                   </div>
                 </div>
               </button>

@@ -84,7 +84,7 @@ declare global {
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { InsertBlockContext } from './composables/blocks-popover'
+  export type { InsertBlockContext, BlockSchemaOption } from './composables/blocks-popover'
   import('./composables/blocks-popover')
 }
 

@@ -85,7 +85,9 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
   cleanupFunctions.push(
     engine.on('block:insert', ({ blockId, parentId }) => {
       pendingChanges.added.add(blockId);
-      pendingChanges.blocksToInclude.add(blockId);
+
+      // Include block and all its descendants in the update (for presets with nested children)
+      addBlockWithDescendants(blockId, pendingChanges.blocksToInclude);
 
       if (parentId) {
         pendingChanges.blocksToInclude.add(parentId);

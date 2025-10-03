@@ -32,6 +32,15 @@ export interface UseBlocksEngineReturn {
       index?: number;
     }
   ) => string;
+  insertBlockFromPreset: (
+    blockType: string,
+    presetIndex: number,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
+    }
+  ) => string;
   removeBlock: (blockId: string) => void;
   moveBlock: (
     blockId: string,
@@ -189,6 +198,24 @@ export function useBlocksEngine(
     return blockId;
   };
 
+  const insertBlockFromPreset = (
+    blockType: string,
+    presetIndex: number,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
+    }
+  ): string => {
+    const blockId = engine.insertBlockFromPreset(blockType, presetIndex, options);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+
+    return blockId;
+  };
+
   const removeBlock = (blockId: string): void => {
     engine.removeBlock(blockId);
 
@@ -288,6 +315,7 @@ export function useBlocksEngine(
 
     // Command methods
     insertBlock,
+    insertBlockFromPreset,
     removeBlock,
     moveBlock,
     setBlockProperty,

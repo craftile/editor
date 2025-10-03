@@ -6,6 +6,7 @@ export interface BlockProperties {
 export interface Block {
   type: string;
   id: string;
+  semanticId?: string;
   properties: BlockProperties;
   disabled?: boolean;
   static?: boolean; // Block cannot be moved or removed
@@ -22,10 +23,27 @@ export interface PropertyField {
   [key: string]: any;
 }
 
+export interface PresetChild {
+  type: string;
+  id?: string;
+  properties?: Record<string, any>;
+  children?: PresetChild[];
+}
+
+export interface BlockPreset {
+  name: string;
+  properties?: Record<string, any>;
+  children?: PresetChild[];
+  icon?: string;
+  category?: string;
+  description?: string;
+}
+
 export interface BlockSchema {
-  type: string; // Unique identifier for the block type
+  type: string;
   properties: PropertyField[];
-  accepts?: string[]; // Allowed children types
+  accepts?: string[];
+  presets?: BlockPreset[];
   meta?: Record<string, any>; // UI-specific metadata for editors
 }
 

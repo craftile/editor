@@ -406,3 +406,5 @@ editor.ui.registerHeaderAction({
   },
   order: 100,
 });
+
+editor.events.on('updates', console.log);

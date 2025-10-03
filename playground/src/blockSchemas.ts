@@ -102,6 +102,99 @@ export const blockSchemas: BlockSchema[] = [
       { id: 'backgroundColor', type: 'color', label: 'Background', default: 'transparent' },
     ],
     accepts: ['*'], // Allow any child blocks
+    presets: [
+      {
+        name: 'Empty Container',
+        description: 'A blank container ready for your content',
+      },
+      {
+        name: 'Heading and Text',
+        description: 'Container with a heading and description',
+        properties: {
+          gap: 12,
+          padding: 20,
+        },
+        children: [
+          {
+            type: 'text',
+            id: 'heading',
+            properties: {
+              content: '<h2>Section Title</h2>',
+              fontSize: 'xl',
+            },
+          },
+          {
+            type: 'text',
+            id: 'description',
+            properties: {
+              content: '<p>Add your description here...</p>',
+              fontSize: 'md',
+            },
+          },
+        ],
+      },
+      {
+        name: 'Two Column Layout',
+        description: 'Horizontal container with two columns',
+        properties: {
+          direction: 'horizontal',
+          gap: 24,
+          padding: 20,
+        },
+        children: [
+          {
+            type: 'container',
+            id: 'column-1',
+            properties: {
+              direction: 'vertical',
+              gap: 12,
+              padding: 16,
+              backgroundColor: '#f9fafb',
+            },
+            children: [
+              {
+                type: 'text',
+                properties: {
+                  content: '<h3>Column 1</h3>',
+                  fontSize: 'lg',
+                },
+              },
+              {
+                type: 'text',
+                properties: {
+                  content: '<p>Content for first column</p>',
+                },
+              },
+            ],
+          },
+          {
+            type: 'container',
+            id: 'column-2',
+            properties: {
+              direction: 'vertical',
+              gap: 12,
+              padding: 16,
+              backgroundColor: '#f9fafb',
+            },
+            children: [
+              {
+                type: 'text',
+                properties: {
+                  content: '<h3>Column 2</h3>',
+                  fontSize: 'lg',
+                },
+              },
+              {
+                type: 'text',
+                properties: {
+                  content: '<p>Content for second column</p>',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
     meta: {
       name: 'Container',
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h16v12H4V6z"/><path d="M6 8h4v2H6V8zm6 0h6v2h-6V8zm-6 4h6v2H6v-2zm8 0h4v2h-4v-2z"/></svg>',

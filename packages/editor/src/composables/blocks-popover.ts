@@ -8,6 +8,15 @@ export interface InsertBlockContext {
   regionName?: string;
 }
 
+export interface BlockSchemaOption {
+  blockType: string;
+  presetIndex?: number;
+  name: string;
+  icon?: string;
+  category?: string;
+  description?: string;
+}
+
 export function useBlocksPopover() {
   const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
 
@@ -56,6 +65,42 @@ export function useBlocksPopover() {
   };
 
   /**
+   * Expand block schemas into individual options, including presets
+   * If a schema has presets, each preset becomes a separate option
+   * If a schema has no presets, it becomes a single option
+   */
+  const expandPresetsToBlockOptions = (schemas: BlockSchema[]): BlockSchemaOption[] => {
+    const options: BlockSchemaOption[] = [];
+
+    for (const schema of schemas) {
+      if (schema.presets && schema.presets.length > 0) {
+        schema.presets.forEach((preset, index) => {
+          options.push({
+            blockType: schema.type,
+            presetIndex: index,
+            name: preset.name,
+            icon: preset.icon || schema.meta?.icon,
+            category: preset.category || schema.meta?.category || 'Other',
+            description: preset.description || schema.meta?.description,
+          });
+        });
+      } else {
+        // No presets, use schema as single option
+        options.push({
+          blockType: schema.type,
+          name:
+            schema.meta?.name || schema.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase()),
+          icon: schema.meta?.icon,
+          category: schema.meta?.category || 'Other',
+          description: schema.meta?.description,
+        });
+      }
+    }
+
+    return options;
+  };
+
+  /**
    * Helper function to get insertion context for before/after positions
    */
   const getInsertionContext = (targetBlockId: string, position: 'before' | 'after'): InsertBlockContext => {
@@ -98,6 +143,7 @@ export function useBlocksPopover() {
     open,
     close,
     getAllowedBlockSchemas,
+    expandPresetsToBlockOptions,
     getInsertionContext,
   };
 }

@@ -9,8 +9,8 @@ import type { BlockSchema } from '@craftile/types';
 
 const { t } = useI18n();
 const eventBus = useEventBus();
-const { engine, insertBlock } = useCraftileEngine();
-const { getAllowedBlockSchemas } = useBlocksPopover();
+const { engine, insertBlock, insertBlockFromPreset } = useCraftileEngine();
+const { getAllowedBlockSchemas, expandPresetsToBlockOptions } = useBlocksPopover();
 const { setExpanded } = useLayersPanel();
 
 const anchorEl = ref<HTMLElement | null>(null);
@@ -41,20 +41,21 @@ const filteredBlockSchemas = computed(() => {
     return [];
   }
 
-  return getAllowedBlockSchemas(insertionContext.value);
+  const schemas = getAllowedBlockSchemas(insertionContext.value);
+  return expandPresetsToBlockOptions(schemas);
 });
 
 const blocksByCategory = computed(() => {
-  const categories: Record<string, BlockSchema[]> = {};
+  const categories: Record<string, BlockSchemaOption[]> = {};
 
-  filteredBlockSchemas.value.forEach((schema) => {
-    const category = schema.meta?.category || 'Other';
+  filteredBlockSchemas.value.forEach((option) => {
+    const category = option.category || 'Other';
 
     if (!categories[category]) {
       categories[category] = [];
     }
 
-    categories[category].push(schema);
+    categories[category].push(option);
   });
 
   return categories;
@@ -67,36 +68,46 @@ const filteredBlocksByCategory = computed(() => {
     return blocksByCategory.value;
   }
 
-  const filtered: Record<string, BlockSchema[]> = {};
+  const filtered: Record<string, BlockSchemaOption[]> = {};
 
-  Object.entries(blocksByCategory.value).forEach(([category, blocks]) => {
-    const matchingBlocks = blocks.filter((block) => {
-      const name = (block.meta?.name || block.type).toLowerCase();
-      const description = (block.meta?.description || '').toLowerCase();
+  Object.entries(blocksByCategory.value).forEach(([category, options]) => {
+    const matchingOptions = options.filter((option) => {
+      const name = option.name.toLowerCase();
+      const description = (option.description || '').toLowerCase();
       return name.includes(query) || description.includes(query);
     });
 
-    if (matchingBlocks.length > 0) {
-      filtered[category] = matchingBlocks;
+    if (matchingOptions.length > 0) {
+      filtered[category] = matchingOptions;
     }
   });
 
   return filtered;
 });
 
-const handleBlockSelect = (blockType: string) => {
+const handleBlockSelect = (option: BlockSchemaOption) => {
   if (!insertionContext.value) {
     return;
   }
 
-  const blockId = insertBlock(blockType, {
-    parentId: insertionContext.value.parentId!,
-    regionName: insertionContext.value.regionName!,
-    index: insertionContext.value.index!,
-  });
+  let blockId: string;
+
+  if (option.presetIndex !== undefined) {
+    blockId = insertBlockFromPreset(option.blockType, option.presetIndex, {
+      parentId: insertionContext.value.parentId,
+      regionName: insertionContext.value.regionName,
+      index: insertionContext.value.index,
+    });
+  } else {
+    blockId = insertBlock(option.blockType, {
+      parentId: insertionContext.value.parentId,
+      regionName: insertionContext.value.regionName,
+      index: insertionContext.value.index,
+    });
+  }
 
   // Auto-expand blocks that can have children
-  const schema = engine.getBlocksManager().get(blockType);
+  const schema = engine.getBlocksManager().get(option.blockType);
 
   if (schema?.accepts && schema.accepts.length > 0) {
     setExpanded(blockId, true);
