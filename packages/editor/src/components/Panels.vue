@@ -13,19 +13,17 @@ const activePanel = computed(() => sidebarPanels.value.find((panel) => panel.id 
     <LayersPanel v-if="activeSidebarPanel === 'layers'" class="h-full" />
 
     <template v-else-if="activePanel">
-      <KeepAlive>
-        <component
-          v-if="isVueComponent(activePanel.render) || isComponentString(activePanel.render)"
-          :is="activePanel.render"
-          :editor="editor"
-          class="h-full"
-        />
-        <RenderFunctionWrapper
-          v-else-if="isHtmlRenderFunction(activePanel.render)"
-          :render-fn="activePanel.render"
-          class="h-full"
-        />
-      </KeepAlive>
+      <component
+        v-if="isVueComponent(activePanel.render) || isComponentString(activePanel.render)"
+        :is="activePanel.render"
+        :editor="editor"
+        class="h-full"
+      />
+      <RenderFunctionWrapper
+        v-else-if="isHtmlRenderFunction(activePanel.render)"
+        :render-fn="activePanel.render"
+        class="h-full"
+      />
     </template>
   </aside>
 </template>

@@ -313,6 +313,74 @@ editor.ui.registerSidebarPanel({
   order: 20,
 });
 
+// Register another sidebar panel
+editor.ui.registerSidebarPanel({
+  title: 'Info Panel',
+  render: ({ editor }: UiRenderFunctionContext) => {
+    const div = document.createElement('div');
+    div.style.height = '100%';
+    div.style.padding = '16px';
+    div.style.backgroundColor = '#f9fafb';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Page Information';
+    title.style.fontSize = '18px';
+    title.style.fontWeight = '600';
+    title.style.marginBottom = '16px';
+    title.style.color = '#111827';
+
+    const info = document.createElement('div');
+    info.style.display = 'flex';
+    info.style.flexDirection = 'column';
+    info.style.gap = '12px';
+
+    const createInfoItem = (label: string, value: string) => {
+      const item = document.createElement('div');
+      item.style.padding = '12px';
+      item.style.backgroundColor = 'white';
+      item.style.borderRadius = '6px';
+      item.style.border = '1px solid #e5e7eb';
+
+      const labelEl = document.createElement('div');
+      labelEl.textContent = label;
+      labelEl.style.fontSize = '12px';
+      labelEl.style.color = '#6b7280';
+      labelEl.style.marginBottom = '4px';
+
+      const valueEl = document.createElement('div');
+      valueEl.textContent = value;
+      valueEl.style.fontSize = '14px';
+      valueEl.style.fontWeight = '500';
+      valueEl.style.color = '#111827';
+
+      item.appendChild(labelEl);
+      item.appendChild(valueEl);
+      return item;
+    };
+
+    const page = editor.engine.getPage();
+    const blockCount = Object.keys(page.blocks).length;
+    const regionCount = page.regions.length;
+
+    info.appendChild(createInfoItem('Total Blocks', blockCount.toString()));
+    info.appendChild(createInfoItem('Regions', regionCount.toString()));
+
+    div.appendChild(title);
+    div.appendChild(info);
+
+    return div;
+  },
+
+  icon: () => {
+    const icon = document.createElement('span');
+    icon.textContent = 'ℹ️';
+    icon.style.fontSize = '16px';
+    return icon;
+  },
+
+  order: 30,
+});
+
 // Example of header action button with loading state
 editor.ui.registerHeaderAction({
   id: 'save-button-demo',

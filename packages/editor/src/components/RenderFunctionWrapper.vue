@@ -27,9 +27,9 @@ onMounted(() => {
   renderContent();
 });
 
-// watch(() => [editor.ui.state, editor.preview.state], () => {
+// watch(() => props.renderFn, () => {
 //   renderContent();
-// }, { deep: true });
+// });
 </script>
 
 <template>
