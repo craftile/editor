@@ -1,5 +1,13 @@
 # @craftile/core
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`4e9652c`](https://github.com/craftile/editor/commit/4e9652c57214b72e8f7b8519fac8aead14297a4c)]:
+  - @craftile/types@0.1.5
+  - @craftile/event-bus@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes

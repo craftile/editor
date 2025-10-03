@@ -1,5 +1,11 @@
 # @craftile/types
 
+## 0.1.5
+
+### Patch Changes
+
+- [`4e9652c`](https://github.com/craftile/editor/commit/4e9652c57214b72e8f7b8519fac8aead14297a4c) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix block deselection sync issue
+
 ## 0.1.4
 
 ### Patch Changes
