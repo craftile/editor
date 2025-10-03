@@ -1,5 +1,19 @@
 # @craftile/editor
 
+## 0.1.4
+
+### Patch Changes
+
+- [`e0f6702`](https://github.com/craftile/editor/commit/e0f6702f3e6d0aad3c7268ba55db309f31bc1f9a) Thanks [@eldomagan](https://github.com/eldomagan)! - Show block schema name and custom label in layers panel
+
+- [`6fbf803`](https://github.com/craftile/editor/commit/6fbf803067b4bc7b6a56e9813fcb30b8ea7dc564) Thanks [@eldomagan](https://github.com/eldomagan)! - Sync block selection between layers panel and preview
+
+- Updated dependencies [[`6fbf803`](https://github.com/craftile/editor/commit/6fbf803067b4bc7b6a56e9813fcb30b8ea7dc564)]:
+  - @craftile/types@0.1.4
+  - @craftile/core@0.1.4
+  - @craftile/event-bus@0.1.4
+  - @craftile/messenger@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes
