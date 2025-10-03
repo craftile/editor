@@ -70,6 +70,23 @@ export function useLayersPanel() {
     });
   };
 
+  const expandAncestors = (blockId: string) => {
+    const page = editor.engine.getPage();
+    const block = page.blocks[blockId];
+
+    if (!block) {
+      return;
+    }
+
+    // Expand all ancestors
+    let currentParentId = block.parentId;
+    while (currentParentId) {
+      editor.ui.state.layersPanel.expandedBlocks.add(currentParentId);
+      const parentBlock = page.blocks[currentParentId];
+      currentParentId = parentBlock?.parentId;
+    }
+  };
+
   return {
     expandedBlocks,
 
@@ -79,5 +96,6 @@ export function useLayersPanel() {
     expandAll,
     collapseAll,
     collapseRegion,
+    expandAncestors,
   };
 }

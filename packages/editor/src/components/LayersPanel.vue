@@ -5,8 +5,21 @@ import type { InsertBlockContext } from '../composables/blocks-popover';
 
 const { t } = useI18n();
 const { regions, moveBlock } = useCraftileEngine();
-const { collapseRegion } = useLayersPanel();
+const { collapseRegion, expandAncestors } = useLayersPanel();
 const { open: openBlocksPopover } = useBlocksPopover();
+const eventBus = useEventBus();
+
+// Expand ancestors and scroll to block when selected
+eventBus.on('ui:block:select', (data: { blockId: string }) => {
+  expandAncestors(data.blockId);
+
+  nextTick(() => {
+    const blockElement = document.querySelector(`[data-block-id="${data.blockId}"]`);
+    if (blockElement) {
+      blockElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+});
 
 // TODO: check the issue where region item is incorrectly inferred as true | Region
 const regionList = computed(() => (Array.isArray(regions.value) ? regions.value : []));

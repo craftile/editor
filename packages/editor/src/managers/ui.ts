@@ -60,8 +60,12 @@ export class UIManager {
   }
 
   setSelectedBlock(blockId: string | null): void {
+    const previousBlockId = this.state.selectedBlockId;
     this.state.selectedBlockId = blockId;
-    this.events.emit('ui:block:select', { blockId });
+
+    if (blockId !== null && blockId !== previousBlockId) {
+      this.events.emit('ui:block:select', { blockId });
+    }
   }
 
   clearSelectedBlock(): void {

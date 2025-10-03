@@ -78,6 +78,7 @@ export interface WindowMessages {
 
   'craftile.inspector.enable': void;
   'craftile.inspector.disable': void;
+  'craftile.editor.select-block': { blockId: string };
   'craftile.preview.click': void;
   'craftile.preview.block-leave': void;
   'craftile.preview.block-hover': {

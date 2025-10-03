@@ -59,6 +59,10 @@ export class InspectorManager {
         this.clearHoveredBlock();
       });
     });
+
+    this.events.on('ui:block:select', (data: { blockId: string }) => {
+      this.preview.sendMessage('craftile.editor.select-block', { blockId: data.blockId });
+    });
   }
 
   enable() {

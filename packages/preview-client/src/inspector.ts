@@ -18,6 +18,7 @@ export class Inspector {
     this.messenger.listen('craftile.inspector.disable', () => this.disable());
     this.messenger.listen('craftile.inspector.overlay-button-enter', this.handleOverlayButtonEnter.bind(this));
     this.messenger.listen('craftile.inspector.overlay-button-leave', this.handleOverlayButtonLeave.bind(this));
+    this.messenger.listen('craftile.editor.select-block', this.handleEditorSelectBlock.bind(this));
 
     window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
     this.setupGlobalEventListeners();
@@ -45,6 +46,16 @@ export class Inspector {
 
     if (!this.currentHoveredBlock) {
       this.messenger.send('craftile.preview.block-leave');
+    }
+  }
+
+  private handleEditorSelectBlock(data: { blockId: string }) {
+    const element = document.querySelector(`[data-block="${data.blockId}"]`) as HTMLElement;
+
+    if (element) {
+      this.currentSelectedBlock = element;
+      this.sendSelectedBlockPosition();
+      this.trackSelectedBlock();
     }
   }
 
