@@ -162,7 +162,7 @@ function handleRemoveBlock() {
         </Menu.Trigger>
         <Menu.Positioner>
           <Menu.Content
-            class="bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[160px] z-50 focus:outline-none"
+            class="bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[160px] focus:outline-none"
           >
             <!-- Duplicate -->
             <Menu.Item

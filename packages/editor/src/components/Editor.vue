@@ -36,7 +36,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
       <main class="flex-1 flex overflow-hidden relative">
         <Sidebar />
         <Panels />
-        <div v-if="hasSelection && !isExtraExtraLarge" class="absolute left-14 top-0 h-full w-75 z-10">
+        <div v-if="hasSelection && !isExtraExtraLarge" class="absolute left-14 top-0 h-full w-75 z-50">
           <ConfigurationPanels is-overlay />
         </div>
 

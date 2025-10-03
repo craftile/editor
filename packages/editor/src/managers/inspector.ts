@@ -63,6 +63,11 @@ export class InspectorManager {
     this.events.on('ui:block:select', (data: { blockId: string }) => {
       this.preview.sendMessage('craftile.editor.select-block', { blockId: data.blockId });
     });
+
+    this.events.on('ui:block:clear-selection', () => {
+      this.preview.sendMessage('craftile.editor.deselect-block');
+      this.clearSelectedBlock();
+    });
   }
 
   enable() {

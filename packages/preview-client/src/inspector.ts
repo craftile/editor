@@ -19,6 +19,7 @@ export class Inspector {
     this.messenger.listen('craftile.inspector.overlay-button-enter', this.handleOverlayButtonEnter.bind(this));
     this.messenger.listen('craftile.inspector.overlay-button-leave', this.handleOverlayButtonLeave.bind(this));
     this.messenger.listen('craftile.editor.select-block', this.handleEditorSelectBlock.bind(this));
+    this.messenger.listen('craftile.editor.deselect-block', this.handleEditorDeselectBlock.bind(this));
 
     window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
     this.setupGlobalEventListeners();
@@ -56,6 +57,20 @@ export class Inspector {
       this.currentSelectedBlock = element;
       this.sendSelectedBlockPosition();
       this.trackSelectedBlock();
+    }
+  }
+
+  private handleEditorDeselectBlock() {
+    this.currentSelectedBlock = null;
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
     }
   }
 
