@@ -1,5 +1,59 @@
 # @craftile/types
 
+## 0.2.0
+
+### Minor Changes
+
+- [`01f3243`](https://github.com/craftile/editor/commit/01f3243a863a540deee4c62afa36c4ce06121a5d) Thanks [@eldomagan](https://github.com/eldomagan)! - Add support for block presets - predefined configurations with properties and nested children
+
+  **New Features:**
+  - Block schemas can now define presets with custom properties and nested children
+  - Presets appear as separate options in the blocks popover
+  - Preset properties override schema defaults
+  - Support for nested block hierarchies in presets
+  - Optional preset metadata overrides (icon, category, description)
+
+  **Changes:**
+  - Added `BlockPreset` and `PresetChild` interfaces to `@craftile/types`
+  - Added `presets` field to BlockSchema
+  - New `InsertBlockFromPresetCommand` for preset-based insertion
+  - New `insertBlockFromPreset()` method on Engine and useBlocksEngine
+  - Updated BlocksPopover to expand presets into individual options
+  - BlocksList now handles BlockSchemaOption instead of BlockSchema directly
+  - Updated engine updates watcher to include all descendants when inserting blocks with children
+
+  **Example Usage:**
+
+  ```typescript
+  {
+    type: 'container',
+    properties: [...],
+    presets: [
+      {
+        name: 'Heading and Text',
+        description: 'Container with a heading and description',
+        properties: { gap: 12 },
+        children: [
+          {
+            type: 'text',
+            id: 'heading',
+            properties: { content: '<h2>Title</h2>' }
+          },
+          {
+            type: 'text',
+            id: 'description',
+            properties: { content: '<p>Description</p>' }
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+- [`2cef7d1`](https://github.com/craftile/editor/commit/2cef7d1c9d555045c6ecac054607923f435febdb) Thanks [@eldomagan](https://github.com/eldomagan)! - Improve blocks popover with split preview layout
+  - Implement split preview panel design with compact list on left and preview area on right
+  - Display preview images when available in the preview area
+
 ## 0.1.6
 
 ## 0.1.5
