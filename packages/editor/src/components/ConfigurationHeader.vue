@@ -12,13 +12,13 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n();
 const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
 const { selectedBlock, clearSelection } = useSelectedBlock();
-const { getBlockLabel } = useBlockLabel();
 
 const blockDisplayName = computed(() => {
   if (!selectedBlock.value) {
     return '';
   }
-  return getBlockLabel(selectedBlock.value.id);
+  const schema = engine.getBlockSchema(selectedBlock.value.type);
+  return schema?.meta?.name || selectedBlock.value.type;
 });
 
 const blockPositionInfo = computed(() => {
@@ -151,7 +151,7 @@ function handleRemoveBlock() {
       </button>
 
       <!-- Block Name -->
-      <h3 class="flex-1 text-sm font-medium text-gray-900 truncate">
+      <h3 class="flex-1 text-sm font-medium text-gray-900 truncate capitalize">
         {{ blockDisplayName }}
       </h3>
 

@@ -3,15 +3,12 @@ import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import type { CraftileEditor } from '../editor';
 
 /**
- * Default block label function
- * Uses schema.meta.name or block.type
+ * Get the schema name for a block
  */
-const defaultBlockLabelFunction = (block: Block, schema: BlockSchema | undefined): string => {
+const getSchemaName = (block: Block, schema: BlockSchema | undefined): string => {
   if (schema?.meta?.name) {
     return schema.meta.name;
   }
-
-  // Fallback: use title-cased block type (slug)
   return block.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
 };
 
@@ -19,17 +16,17 @@ export function useBlockLabel() {
   const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
   const { engine, getBlockById } = useCraftileEngine();
 
-  const labelFunction = editor?.blockLabelFunction || defaultBlockLabelFunction;
+  const labelFunction = editor?.blockLabelFunction;
 
   /**
-   * Get a block's display label by block ID
+   * Get a block's custom label (from blockLabelFunction)
    * @param blockId The block ID
-   * @returns The display label for the block
+   * @returns The custom label for the block, or empty string if no custom label
    */
   const getBlockLabel = (blockId: string): string => {
     const block = getBlockById(blockId);
-    if (!block) {
-      return 'Unknown Block';
+    if (!block || !labelFunction) {
+      return '';
     }
 
     const schema = engine.getBlockSchema(block.type);
@@ -37,13 +34,18 @@ export function useBlockLabel() {
   };
 
   /**
-   * Get a block's display label from block and schema data directly
-   * @param block The block data
-   * @param schema The block schema (optional)
-   * @returns The display label for the block
+   * Get a block's schema name
+   * @param blockId The block ID
+   * @returns The schema name for the block
    */
-  const getBlockLabelFromData = (block: Block, schema?: BlockSchema): string => {
-    return labelFunction(block, schema);
+  const getBlockSchemaName = (blockId: string): string => {
+    const block = getBlockById(blockId);
+    if (!block) {
+      return 'Unknown Block';
+    }
+
+    const schema = engine.getBlockSchema(block.type);
+    return getSchemaName(block, schema);
   };
 
   /**
@@ -57,7 +59,7 @@ export function useBlockLabel() {
 
   return {
     getBlockLabel,
-    getBlockLabelFromData,
+    getBlockSchemaName,
     getBlockLabelReactive,
   };
 }

@@ -20,13 +20,16 @@ const {
   moveChild,
 } = useBlock(props.blockId);
 const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayersPanel();
-const { getBlockLabelReactive } = useBlockLabel();
+const { getBlockLabelReactive, getBlockSchemaName } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
 
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
 const isStatic = computed(() => blockData.value?.static === true);
-const blockDisplayName = getBlockLabelReactive(props.blockId);
+
+const blockSchemaName = getBlockSchemaName(props.blockId);
+const blockLabel = getBlockLabelReactive(props.blockId);
+
 const canInsertNextSibling = computed(() => {
   return !nextSibling.value || nextSibling.value.static !== true;
 });
@@ -101,7 +104,10 @@ function onChildMove(event: any) {
       </div>
 
       <!-- Block Name -->
-      <span class="flex-1">{{ blockDisplayName }}</span>
+      <div class="flex-1 flex items-center gap-1 min-w-0">
+        <span class="shrink-0">{{ blockSchemaName }}</span>
+        <span v-if="blockLabel" class="italic text-gray-500 truncate text-xs">- {{ blockLabel }}</span>
+      </div>
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-0.5">

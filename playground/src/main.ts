@@ -11,6 +11,27 @@ const editor = createCraftileEditor({
     CommonPropertiesPlugin,
     StaticBlocksRenderer({ blockRenderers, scripts: ['https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'] }),
   ],
+  // Custom block label function to show block label from properties
+  blockLabelFunction: (block) => {
+    // For text blocks, show the content as label
+    if (block.type === 'text' && block.properties?.content) {
+      const content = String(block.properties.content);
+      return content.length > 30 ? content.substring(0, 30) + '...' : content;
+    }
+
+    // For buttons, show the button text as label
+    if (block.type === 'button' && block.properties?.text) {
+      return String(block.properties.text);
+    }
+
+    // For images, show the alt text as label
+    if (block.type === 'image' && block.properties?.alt) {
+      return String(block.properties.alt);
+    }
+
+    // Return empty string to show only schema name
+    return '';
+  },
   initialPage: {
     blocks: {
       // Header region blocks
