@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.1.5
+
+### Patch Changes
+
+- [`4e9652c`](https://github.com/craftile/editor/commit/4e9652c57214b72e8f7b8519fac8aead14297a4c) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix block deselection sync issue
+
+- Updated dependencies [[`4e9652c`](https://github.com/craftile/editor/commit/4e9652c57214b72e8f7b8519fac8aead14297a4c)]:
+  - @craftile/types@0.1.5
+  - @craftile/core@0.1.5
+  - @craftile/event-bus@0.1.5
+  - @craftile/messenger@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes
