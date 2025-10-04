@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.2.1
+
+### Patch Changes
+
+- [`acf8afa`](https://github.com/craftile/editor/commit/acf8afa174abc19d4e6b4eb4c409b2cfbad6b3b3) Thanks [@eldomagan](https://github.com/eldomagan)! - Export PropertyField in @craftile/editor/ui component for plugin use
+
+- Updated dependencies []:
+  - @craftile/core@0.2.1
+  - @craftile/event-bus@0.2.1
+  - @craftile/messenger@0.2.1
+  - @craftile/types@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
