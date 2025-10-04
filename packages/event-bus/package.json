@@ -1,6 +1,6 @@
 {
   "name": "@craftile/event-bus",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Generic event bus utility for Craftile packages",
   "keywords": [
     "craftile",
