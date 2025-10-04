@@ -1,1 +1,1 @@
-export const CRAFTILE_EDITOR_SYMBOL = Symbol('craftile-editor');
+export const CRAFTILE_EDITOR_SYMBOL = Symbol.for('craftile-editor');

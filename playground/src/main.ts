@@ -1,6 +1,7 @@
 import { createCraftileEditor, type UiRenderFunctionContext } from '@craftile/editor';
 import CommonPropertiesPlugin from '@craftile/plugin-common-properties';
 import StaticBlocksRenderer from '@craftile/plugin-static-blocks-renderer';
+import CustomPanelPlugin from './custom-panel-plugin';
 import { blockSchemas } from './blockSchemas';
 import { blockRenderers } from './blockRenderers';
 
@@ -10,6 +11,7 @@ const editor = createCraftileEditor({
   plugins: [
     CommonPropertiesPlugin,
     StaticBlocksRenderer({ blockRenderers, scripts: ['https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'] }),
+    CustomPanelPlugin,
   ],
   // Custom block label function to show block label from properties
   blockLabelFunction: (block) => {
