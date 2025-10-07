@@ -51,6 +51,7 @@ export interface UseBlocksEngineReturn {
     }
   ) => void;
   setBlockProperty: (blockId: string, propertyKey: string, propertyValue: any) => void;
+  setBlockName: (blockId: string, name: string) => void;
   toggleBlock: (blockId: string, disabled?: boolean) => void;
   duplicateBlock: (blockId: string) => string;
 
@@ -168,6 +169,7 @@ export function useBlocksEngine(
       'block:toggle',
       'block:duplicate',
       'block:property:set',
+      'block:update',
       'undo',
       'redo',
     ] as const;
@@ -247,6 +249,14 @@ export function useBlocksEngine(
     }
   };
 
+  const setBlockName = (blockId: string, name: string): void => {
+    engine.setBlockName(blockId, name);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+  };
+
   const toggleBlock = (blockId: string, disabled?: boolean): void => {
     engine.toggleBlock(blockId, disabled);
 
@@ -319,6 +329,7 @@ export function useBlocksEngine(
     removeBlock,
     moveBlock,
     setBlockProperty,
+    setBlockName,
     toggleBlock,
     duplicateBlock,
 

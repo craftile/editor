@@ -10,16 +10,64 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { t } = useI18n();
-const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
+const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock, setBlockName } = useCraftileEngine();
 const { selectedBlock, clearSelection } = useSelectedBlock();
 
 const blockDisplayName = computed(() => {
   if (!selectedBlock.value) {
     return '';
   }
+
+  if (selectedBlock.value.name) {
+    return selectedBlock.value.name;
+  }
+
   const schema = engine.getBlockSchema(selectedBlock.value.type);
   return schema?.meta?.name || selectedBlock.value.type;
 });
+
+const isEditingName = ref(false);
+const editingName = ref('');
+const nameInputRef = ref<HTMLInputElement | null>(null);
+
+function startEditingName() {
+  if (!selectedBlock.value) return;
+  editingName.value = blockDisplayName.value;
+  isEditingName.value = true;
+  nextTick(() => {
+    nameInputRef.value?.focus();
+    nameInputRef.value?.select();
+  });
+}
+
+function saveBlockName() {
+  if (!selectedBlock.value || !editingName.value.trim()) {
+    cancelEditingName();
+    return;
+  }
+
+  const newName = editingName.value.trim();
+  if (newName !== blockDisplayName.value) {
+    setBlockName(selectedBlock.value.id, newName);
+  }
+
+  isEditingName.value = false;
+}
+
+function cancelEditingName() {
+  isEditingName.value = false;
+  editingName.value = '';
+}
+
+function handleNameKeydown(event: KeyboardEvent) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    saveBlockName();
+  } else if (event.key === 'Escape') {
+    event.preventDefault();
+    cancelEditingName();
+  }
+}
 
 const blockPositionInfo = computed(() => {
   if (!selectedBlock.value) {
@@ -150,10 +198,25 @@ function handleRemoveBlock() {
         <icon-chevron-left class="w-4 h-4 text-gray-600" />
       </button>
 
-      <!-- Block Name -->
-      <h3 class="flex-1 text-sm font-medium text-gray-900 truncate capitalize">
-        {{ blockDisplayName }}
-      </h3>
+      <!-- Block Name (editable) -->
+      <div class="flex-1 min-w-0">
+        <input
+          v-if="isEditingName"
+          ref="nameInputRef"
+          v-model="editingName"
+          type="text"
+          @blur="saveBlockName"
+          @keydown="handleNameKeydown"
+          class="w-full text-sm font-medium text-gray-900 px-2 py-1 rounded border border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+        <button
+          v-else
+          @click="startEditingName"
+          class="w-full text-left text-sm font-medium text-gray-900 truncate capitalize px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+        >
+          {{ blockDisplayName }}
+        </button>
+      </div>
 
       <!-- Actions Menu -->
       <Menu.Root>

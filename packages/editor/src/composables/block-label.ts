@@ -3,12 +3,17 @@ import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import type { CraftileEditor } from '../editor';
 
 /**
- * Get the schema name for a block
+ * Get the display name for a block (prioritizes block.name over schema name)
  */
 const getSchemaName = (block: Block, schema: BlockSchema | undefined): string => {
+  if (block.name) {
+    return block.name;
+  }
+
   if (schema?.meta?.name) {
     return schema.meta.name;
   }
+
   return block.type.replace(/-/g, ' ').replace(/\b\w/g, (char: string) => char.toUpperCase());
 };
 
@@ -57,9 +62,19 @@ export function useBlockLabel() {
     return computed(() => getBlockLabel(blockId));
   };
 
+  /**
+   * Reactive block schema name computed property for a specific block ID
+   * @param blockId The block ID to watch
+   * @returns Computed ref that updates when block name or schema changes
+   */
+  const getBlockSchemaNameReactive = (blockId: string) => {
+    return computed(() => getBlockSchemaName(blockId));
+  };
+
   return {
     getBlockLabel,
     getBlockSchemaName,
     getBlockLabelReactive,
+    getBlockSchemaNameReactive,
   };
 }

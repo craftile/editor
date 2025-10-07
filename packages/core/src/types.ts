@@ -19,6 +19,7 @@ export interface EngineEvents {
   'block:remove': { blockId: string; block: Block; parentId?: string };
   'block:toggle': { blockId: string; disabled: boolean; oldValue?: boolean };
   'block:property:set': { blockId: string; key: string; value: any; oldValue: any };
+  'block:update': { blockId: string; block: Block; property: string; value: any; oldValue: any };
   'block:move': {
     blockId: string;
     targetParentId?: string;

@@ -26,6 +26,15 @@ const textSchema: BlockSchema = {
   accepts: [],
 };
 
+const buttonSchema: BlockSchema = {
+  type: 'button',
+  meta: {
+    name: 'Button',
+  },
+  properties: [{ id: 'text', type: 'text', label: 'Text', default: 'Click me' }],
+  accepts: [],
+};
+
 describe('InsertBlockCommand', () => {
   let page: Page;
   let emittedEvents: Array<{ event: string; data: any }> = [];
@@ -150,6 +159,52 @@ describe('InsertBlockCommand', () => {
       expect(emittedEvents).toHaveLength(2);
       expect(emittedEvents[1].event).toBe('block:remove');
       expect(emittedEvents[1].data.blockId).toBe(insertedId);
+    });
+  });
+
+  describe('Block Naming', () => {
+    it('should set block name from schema meta name', () => {
+      const command = new InsertBlockCommand(page, {
+        blockType: 'button',
+        blockSchema: buttonSchema,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      expect(insertedBlock.name).toBe('Button');
+    });
+
+    it('should set block name to block type if no schema meta name', () => {
+      const command = new InsertBlockCommand(page, {
+        blockType: 'text',
+        blockSchema: textSchema,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      expect(insertedBlock.name).toBe('text');
+    });
+
+    it('should set block name to block type if no schema provided', () => {
+      const command = new InsertBlockCommand(page, {
+        blockType: 'custom-block',
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      expect(insertedBlock.name).toBe('custom-block');
     });
   });
 });

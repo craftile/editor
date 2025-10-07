@@ -20,6 +20,7 @@ export class InsertBlockCommand implements Command {
   private index?: number;
   private blockId: string;
   private properties: Record<string, any>;
+  private blockSchema?: BlockSchema;
   private insertedBlock?: Block;
   private actualIndex?: number;
   private emit: EngineEmitFn;
@@ -32,14 +33,18 @@ export class InsertBlockCommand implements Command {
     this.index = options.index;
     this.blockId = generateId();
     this.emit = options.emit;
+    this.blockSchema = options.blockSchema;
 
     this.properties = this.buildProperties(options.blockSchema);
   }
 
   apply(): void {
+    const blockName = this.blockSchema?.meta?.name || this.blockType;
+
     this.insertedBlock = {
       type: this.blockType,
       id: this.blockId,
+      name: blockName,
       properties: this.properties,
       children: [],
       parentId: undefined, // Will be set if inserting as child

@@ -63,6 +63,7 @@ export class InsertBlockFromPresetCommand implements Command {
     this.insertedBlock = {
       type: this.blockType,
       id: this.blockId,
+      name: preset.name,
       properties: this.properties,
       children: [],
       parentId: undefined,
@@ -176,6 +177,7 @@ export class InsertBlockFromPresetCommand implements Command {
       const childBlock: Block = {
         type: presetChild.type,
         id: childId,
+        name: childSchema.meta?.name || presetChild.type, // Use schema name for child blocks
         semanticId: presetChild.id, // Preserve semantic ID from preset
         properties: childProperties,
         children: [],

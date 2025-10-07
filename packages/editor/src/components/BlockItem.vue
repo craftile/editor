@@ -20,14 +20,14 @@ const {
   moveChild,
 } = useBlock(props.blockId);
 const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayersPanel();
-const { getBlockLabelReactive, getBlockSchemaName } = useBlockLabel();
+const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
 
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
 const isStatic = computed(() => blockData.value?.static === true);
 
-const blockSchemaName = getBlockSchemaName(props.blockId);
+const blockSchemaName = getBlockSchemaNameReactive(props.blockId);
 const blockLabel = getBlockLabelReactive(props.blockId);
 
 const canInsertNextSibling = computed(() => {

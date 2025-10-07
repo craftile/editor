@@ -30,6 +30,7 @@ export type VisibilityRule = VisibilityCondition | VisibilityLogicGroup;
 export interface Block {
   type: string;
   id: string;
+  name?: string; // Custom display name for the block
   semanticId?: string;
   properties: BlockProperties;
   disabled?: boolean;

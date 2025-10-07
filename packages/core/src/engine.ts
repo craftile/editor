@@ -10,6 +10,7 @@ import { MoveBlockCommand } from './commands/move-block';
 import { ToggleBlockCommand } from './commands/toggle-block';
 import { SetBlockPropertyCommand } from './commands/set-block-property';
 import { DuplicateBlockCommand } from './commands/duplicate-block';
+import { SetBlockNameCommand } from './commands/set-block-name';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
@@ -226,6 +227,25 @@ export class Engine extends EventBus<EngineEvents> {
       blockId,
       propertyKey,
       propertyValue,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+  }
+
+  /**
+   * Set the display name for a block
+   *
+   * @param blockId - ID of the target block
+   * @param name - The new display name for the block
+   * @throws {Error} When block is not found
+   * @emits block:update - When the name is successfully set
+   */
+  setBlockName(blockId: string, name: string): void {
+    const command = new SetBlockNameCommand(this.page, {
+      blockId,
+      name,
       emit: this.emit.bind(this),
     });
 
