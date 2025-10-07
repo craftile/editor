@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
+import type { InsertBlockContext } from '../composables/blocks-popover';
 
 const props = defineProps<{
   blockId: any;
@@ -22,6 +23,7 @@ const {
 const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayersPanel();
 const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
+const { open: openBlocksPopover } = useBlocksPopover();
 
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
@@ -33,7 +35,20 @@ const blockLabel = getBlockLabelReactive(props.blockId);
 const canInsertNextSibling = computed(() => {
   return !nextSibling.value || nextSibling.value.static !== true;
 });
-function handleAddFirstChild() {}
+
+function handleAddFirstChild(event: Event) {
+  const button = event.target as HTMLElement;
+
+  const context: InsertBlockContext = {
+    parentId: props.blockId,
+    index: 0,
+  };
+
+  openBlocksPopover({
+    anchor: button,
+    context,
+  });
+}
 
 function onChildDragEnd(event: SortableEvent) {
   const { oldIndex, newIndex } = event;
@@ -136,7 +151,7 @@ function onChildMove(event: any) {
 
     <div v-if="!hasChildren && isExpanded" class="ml-3 py-1">
       <button
-        @click="handleAddFirstChild"
+        @click="handleAddFirstChild($event)"
         class="flex items-center gap-1.5 w-full p-1.5 text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors"
       >
         <icon-plus class="w-3 h-3" />
