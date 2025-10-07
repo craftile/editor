@@ -1,6 +1,6 @@
 {
   "name": "@craftile/preview-client-html",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "HTML preview client for static block rendering in Craftile",
   "keywords": [
     "craftile",
