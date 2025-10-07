@@ -1,5 +1,17 @@
 # @craftile/core
 
+## 0.3.0
+
+### Minor Changes
+
+- [`61eefa4`](https://github.com/craftile/editor/commit/61eefa45d358abbfdc9c0c2a9d52263a436e170c) Thanks [@eldomagan](https://github.com/eldomagan)! - Add support for custom block names
+
+### Patch Changes
+
+- Updated dependencies [[`61eefa4`](https://github.com/craftile/editor/commit/61eefa45d358abbfdc9c0c2a9d52263a436e170c), [`f2f0ecd`](https://github.com/craftile/editor/commit/f2f0ecd68a0b3eaadf8676622788058f5fdc422d)]:
+  - @craftile/types@0.3.0
+  - @craftile/event-bus@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @craftile/preview-client
 
+## 0.3.0
+
+### Patch Changes
+
+- [`f5ada99`](https://github.com/craftile/editor/commit/f5ada994be1072d6bbc775ed2186fc41e8a77191) Thanks [@eldomagan](https://github.com/eldomagan)! - Add automatic scroll to selected block in preview
+
+  When a block is selected in the editor, the preview now automatically scrolls to keep the selected block visible using smooth scroll behavior with 'nearest' positioning to minimize unnecessary scrolling.
+
 ## 0.2.1
 
 ## 0.2.0
