@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Accordion } from '@ark-ui/vue';
+import { evaluateVisibilityRule } from '../utils';
 
 const { t } = useI18n();
 const { selectedBlock } = useSelectedBlock();
@@ -16,7 +17,10 @@ const propertyFields = computed(() => {
     return [];
   }
 
-  return schema.properties;
+  return schema.properties.filter((field) => {
+    if (!field.visibleIf) return true;
+    return evaluateVisibilityRule(field.visibleIf, selectedBlock.value?.properties || {});
+  });
 });
 
 const hasGroupedProperties = computed(() => {
@@ -90,26 +94,30 @@ function updateProperty(propertyId: string, value: any) {
             </Accordion.ItemTrigger>
             <Accordion.ItemContent class="overflow-hidden">
               <div class="p-3 space-y-4">
-                <PropertyField
-                  v-for="field in group.fields"
-                  :key="field.id"
-                  :field="field"
-                  :model-value="getPropertyValue(field.id)"
-                  @update:model-value="updateProperty(field.id, $event)"
-                />
+                <TransitionGroup name="property-field" tag="div">
+                  <PropertyField
+                    v-for="field in group.fields"
+                    :key="field.id"
+                    :field="field"
+                    :model-value="getPropertyValue(field.id)"
+                    @update:model-value="updateProperty(field.id, $event)"
+                  />
+                </TransitionGroup>
               </div>
             </Accordion.ItemContent>
           </Accordion.Item>
         </Accordion.Root>
       </template>
-      <div v-else class="p-4 space-y-4">
-        <PropertyField
-          v-for="field in propertyFields"
-          :key="field.id"
-          :field="field"
-          :model-value="getPropertyValue(field.id)"
-          @update:model-value="updateProperty(field.id, $event)"
-        />
+      <div v-else class="p-4">
+        <TransitionGroup name="property-field" tag="div" class="space-y-4">
+          <PropertyField
+            v-for="field in propertyFields"
+            :key="field.id"
+            :field="field"
+            :model-value="getPropertyValue(field.id)"
+            @update:model-value="updateProperty(field.id, $event)"
+          />
+        </TransitionGroup>
       </div>
     </template>
     <div v-else class="text-center py-8">
@@ -119,3 +127,28 @@ function updateProperty(propertyId: string, value: any) {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Transition animations for conditional property fields */
+.property-field-move,
+.property-field-enter-active,
+.property-field-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.property-field-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.property-field-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Ensure items maintain spacing during transitions */
+.property-field-leave-active {
+  position: absolute;
+  width: 100%;
+}
+</style>

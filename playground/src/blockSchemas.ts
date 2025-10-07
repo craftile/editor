@@ -476,4 +476,154 @@ export const blockSchemas: BlockSchema[] = [
       description: 'Text block with grouped properties to test the grouping feature',
     },
   },
+  {
+    type: 'conditional-card',
+    properties: [
+      { id: 'title', type: 'text', label: 'Card Title', default: 'My Card' },
+      {
+        id: 'showImage',
+        type: 'boolean',
+        label: 'Show Image',
+        default: false,
+        variant: 'switch',
+      },
+      {
+        id: 'imageUrl',
+        type: 'text',
+        label: 'Image URL',
+        default: 'https://placehold.co/400x200',
+        // Only show when showImage is true
+        visibleIf: {
+          field: 'showImage',
+          operator: 'truthy',
+        },
+      },
+      {
+        id: 'imageAlt',
+        type: 'text',
+        label: 'Image Alt Text',
+        default: 'Card image',
+        // Only show when showImage is true
+        visibleIf: {
+          field: 'showImage',
+          operator: 'truthy',
+        },
+      },
+      {
+        id: 'layout',
+        type: 'select',
+        label: 'Layout',
+        default: 'simple',
+        variant: 'segment',
+        options: [
+          { value: 'simple', label: 'Simple' },
+          { value: 'grid', label: 'Grid' },
+          { value: 'featured', label: 'Featured' },
+        ],
+      },
+      {
+        id: 'columns',
+        type: 'number',
+        label: 'Columns',
+        default: 3,
+        // Only show when layout is 'grid'
+        visibleIf: {
+          field: 'layout',
+          operator: 'equals',
+          value: 'grid',
+        },
+      },
+      {
+        id: 'enableLink',
+        type: 'boolean',
+        label: 'Enable Link',
+        default: false,
+        variant: 'switch',
+      },
+      {
+        id: 'linkUrl',
+        type: 'text',
+        label: 'Link URL',
+        default: '#',
+        // Only show when enableLink is true
+        visibleIf: {
+          field: 'enableLink',
+          operator: 'truthy',
+        },
+      },
+      {
+        id: 'linkTarget',
+        type: 'select',
+        label: 'Link Target',
+        default: '_self',
+        options: [
+          { value: '_self', label: 'Same Window' },
+          { value: '_blank', label: 'New Window' },
+        ],
+        // Only show when enableLink is true
+        visibleIf: {
+          field: 'enableLink',
+          operator: 'truthy',
+        },
+      },
+      {
+        id: 'highlightColor',
+        type: 'color',
+        label: 'Highlight Color',
+        default: '#3b82f6',
+        // Show when layout is 'featured' OR showImage is true
+        visibleIf: {
+          or: [
+            { field: 'layout', operator: 'equals', value: 'featured' },
+            { field: 'showImage', operator: 'truthy' },
+          ],
+        },
+      },
+      {
+        id: 'advancedOptions',
+        type: 'boolean',
+        label: 'Show Advanced Options',
+        default: false,
+        variant: 'switch',
+      },
+      {
+        id: 'borderRadius',
+        type: 'number',
+        label: 'Border Radius (px)',
+        default: 8,
+        // Only show when advancedOptions is true AND layout is not 'simple'
+        visibleIf: {
+          and: [
+            { field: 'advancedOptions', operator: 'truthy' },
+            { field: 'layout', operator: 'not_equals', value: 'simple' },
+          ],
+        },
+      },
+      {
+        id: 'shadowIntensity',
+        type: 'select',
+        label: 'Shadow Intensity',
+        default: 'medium',
+        options: [
+          { value: 'none', label: 'None' },
+          { value: 'light', label: 'Light' },
+          { value: 'medium', label: 'Medium' },
+          { value: 'strong', label: 'Strong' },
+        ],
+        // Only show when advancedOptions is true
+        visibleIf: {
+          field: 'advancedOptions',
+          operator: 'truthy',
+        },
+      },
+    ],
+    accepts: [],
+    meta: {
+      name: 'Conditional Card',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V5h14v14z"/><path d="M7 10h4v4H7z"/><path d="M14 7h3v2h-3zm0 4h3v2h-3zm0 4h3v2h-3z"/></svg>',
+      category: 'Testing',
+      description: 'Card block demonstrating conditional field visibility based on property values',
+      previewImageUrl: 'https://placehold.co/400x240/8b5cf6/ffffff?text=Conditional+Card',
+    },
+  },
 ];

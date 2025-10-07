@@ -3,6 +3,30 @@ export interface BlockProperties {
   [key: string]: any;
 }
 
+export type VisibilityOperator =
+  | 'equals'
+  | 'not_equals'
+  | 'in'
+  | 'not_in'
+  | 'contains'
+  | 'greater_than'
+  | 'less_than'
+  | 'truthy'
+  | 'falsy';
+
+export interface VisibilityCondition {
+  field: string;
+  operator: VisibilityOperator;
+  value?: any;
+}
+
+export interface VisibilityLogicGroup {
+  and?: VisibilityRule[];
+  or?: VisibilityRule[];
+}
+
+export type VisibilityRule = VisibilityCondition | VisibilityLogicGroup;
+
 export interface Block {
   type: string;
   id: string;
@@ -20,6 +44,7 @@ export interface PropertyField {
   label?: string;
   default?: any;
   group?: string; // Optional group name for organizing properties in UI
+  visibleIf?: VisibilityRule; // Conditional visibility based on other property values
   [key: string]: any;
 }
 
