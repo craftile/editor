@@ -45,7 +45,7 @@ const selectedValues = computed({
 
 <template>
   <!-- Segment Group variant -->
-  <div v-if="variant === 'segment'" class="flex rounded-lg border border-gray-300 bg-gray-100 relative p-0.5">
+  <div v-if="variant === 'segment'" class="flex rounded-lg border border-gray-300 bg-gray-100 p-0.5">
     <button
       v-for="option in field.options"
       class="flex-1 h-9 text-center cursor-pointer rounded text-sm data-[state=checked]:bg-white data-[state=checked]:shadow"

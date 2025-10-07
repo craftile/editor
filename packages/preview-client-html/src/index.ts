@@ -374,6 +374,7 @@ export default class RawHtmlRenderer {
     }
 
     this.elementCache.set(block.id, newElement);
+    newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
 
     this.previewClient.emit('block.insert.after', {
       blockId: block.id,

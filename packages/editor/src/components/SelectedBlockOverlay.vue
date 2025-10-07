@@ -158,12 +158,12 @@ const toolbarStyle = computed(() => {
       </PreviewToolbarButton>
 
       <!-- Duplicate Button -->
-      <PreviewToolbarButton :title="t('block.duplicate')" @click="duplicate">
+      <PreviewToolbarButton v-if="!isStaticBlock" :title="t('block.duplicate')" @click="duplicate">
         <icon-document-duplicate-16-solid />
       </PreviewToolbarButton>
 
       <!-- Disable Button -->
-      <PreviewToolbarButton v-if="!isStaticBlock" :title="t('block.disable')" @click="toggle">
+      <PreviewToolbarButton :title="t('block.disable')" @click="toggle">
         <icon-eye-slash-16-solid />
       </PreviewToolbarButton>
 

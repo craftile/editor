@@ -57,6 +57,7 @@ export class Inspector {
       this.currentSelectedBlock = element;
       this.sendSelectedBlockPosition();
       this.trackSelectedBlock();
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
   }
 
