@@ -45,15 +45,21 @@ const selectedValues = computed({
 
 <template>
   <!-- Segment Group variant -->
-  <div v-if="variant === 'segment'" class="flex rounded-lg border border-gray-300 bg-gray-100 p-0.5">
-    <button
-      v-for="option in field.options"
-      class="flex-1 h-9 text-center cursor-pointer rounded text-sm data-[state=checked]:bg-white data-[state=checked]:shadow"
-      :data-state="value === option.value ? 'checked' : 'unchecked'"
-      @click="value = option.value"
-    >
-      {{ option.label || option.value }}
-    </button>
+  <div v-if="variant === 'segment'">
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      {{ field.label }}
+    </label>
+
+    <div class="flex rounded-lg border border-gray-300 bg-gray-100 p-0.5">
+      <button
+        v-for="option in field.options"
+        class="flex-1 h-9 text-center cursor-pointer rounded text-sm data-[state=checked]:bg-white data-[state=checked]:shadow"
+        :data-state="value === option.value ? 'checked' : 'unchecked'"
+        @click="value = option.value"
+      >
+        {{ option.label || option.value }}
+      </button>
+    </div>
   </div>
 
   <!-- Select dropdown variant -->

@@ -8,6 +8,13 @@ import { blockRenderers } from './blockRenderers';
 const editor = createCraftileEditor({
   el: '#app',
   blockSchemas,
+  devices: {
+    presets: [
+      { id: 'mobile', label: 'Mobile', width: 375, icon: 'mobile' },
+      { id: 'tablet', label: 'Tablet', width: 768, icon: 'tablet' },
+      { id: 'desktop', label: 'Desktop', width: 1024, icon: 'desktop' },
+    ],
+  },
   plugins: [
     CommonPropertiesPlugin,
     StaticBlocksRenderer({ blockRenderers, scripts: ['https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'] }),
@@ -102,7 +109,7 @@ const editor = createCraftileEditor({
           padding: 40,
           backgroundColor: '#f8f9fa',
         },
-        children: ['welcome-text', 'grouped-demo-block', 'cta-button', 'content-section'],
+        children: ['welcome-text', 'responsive-hero-demo', 'grouped-demo-block', 'cta-button', 'content-section'],
       },
       'welcome-text': {
         id: 'welcome-text',
@@ -113,6 +120,26 @@ const editor = createCraftileEditor({
           color: '#1f2937',
           booleanField: true,
           rangeField: 50,
+        },
+        children: [],
+      },
+      'responsive-hero-demo': {
+        id: 'responsive-hero-demo',
+        type: 'responsive-hero',
+        properties: {
+          title: 'Responsive Design Demo',
+          fontSize: {
+            _default: '3xl',
+            tablet: '2xl',
+            mobile: 'xl',
+          },
+          padding: {
+            _default: 40,
+            tablet: 30,
+            mobile: 20,
+          },
+          textAlign: 'center',
+          backgroundColor: '#3b82f6',
         },
         children: [],
       },

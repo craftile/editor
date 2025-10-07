@@ -27,6 +27,12 @@ export interface VisibilityLogicGroup {
 
 export type VisibilityRule = VisibilityCondition | VisibilityLogicGroup;
 
+// Responsive property value type
+export interface ResponsiveValue<T = any> {
+  _default: T;
+  [deviceId: string]: T;
+}
+
 export interface Block {
   type: string;
   id: string;
@@ -46,6 +52,7 @@ export interface PropertyField {
   default?: any;
   group?: string; // Optional group name for organizing properties in UI
   visibleIf?: VisibilityRule; // Conditional visibility based on other property values
+  responsive?: boolean; // Enable breakpoint-specific values for this property
   [key: string]: any;
 }
 

@@ -33,6 +33,7 @@ declare module 'vue' {
     IconArrowLongUp16Solid: typeof import('~icons/heroicons/arrow-long-up16-solid')['default']
     IconArrowUturnLeft: typeof import('~icons/heroicons/arrow-uturn-left')['default']
     IconArrowUturnRight: typeof import('~icons/heroicons/arrow-uturn-right')['default']
+    IconCheck: typeof import('~icons/heroicons/check')['default']
     IconChevronDown: typeof import('~icons/heroicons/chevron-down')['default']
     IconChevronLeft: typeof import('~icons/heroicons/chevron-left')['default']
     IconChevronRight: typeof import('~icons/heroicons/chevron-right')['default']
@@ -60,9 +61,11 @@ declare module 'vue' {
     PropertyField: typeof import('./components/PropertyField.vue')['default']
     PropertyFieldRenderWrapper: typeof import('./components/PropertyFieldRenderWrapper.vue')['default']
     RenderFunctionWrapper: typeof import('./components/RenderFunctionWrapper.vue')['default']
+    ResponsivePropertyField: typeof import('./components/ResponsivePropertyField.vue')['default']
     SelectedBlockOverlay: typeof import('./components/SelectedBlockOverlay.vue')['default']
     Sidebar: typeof import('./components/Sidebar.vue')['default']
     Toasts: typeof import('./components/Toasts.vue')['default']
+    Tooltip: typeof import('./components/Tooltip.vue')['default']
     UiButton: typeof import('./components/ui/Button.vue')['default']
   }
 }

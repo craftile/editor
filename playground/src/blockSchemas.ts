@@ -626,4 +626,56 @@ export const blockSchemas: BlockSchema[] = [
       previewImageUrl: 'https://placehold.co/400x240/8b5cf6/ffffff?text=Conditional+Card',
     },
   },
+  // Responsive properties demo
+  {
+    type: 'responsive-hero',
+    properties: [
+      { id: 'title', type: 'text', label: 'Title', default: 'Responsive Hero' },
+      {
+        id: 'fontSize',
+        type: 'select',
+        label: 'Font Size',
+        responsive: true, // Enable responsive mode
+        default: '3xl',
+        options: [
+          { value: 'xl', label: 'XL' },
+          { value: '2xl', label: '2XL' },
+          { value: '3xl', label: '3XL' },
+          { value: '4xl', label: '4XL' },
+          { value: '5xl', label: '5XL' },
+        ],
+      },
+      {
+        id: 'padding',
+        type: 'number',
+        label: 'Padding (px)',
+        responsive: true, // Enable responsive mode
+        default: 40,
+        min: 0,
+        max: 100,
+      },
+      {
+        id: 'textAlign',
+        type: 'select',
+        label: 'Text Alignment',
+        responsive: true, // Enable responsive mode
+        default: 'center',
+        variant: 'segment',
+        options: [
+          { value: 'left', label: 'Left' },
+          { value: 'center', label: 'Center' },
+          { value: 'right', label: 'Right' },
+        ],
+      },
+      { id: 'backgroundColor', type: 'color', label: 'Background', default: '#3b82f6' },
+    ],
+    accepts: [],
+    meta: {
+      name: 'Responsive Hero',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>',
+      category: 'Testing',
+      description: 'Hero block demonstrating responsive properties with device-specific values',
+      previewImageUrl: 'https://placehold.co/400x240/3b82f6/ffffff?text=Responsive+Hero',
+    },
+  },
 ];

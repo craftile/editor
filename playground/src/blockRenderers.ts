@@ -129,4 +129,36 @@ export const blockRenderers: Record<string, BlockRenderer> = {
       ${escapeHtml(props.content || props.placeholder || 'Text')}
     </div>`;
   },
+
+  'responsive-hero': ({ props, editorAttributes }: any) => {
+    // Helper to get responsive value or fallback to default
+    const getResponsiveValue = (value: any) => {
+      if (value && typeof value === 'object' && '_default' in value) {
+        // For now in preview, just use the _default value
+        // In a real implementation, you'd check viewport size and use appropriate breakpoint
+        return value._default;
+      }
+      return value;
+    };
+
+    const fontSize = getResponsiveValue(props.fontSize) || '3xl';
+    const padding = getResponsiveValue(props.padding) || 40;
+    const textAlign = getResponsiveValue(props.textAlign) || 'center';
+    const backgroundColor = props.backgroundColor || '#3b82f6';
+    const title = props.title || 'Hero Title';
+
+    const style = `
+      background-color: ${escapeHtml(backgroundColor)};
+      padding: ${padding}px;
+      text-align: ${textAlign};
+      color: white;
+      font-size: var(--fs-${fontSize});
+      font-weight: bold;
+      border-radius: 8px;
+    `;
+
+    return `<div class="block" ${editorAttributes} style="${style}">
+      ${escapeHtml(title)}
+    </div>`;
+  },
 };

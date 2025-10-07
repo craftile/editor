@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PropertyField } from '@craftile/types';
 import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../utils';
+import ResponsivePropertyField from './ResponsivePropertyField.vue';
 
 interface Props {
   field: PropertyField;
@@ -15,6 +16,18 @@ const emit = defineEmits<{
 
 const { propertyFields: propertyFieldConfigs } = useUI();
 
+const { currentDevice, devicePresets, setDeviceMode } = useDeviceMode();
+
+const availableDevices = computed(() => {
+  const baseDevice = { id: '_default', label: 'All devices', width: 0, icon: 'desktop' };
+  const otherDevices = devicePresets.filter((d) => d.id !== 'fit');
+  return [baseDevice, ...otherDevices];
+});
+
+const responsiveCurrentDevice = computed(() => {
+  return currentDevice.value === 'fit' ? '_default' : currentDevice.value;
+});
+
 const fieldRenderer = computed(() => {
   const config = propertyFieldConfigs.value.get(props.field.type);
   return config?.render;
@@ -23,9 +36,27 @@ const fieldRenderer = computed(() => {
 const handleInput = (value: any) => {
   emit('update:modelValue', value);
 };
+
+// Handle device change from responsive field
+const handleDeviceChange = (deviceId: string) => {
+  const globalDeviceId = deviceId === '_default' ? 'fit' : deviceId;
+  setDeviceMode(globalDeviceId);
+};
 </script>
 <template>
-  <div>
+  <!-- Responsive Field Wrapper -->
+  <ResponsivePropertyField
+    v-if="field.responsive"
+    :field="field"
+    :model-value="modelValue"
+    :current-device="responsiveCurrentDevice"
+    :available-devices="availableDevices"
+    @update:model-value="handleInput"
+    @change-device="handleDeviceChange"
+  />
+
+  <!-- Regular Field -->
+  <div v-else>
     <!-- Vue Component Rendering -->
     <component
       v-if="isVueComponent(fieldRenderer) || isComponentString(fieldRenderer)"
