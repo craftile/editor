@@ -1,5 +1,11 @@
 # @craftile/plugin-common-properties
 
+## 0.3.0
+
+### Patch Changes
+
+- [`756b152`](https://github.com/craftile/editor/commit/756b15291e71b408a3b22b70797cc667cfb79504) Thanks [@eldomagan](https://github.com/eldomagan)! - Replace Ark UI checkbox with native HTML checkbox and export field components
+
 ## 0.2.1
 
 ## 0.2.0

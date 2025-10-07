@@ -1,5 +1,40 @@
 # @craftile/types
 
+## 0.3.0
+
+### Minor Changes
+
+- [`61eefa4`](https://github.com/craftile/editor/commit/61eefa45d358abbfdc9c0c2a9d52263a436e170c) Thanks [@eldomagan](https://github.com/eldomagan)! - Add support for custom block names
+
+- [`f2f0ecd`](https://github.com/craftile/editor/commit/f2f0ecd68a0b3eaadf8676622788058f5fdc422d) Thanks [@eldomagan](https://github.com/eldomagan)! - Add conditional property field visibility with visibleIf rules
+
+  **Example usage:**
+
+  ```typescript
+  {
+    id: 'linkUrl',
+    type: 'text',
+    label: 'Link URL',
+    visibleIf: {
+      field: 'enableLink',
+      operator: 'truthy'
+    }
+  }
+
+  // Complex example with logical groups
+  {
+    id: 'borderRadius',
+    type: 'number',
+    label: 'Border Radius',
+    visibleIf: {
+      and: [
+        { field: 'advancedOptions', operator: 'truthy' },
+        { field: 'layout', operator: 'not_equals', value: 'simple' }
+      ]
+    }
+  }
+  ```
+
 ## 0.2.1
 
 ## 0.2.0
