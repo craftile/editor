@@ -93,8 +93,8 @@ function updateProperty(propertyId: string, value: any) {
               </Accordion.ItemIndicator>
             </Accordion.ItemTrigger>
             <Accordion.ItemContent class="overflow-hidden">
-              <div class="p-3 space-y-4">
-                <TransitionGroup name="property-field" tag="div">
+              <div class="p-3">
+                <TransitionGroup name="property-field" tag="div" class="space-y-4">
                   <PropertyField
                     v-for="field in group.fields"
                     :key="field.id"

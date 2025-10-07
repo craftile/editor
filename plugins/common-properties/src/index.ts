@@ -27,3 +27,6 @@ const CommonPropertiesPlugin: CraftileEditorPlugin = ({ editor }) => {
 };
 
 export default CommonPropertiesPlugin;
+
+// Export individual field components
+export { Text, Textarea, Boolean, Select, Radio, Range, Color, Number };

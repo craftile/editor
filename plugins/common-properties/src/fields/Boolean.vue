@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropertyField } from '@craftile/types';
-import { Checkbox } from '@ark-ui/vue/checkbox';
 import { Switch } from '@ark-ui/vue/switch';
 
 interface Props {
@@ -31,15 +30,12 @@ const checked = defineModel<boolean>();
   </Switch.Root>
 
   <!-- Checkbox variant -->
-  <Checkbox.Root v-else v-model:checked="checked" class="flex items-center cursor-pointer gap-2">
-    <Checkbox.Control
-      class="w-4 h-4 border border-gray-300 rounded data-[state=checked]:bg-accent data-[state=checked]:border-accent flex items-center justify-center"
-    >
-      <Checkbox.Indicator>
-        <icon-check class="w-3 h-3 text-white" />
-      </Checkbox.Indicator>
-    </Checkbox.Control>
-    <Checkbox.Label>{{ field.label }}</Checkbox.Label>
-    <Checkbox.HiddenInput />
-  </Checkbox.Root>
+  <label v-else class="flex items-center cursor-pointer gap-2">
+    <input
+      type="checkbox"
+      v-model="checked"
+      class="w-4 h-4 rounded border-gray-300 focus:outline-none text-accent focus:ring-accent focus:ring-2"
+    />
+    <span class="text-sm font-medium text-gray-700">{{ field.label }}</span>
+  </label>
 </template>
