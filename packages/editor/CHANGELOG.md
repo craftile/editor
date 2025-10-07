@@ -1,5 +1,19 @@
 # @craftile/editor
 
+## 0.3.1
+
+### Patch Changes
+
+- [`6a98b46`](https://github.com/craftile/editor/commit/6a98b46a024f2796c3c08e2e9a1b7539814e15c5) Thanks [@eldomagan](https://github.com/eldomagan)! - Add support for block:update event in watch-engine-updates
+
+  Handle the block:update event to properly track and propagate block metadata changes (like block name updates) to the preview for re-rendering.
+
+- Updated dependencies []:
+  - @craftile/core@0.3.1
+  - @craftile/event-bus@0.3.1
+  - @craftile/messenger@0.3.1
+  - @craftile/types@0.3.1
+
 ## 0.3.0
 
 ### Minor Changes
