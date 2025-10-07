@@ -30,7 +30,7 @@ const activePanel = computed(() => {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col bg-white">
+  <div class="h-full w-full flex flex-col bg-white relative">
     <ConfigurationHeader :is-overlay="isOverlay" class="flex-none" />
     <template v-if="hasSelection">
       <Tabs.Root v-if="showTabs" v-model="activePanelId" class="flex-1 flex flex-col overflow-y-hidden">
