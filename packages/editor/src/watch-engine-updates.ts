@@ -178,6 +178,17 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
     })
   );
 
+  cleanupFunctions.push(
+    engine.on('block:update', ({ blockId }) => {
+      if (!pendingChanges.added.has(blockId)) {
+        pendingChanges.updated.add(blockId);
+      }
+
+      pendingChanges.blocksToInclude.add(blockId);
+      scheduleEmit();
+    })
+  );
+
   return () => {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
