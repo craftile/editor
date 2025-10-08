@@ -2,6 +2,48 @@ import type { BlockSchema } from '@craftile/types';
 
 export const blockSchemas: BlockSchema[] = [
   {
+    type: 'heading',
+    properties: [
+      { id: 'text', type: 'text', label: 'Heading Text', default: 'Heading' },
+      {
+        id: 'level',
+        type: 'select',
+        label: 'Heading Level',
+        default: 'h2',
+        variant: 'segment',
+        options: [
+          { value: 'h1', label: 'H1' },
+          { value: 'h2', label: 'H2' },
+          { value: 'h3', label: 'H3' },
+          { value: 'h4', label: 'H4' },
+          { value: 'h5', label: 'H5' },
+          { value: 'h6', label: 'H6' },
+        ],
+      },
+      { id: 'color', type: 'color', label: 'Color', default: '#1f2937' },
+      {
+        id: 'align',
+        type: 'select',
+        label: 'Alignment',
+        default: 'left',
+        variant: 'segment',
+        options: [
+          { value: 'left', label: 'Left' },
+          { value: 'center', label: 'Center' },
+          { value: 'right', label: 'Right' },
+        ],
+      },
+    ],
+    accepts: [],
+    meta: {
+      name: 'Heading',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4v7h5V4h2v16h-2v-7H6v7H4V4h2zm13 14h-3v-1.5l1-.63V9.13l-1-.63V7h3v1.5l-1 .63v6.74l1 .63V18z"/></svg>',
+      category: 'Content',
+      description: 'Heading block that demonstrates root tag changes (H1-H6)',
+      previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Heading',
+    },
+  },
+  {
     type: 'text',
     properties: [
       { id: 'content', type: 'text', label: 'Content', default: 'Enter text...' },

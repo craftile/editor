@@ -407,14 +407,25 @@ export default class RawHtmlRenderer {
 
     morphdom(blockElement, html, this.morphdomOptions);
 
-    // Element may have changed after morphdom, invalidate cache
+    // Root tag may have changed after morphdom - invalidate cache and retrieve new element
     this.elementCache.delete(block.id);
+    const updatedElement = this.getElementCached(block.id);
+
+    if (!updatedElement) {
+      console.error(`Block element ${block.id} not found after morphdom update`);
+      return;
+    }
+
+    // Notify inspector if element reference changed (root tag changed)
+    if (updatedElement !== blockElement) {
+      this.previewClient.inspector.updateTrackedElement(block.id, updatedElement);
+    }
 
     this.previewClient.emit('block.update.after', {
       blockId: block.id,
       blockType: block.type,
       block,
-      element: blockElement,
+      element: updatedElement,
       html,
     });
   }

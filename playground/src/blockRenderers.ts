@@ -88,6 +88,24 @@ function generateBlockStyle(properties: Record<string, any>): string {
 }
 
 export const blockRenderers: Record<string, BlockRenderer> = {
+  heading: ({ props, editorAttributes }) => {
+    const level = props.level || 'h2';
+    const text = escapeHtml(props.text || 'Heading');
+    const color = props.color || '#1f2937';
+    const align = props.align || 'left';
+
+    const style = `
+      color: ${escapeHtml(color)};
+      text-align: ${align};
+      margin: 0;
+    `;
+
+    // The root tag changes based on the level property (h1, h2, h3, h4, h5, h6)
+    return `<${level} class="block" ${editorAttributes} style="${style}">
+      ${text}
+    </${level}>`;
+  },
+
   container: ({ props, editorAttributes, children }) => {
     const style = generateContainerStyle(props);
 

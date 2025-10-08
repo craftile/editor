@@ -25,6 +25,25 @@ export class Inspector {
     this.setupGlobalEventListeners();
   }
 
+  /**
+   * Update the tracked element reference when a block's DOM element changes.
+   * This is needed when the root tag of a block changes during an update.
+   */
+  updateTrackedElement(blockId: string, newElement: HTMLElement): void {
+    // Update hovered block if it matches
+    if (this.currentHoveredBlock?.dataset.block === blockId) {
+      this.currentHoveredBlock = newElement;
+      this.sendHoveredBlockPosition();
+    }
+
+    // Update selected block if it matches and re-track it
+    if (this.currentSelectedBlock?.dataset.block === blockId) {
+      this.currentSelectedBlock = newElement;
+      this.sendSelectedBlockPosition(true);
+      this.trackSelectedBlock();
+    }
+  }
+
   enable() {
     this.active = true;
     document.body.classList.add('craftile-inspector-active');

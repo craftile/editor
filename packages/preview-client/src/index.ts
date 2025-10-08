@@ -1,2 +1,4 @@
 import { PreviewClient } from './client';
-export { PreviewClient };
+import { Inspector } from './inspector';
+
+export { PreviewClient, Inspector };

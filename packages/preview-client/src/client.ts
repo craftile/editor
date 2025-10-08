@@ -5,8 +5,7 @@ import { Inspector } from './inspector';
 
 export class PreviewClient extends EventBus {
   private messenger: WindowMessenger<WindowMessages>;
-  // @ts-ignore
-  private inspector: Inspector;
+  public inspector: Inspector;
 
   constructor() {
     super();
