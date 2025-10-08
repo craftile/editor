@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.4.1
+
+### Patch Changes
+
+- [`eea5c83`](https://github.com/craftile/editor/commit/eea5c83bdb654fb408268bee08fc5eee58de3470) Thanks [@eldomagan](https://github.com/eldomagan)! - Update property field transition to use smooth expand/collapse animation instead of slide
+
+- Updated dependencies []:
+  - @craftile/core@0.4.1
+  - @craftile/event-bus@0.4.1
+  - @craftile/messenger@0.4.1
+  - @craftile/types@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes
