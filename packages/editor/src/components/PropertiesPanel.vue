@@ -127,28 +127,3 @@ function updateProperty(propertyId: string, value: any) {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Transition animations for conditional property fields */
-.property-field-move,
-.property-field-enter-active,
-.property-field-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.property-field-enter-from {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-.property-field-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-/* Ensure items maintain spacing during transitions */
-.property-field-leave-active {
-  position: absolute;
-  width: 100%;
-}
-</style>

@@ -64,4 +64,22 @@
   .ghost-block {
     @apply opacity-30 bg-accent/20 border-2 border-dashed border-accent/80 rounded-md;
   }
+
+  .property-field-enter-active,
+  .property-field-leave-active {
+    transition: all 0.2s ease;
+    overflow: hidden;
+  }
+
+  .property-field-enter-from,
+  .property-field-leave-to {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  .property-field-enter-to,
+  .property-field-leave-from {
+    opacity: 1;
+    max-height: 200px;
+  }
 }
