@@ -5,7 +5,6 @@ import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import '../index.css';
 
 const { isExtraExtraLarge } = useBreakpoints();
-const { hasSelection } = useSelectedBlock();
 const { keyboardShortcuts } = useUI();
 const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
 
@@ -36,9 +35,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
       <main class="flex-1 flex overflow-hidden relative">
         <Sidebar />
         <Panels />
-        <div v-if="hasSelection && !isExtraExtraLarge" class="absolute left-14 top-0 h-full w-75 z-50">
-          <ConfigurationPanels is-overlay />
-        </div>
 
         <div class="flex-1 p-3 bg-gray-100 overflow-auto preview-container flex justify-center">
           <PreviewCanvas />

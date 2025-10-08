@@ -8,6 +8,8 @@ const { regions, moveBlock } = useCraftileEngine();
 const { collapseRegion, expandAncestors } = useLayersPanel();
 const { open: openBlocksPopover } = useBlocksPopover();
 const eventBus = useEventBus();
+const { isExtraExtraLarge } = useBreakpoints();
+const { hasSelection } = useSelectedBlock();
 
 // Expand ancestors and scroll to block when selected
 eventBus.on('ui:block:select', (data: { blockId: string }) => {
@@ -67,7 +69,7 @@ function addBlockToRegion(event: Event, regionName: string) {
 </script>
 
 <template>
-  <div class="h-full flex flex-col overflow-y-hidden">
+  <div class="h-full flex flex-col overflow-y-hidden relative">
     <div class="flex-none h-12 flex items-center border-b px-4">
       <h2>{{ t('layers.header') }}</h2>
     </div>
@@ -110,6 +112,10 @@ function addBlockToRegion(event: Event, regionName: string) {
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-if="hasSelection && !isExtraExtraLarge" class="absolute inset-0 z-10">
+      <ConfigurationPanels is-overlay />
     </div>
   </div>
 </template>
