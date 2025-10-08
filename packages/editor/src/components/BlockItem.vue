@@ -24,6 +24,7 @@ const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayers
 const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
 const { open: openBlocksPopover } = useBlocksPopover();
+const { engine, moveBlock, blocks } = useCraftileEngine();
 
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
@@ -50,31 +51,89 @@ function handleAddFirstChild(event: Event) {
   });
 }
 
-function onChildDragEnd(event: SortableEvent) {
-  const { oldIndex, newIndex } = event;
-
-  if (typeof newIndex === 'undefined' || oldIndex === newIndex) {
-    return;
-  }
-
-  const movedChild = children.value[oldIndex as number];
-
-  if (!movedChild) {
-    return;
-  }
-
-  moveChild(movedChild.id, newIndex);
-}
-
-function onChildMove(event: any) {
+function canAcceptChild(event: any): boolean {
+  // Prevent dropping on static blocks
   if (event.related && event.related.classList.contains('is-static')) {
     return false;
   }
+
+  // Sometimes, the event is the direct drag event, not the vue-draggable-plus custom event
+  // so elements like dragged, to, target may not be available
+  // the element is still being dragged, so we allow
+  if (!event.drag || !event.target || !event.to) {
+    return true;
+  }
+
+  const draggedBlockId = event.dragged.getAttribute?.('data-block-id');
+
+  if (!draggedBlockId) {
+    return false;
+  }
+
+  const draggedBlock = blocks.value[draggedBlockId];
+  if (!draggedBlock) {
+    return false;
+  }
+
+  const targetParentId = event.to?.parentElement?.closest?.('[data-block-id]')?.getAttribute?.('data-block-id');
+
+  if (!targetParentId) {
+    return false;
+  }
+
+  const targetParentBlock = blocks.value[targetParentId];
+  if (!targetParentBlock) {
+    return false;
+  }
+
+  // Check if the block type can be a child of the target parent type
+  return engine.getBlocksManager().canBeChild(draggedBlock.type, targetParentBlock.type);
+}
+
+function onChildDragEnd(event: SortableEvent) {
+  const { oldIndex, newIndex, from, to } = event;
+
+  if (typeof newIndex === 'undefined') {
+    return;
+  }
+
+  // Get the moved block ID from the dragged item
+  const movedBlockId = event.item?.getAttribute?.('data-block-id');
+  if (!movedBlockId) {
+    return;
+  }
+
+  const isSameContainer = from === to;
+
+  if (isSameContainer && oldIndex === newIndex) {
+    return;
+  }
+
+  if (isSameContainer) {
+    moveChild(movedBlockId, newIndex);
+    return;
+  }
+
+  // For cross-container moves, get the target parent block ID
+  // The 'to' element is the VueDraggable container, so we need to look at its parent
+  const targetParentElement = to?.parentElement?.closest?.('[data-block-id]');
+  const targetParentId = targetParentElement?.getAttribute?.('data-block-id');
+
+  if (targetParentId) {
+    moveBlock(movedBlockId, {
+      targetParentId,
+      targetIndex: newIndex,
+    });
+  }
+}
+
+function onChildMove(event: any) {
+  return canAcceptChild(event);
 }
 </script>
 
 <template>
-  <div v-if="blockData" :class="{ 'bg-gray-100': isActive, 'is-static': isStatic }">
+  <div v-if="blockData" :class="{ 'bg-gray-100': isActive, 'is-static': isStatic }" :data-block-id="blockData.id">
     <div
       :data-block-id="blockData.id"
       :data-selected="isSelected ? 'true' : undefined"
@@ -149,21 +208,12 @@ function onChildMove(event: any) {
       </div>
     </div>
 
-    <div v-if="!hasChildren && isExpanded" class="ml-3 py-1">
-      <button
-        @click="handleAddFirstChild($event)"
-        class="flex items-center gap-1.5 w-full p-1.5 text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors"
-      >
-        <icon-plus class="w-3 h-3" />
-        <span>{{ t('layers.addBlockToBlock') }}</span>
-      </button>
-    </div>
-
-    <!-- Child Blocks -->
-    <div v-if="hasChildren && isExpanded" class="ml-3 space-y-1">
+    <!-- Child Blocks - Always show when expanded and can have children to allow drops into empty containers -->
+    <div v-if="canHaveChildren && isExpanded" class="ml-3 space-y-1">
       <VueDraggable
         :model-value="blockData.children"
         :animation="200"
+        :group="{ name: 'blocks', pull: true, put: canAcceptChild }"
         ghost-class="ghost-block"
         chosen-class="chosen-block"
         drag-class="drag-block"
@@ -173,6 +223,17 @@ function onChildMove(event: any) {
       >
         <BlockItem v-for="child in children" :key="child.id" :block-id="child.id" :level="level + 1" />
       </VueDraggable>
+
+      <!-- Show add button when empty -->
+      <div v-if="!hasChildren" class="py-1">
+        <button
+          @click="handleAddFirstChild($event)"
+          class="flex items-center gap-1.5 w-full p-1.5 text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors"
+        >
+          <icon-plus class="w-3 h-3" />
+          <span>{{ t('layers.addBlockToBlock') }}</span>
+        </button>
+      </div>
     </div>
 
     <AddBlockBtn
