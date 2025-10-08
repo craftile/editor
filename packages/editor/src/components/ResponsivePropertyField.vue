@@ -89,7 +89,7 @@ const fieldRenderer = computed(() => {
 
 <template>
   <div class="relative">
-    <div class="flex items-center justify-end gap-3 absolute right-0 top-0">
+    <div class="flex items-center justify-end gap-3 absolute right-0 top-0 z-5">
       <Tooltip title="Reset to default value">
         <button
           v-if="hasOverride"
