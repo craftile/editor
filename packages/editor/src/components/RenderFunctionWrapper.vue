@@ -27,9 +27,12 @@ onMounted(() => {
   renderContent();
 });
 
-// watch(() => props.renderFn, () => {
-//   renderContent();
-// });
+watch(
+  () => props.renderFn,
+  () => {
+    renderContent();
+  }
+);
 </script>
 
 <template>
