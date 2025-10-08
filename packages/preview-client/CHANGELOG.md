@@ -1,5 +1,11 @@
 # @craftile/preview-client
 
+## 0.4.2
+
+### Patch Changes
+
+- [`d05cb1c`](https://github.com/craftile/editor/commit/d05cb1c9d33a60d1a47112780419f1509b3227fd) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix inspector element tracking when block root tag changes during updates. When morphdom replaces the root element (e.g., changing from h1 to h2), the inspector now properly updates its element references and re-attaches observers to track the new element.
+
 ## 0.4.1
 
 ## 0.4.0
