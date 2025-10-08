@@ -1,5 +1,21 @@
 # @craftile/editor
 
+## 0.5.0
+
+### Minor Changes
+
+- [`c5edbc6`](https://github.com/craftile/editor/commit/c5edbc69a7210ce8393444c68d18d6959b6c63f5) Thanks [@eldomagan](https://github.com/eldomagan)! - Enable cross-level block drag and drop in layers panel. Blocks can now be dragged to their grandparent or any ancestor block that accepts them, with automatic schema validation to prevent invalid parent-child relationships. Empty containers remain valid drop targets.
+
+### Patch Changes
+
+- [`d461adc`](https://github.com/craftile/editor/commit/d461adc60f862ff98eecc22bdca66aed9090c3e6) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix z-index for responsive property field action buttons to ensure they appear above other elements
+
+- Updated dependencies []:
+  - @craftile/core@0.5.0
+  - @craftile/event-bus@0.5.0
+  - @craftile/messenger@0.5.0
+  - @craftile/types@0.5.0
+
 ## 0.4.2
 
 ### Patch Changes
