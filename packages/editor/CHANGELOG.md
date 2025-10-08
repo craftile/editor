@@ -1,5 +1,21 @@
 # @craftile/editor
 
+## 0.4.1
+
+### Patch Changes
+
+- [`6e6aa7d`](https://github.com/craftile/editor/commit/6e6aa7d0d64bdf959db55f14369430b8b79db3af) Thanks [@eldomagan](https://github.com/eldomagan)! - Move overlay configuration panel from Editor to LayersPanel for better positioning
+
+- [`eea5c83`](https://github.com/craftile/editor/commit/eea5c83bdb654fb408268bee08fc5eee58de3470) Thanks [@eldomagan](https://github.com/eldomagan)! - Update property field transition to use smooth expand/collapse animation instead of slide
+
+- [`b48ed79`](https://github.com/craftile/editor/commit/b48ed795c05c8acb98de360ea2ad51e7d752fd6a) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix the issue where custom panels with render function does not update when the active panel change
+
+- Updated dependencies []:
+  - @craftile/core@0.4.1
+  - @craftile/event-bus@0.4.1
+  - @craftile/messenger@0.4.1
+  - @craftile/types@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes
