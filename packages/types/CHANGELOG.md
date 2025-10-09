@@ -1,5 +1,31 @@
 # @craftile/types
 
+## 0.6.0
+
+### Minor Changes
+
+- [`75955f8`](https://github.com/craftile/editor/commit/75955f85852ae4a374799d6d781dd5c739ffb99d) Thanks [@eldomagan](https://github.com/eldomagan)! - Add support for private blocks that can only be children if explicitly listed
+
+  This is useful for blocks that should only be used in specific contexts, such as:
+  - `accordion-row` blocks that should only be children of `accordion` blocks
+  - Tab panels that should only be children of tab containers
+  - List items that should only be children of list containers
+
+  Example:
+
+  ```typescript
+  {
+    type: 'accordion',
+    accepts: ['accordion-row'], // Explicitly accepts accordion-row
+  }
+
+  {
+    type: 'accordion-row',
+    private: true, // Can only be child of blocks that explicitly list 'accordion-row'
+    accepts: ['*'], // But can accept any children itself
+  }
+  ```
+
 ## 0.5.0
 
 ## 0.4.2

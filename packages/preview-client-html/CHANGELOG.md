@@ -1,5 +1,11 @@
 # @craftile/preview-client-html
 
+## 0.6.0
+
+### Minor Changes
+
+- [`7b7d9b9`](https://github.com/craftile/editor/commit/7b7d9b9eea8b166aea81bbad42c97772c43682c4) Thanks [@eldomagan](https://github.com/eldomagan)! - Support children comment markers for blocks with nested DOM structures. Block renderers can now use `<!--BEGIN children: {blockId}-->` and `<!--END children: {blockId}-->` comments to specify where children should be inserted, enabling blocks with complex internal wrapper hierarchies to properly position their children.
+
 ## 0.5.0
 
 ## 0.4.2

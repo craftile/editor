@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.6.0
+
+### Patch Changes
+
+- [`16df030`](https://github.com/craftile/editor/commit/16df0307e8fdba862c7fbb2c3901ecc5eb36334b) Thanks [@eldomagan](https://github.com/eldomagan)! - Show block schema icons in layers panel instead of generic squares-plus icon. Each block type now displays its custom icon from the schema metadata when available.
+
+- Updated dependencies [[`75955f8`](https://github.com/craftile/editor/commit/75955f85852ae4a374799d6d781dd5c739ffb99d)]:
+  - @craftile/types@0.6.0
+  - @craftile/core@0.6.0
+  - @craftile/event-bus@0.6.0
+  - @craftile/messenger@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes
