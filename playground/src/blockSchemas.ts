@@ -253,18 +253,17 @@ export const blockSchemas: BlockSchema[] = [
   {
     type: 'card',
     properties: [
-      { id: 'title', type: 'text', label: 'Card Title', default: 'Card Title' },
-      { id: 'padding', type: 'number', label: 'Padding', default: 20 },
+      { id: 'title', type: 'text', label: 'Title', default: 'Card Title' },
       { id: 'backgroundColor', type: 'color', label: 'Background', default: '#ffffff' },
-      { id: 'borderRadius', type: 'number', label: 'Border Radius', default: 8 },
+      { id: 'borderColor', type: 'color', label: 'Border Color', default: '#e5e7eb' },
     ],
-    accepts: ['text', 'button'], // Only allow text and button blocks
+    accepts: ['*'],
     meta: {
       name: 'Card',
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h16v12H4V6z"/><rect x="6" y="8" width="12" height="2" rx="1"/><rect x="6" y="12" width="8" height="2" rx="1"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h16v3H4V6zm0 5h16v7H4v-7z"/></svg>',
       category: 'Layout',
-      description: 'Card container that only accepts text and button blocks',
-      previewImageUrl: 'https://placehold.co/400x240/f3f4f6/6b7280?text=Card',
+      description: 'Card with header, body, and footer - demonstrates nested children comment markers',
+      previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Card',
     },
   },
   // Custom field demos

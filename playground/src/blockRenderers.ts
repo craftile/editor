@@ -106,12 +106,41 @@ export const blockRenderers: Record<string, BlockRenderer> = {
     </${level}>`;
   },
 
-  container: ({ props, editorAttributes, children }) => {
+  container: ({ props, editorAttributes, children, id }) => {
     const style = generateContainerStyle(props);
 
     return `<div class="block" ${editorAttributes} style="${style}">
+          <!--BEGIN children: ${id}-->
           ${children}
+          <!--END children: ${id}-->
         </div>`;
+  },
+
+  card: ({ props, editorAttributes, children, id }) => {
+    const title = escapeHtml(props.title || 'Card Title');
+    const backgroundColor = props.backgroundColor || '#ffffff';
+    const borderColor = props.borderColor || '#e5e7eb';
+
+    const style = `
+      background-color: ${escapeHtml(backgroundColor)};
+      border: 1px solid ${escapeHtml(borderColor)};
+      border-radius: 8px;
+      overflow: hidden;
+    `;
+
+    return `<div class="block" ${editorAttributes} style="${style}">
+      <div style="padding: 16px; border-bottom: 1px solid ${escapeHtml(borderColor)}; font-weight: bold;">
+        ${title}
+      </div>
+      <div style="padding: 16px;">
+        <!--BEGIN children: ${id}-->
+        ${children}
+        <!--END children: ${id}-->
+      </div>
+      <div style="padding: 12px 16px; background-color: #f9fafb; border-top: 1px solid ${escapeHtml(borderColor)}; font-size: 14px; color: #6b7280;">
+        Card Footer
+      </div>
+    </div>`;
   },
 
   text: ({ props, editorAttributes }) => {

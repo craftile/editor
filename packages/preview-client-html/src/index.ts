@@ -32,6 +32,7 @@ export default class RawHtmlRenderer {
   private morphdomOptions: MorphdomOptions;
   private elementCache = new Map<string, HTMLElement>();
   private regionCommentsCache = new Map<string, RegionComments>();
+  private childrenCommentsCache = new Map<string, RegionComments>();
 
   constructor(previewClient?: PreviewClient, options?: HtmlPreviewClientOptions) {
     this.previewClient = previewClient || new PreviewClient();
@@ -44,6 +45,7 @@ export default class RawHtmlRenderer {
     this.previewClient.on('craftile.editor.updates', this.handleDirectUpdates.bind(this));
 
     this.cacheRegionComments();
+    this.cacheChildrenComments();
   }
 
   static init(previewClient?: PreviewClient, options?: HtmlPreviewClientOptions): RawHtmlRenderer {
@@ -98,9 +100,70 @@ export default class RawHtmlRenderer {
     }
   }
 
+  private cacheChildrenComments(): void {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT, null);
+    let node: Comment | null;
+    const pendingChildren = new Map<string, Comment>();
+
+    while ((node = walker.nextNode() as Comment)) {
+      const text = node.textContent?.trim();
+      if (!text) {
+        continue;
+      }
+
+      if (text.startsWith('BEGIN children: ')) {
+        const blockId = text.substring('BEGIN children: '.length);
+        pendingChildren.set(blockId, node);
+      } else if (text.startsWith('END children: ')) {
+        const blockId = text.substring('END children: '.length);
+        const beginComment = pendingChildren.get(blockId);
+        if (beginComment) {
+          this.childrenCommentsCache.set(blockId, {
+            begin: beginComment,
+            end: node,
+          });
+          pendingChildren.delete(blockId);
+        }
+      }
+    }
+  }
+
+  private cacheChildrenCommentsForBlock(blockId: string): void {
+    const blockElement = this.getElementCached(blockId);
+    if (!blockElement) {
+      return;
+    }
+
+    // Clear existing cache for this block
+    this.childrenCommentsCache.delete(blockId);
+
+    // Walk the block's subtree to find children comments
+    const walker = document.createTreeWalker(blockElement, NodeFilter.SHOW_COMMENT, null);
+    let node: Comment | null;
+    let beginComment: Comment | null = null;
+
+    while ((node = walker.nextNode() as Comment)) {
+      const text = node.textContent?.trim();
+      if (!text) {
+        continue;
+      }
+
+      if (text === `BEGIN children: ${blockId}`) {
+        beginComment = node;
+      } else if (text === `END children: ${blockId}` && beginComment) {
+        this.childrenCommentsCache.set(blockId, {
+          begin: beginComment,
+          end: node,
+        });
+        break;
+      }
+    }
+  }
+
   private invalidateCache(changes: UpdatesEvent['changes']): void {
     [...changes.updated, ...changes.removed].forEach((blockId) => {
       this.elementCache.delete(blockId);
+      this.childrenCommentsCache.delete(blockId);
     });
   }
 
@@ -323,11 +386,19 @@ export default class RawHtmlRenderer {
     elementId: string,
     index?: number
   ): void {
-    const children = Array.from(container.children);
-    const otherChildren = children.filter((child) => child.getAttribute('data-block') !== elementId);
-    const insertBefore = index !== undefined && index < otherChildren.length ? otherChildren[index] : null;
+    const blockId = container.getAttribute('data-block');
+    const comments = blockId ? this.childrenCommentsCache.get(blockId) : null;
 
-    container.insertBefore(element, insertBefore);
+    if (comments) {
+      const insertionPoint = this.findPositionBetweenComments(comments.begin, comments.end, index, elementId);
+      insertionPoint.parent.insertBefore(element, insertionPoint.before);
+    } else {
+      const children = Array.from(container.children);
+      const otherChildren = children.filter((child) => child.getAttribute('data-block') !== elementId);
+      const insertBefore = index !== undefined && index < otherChildren.length ? otherChildren[index] : null;
+
+      container.insertBefore(element, insertBefore);
+    }
   }
 
   private insertBlock(block: Block, html: string, positionInfo: PositionInfo): void {
@@ -374,6 +445,8 @@ export default class RawHtmlRenderer {
     }
 
     this.elementCache.set(block.id, newElement);
+    this.cacheChildrenCommentsForBlock(block.id);
+
     newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
 
     this.previewClient.emit('block.insert.after', {
@@ -421,6 +494,9 @@ export default class RawHtmlRenderer {
       this.previewClient.inspector.updateTrackedElement(block.id, updatedElement);
     }
 
+    // Re-cache children comments after HTML update
+    this.cacheChildrenCommentsForBlock(block.id);
+
     this.previewClient.emit('block.update.after', {
       blockId: block.id,
       blockType: block.type,
@@ -437,21 +513,47 @@ export default class RawHtmlRenderer {
     afterId?: string,
     beforeId?: string
   ): void {
-    let insertBefore: Element | null = null;
+    const blockId = parentElement.getAttribute('data-block');
+    const comments = blockId ? this.childrenCommentsCache.get(blockId) : null;
 
-    if (beforeId) {
-      insertBefore = this.getElementCached(beforeId);
-    } else if (afterId) {
-      const afterElement = this.getElementCached(afterId);
-      if (afterElement) {
-        insertBefore = afterElement.nextElementSibling;
+    if (comments) {
+      let insertBefore: Node | null = null;
+
+      if (beforeId) {
+        insertBefore = this.getElementCached(beforeId);
+      } else if (afterId) {
+        const afterElement = this.getElementCached(afterId);
+        if (afterElement && afterElement.nextSibling) {
+          insertBefore = afterElement.nextSibling;
+        }
+      } else if (typeof position === 'number') {
+        const insertionPoint = this.findPositionBetweenComments(comments.begin, comments.end, position);
+        comments.begin.parentNode!.insertBefore(element, insertionPoint.before);
+        return;
       }
-    } else if (typeof position === 'number') {
-      const children = Array.from(parentElement.children);
-      insertBefore = children[position] || null;
-    }
 
-    parentElement.insertBefore(element, insertBefore);
+      if (!insertBefore) {
+        insertBefore = comments.end;
+      }
+
+      comments.begin.parentNode!.insertBefore(element, insertBefore);
+    } else {
+      let insertBefore: Element | null = null;
+
+      if (beforeId) {
+        insertBefore = this.getElementCached(beforeId);
+      } else if (afterId) {
+        const afterElement = this.getElementCached(afterId);
+        if (afterElement) {
+          insertBefore = afterElement.nextElementSibling;
+        }
+      } else if (typeof position === 'number') {
+        const children = Array.from(parentElement.children);
+        insertBefore = children[position] || null;
+      }
+
+      parentElement.insertBefore(element, insertBefore);
+    }
   }
 
   private findRegionInsertionPoint(
@@ -520,6 +622,44 @@ export default class RawHtmlRenderer {
     }
 
     return position < regionBlocks.length ? regionBlocks[position] : null;
+  }
+
+  private findPositionBetweenComments(
+    beginComment: Comment,
+    endComment: Comment,
+    index?: number,
+    excludeBlockId?: string
+  ): InsertionPoint {
+    let insertBefore: Node | null = null;
+
+    if (typeof index === 'number') {
+      // Find all blocks between comments
+      const blocks: Element[] = [];
+      let currentNode = beginComment.nextSibling;
+
+      while (currentNode && currentNode !== endComment) {
+        if (currentNode.nodeType === Node.ELEMENT_NODE && (currentNode as Element).hasAttribute('data-block')) {
+          const blockId = (currentNode as Element).getAttribute('data-block');
+          if (!excludeBlockId || blockId !== excludeBlockId) {
+            blocks.push(currentNode as Element);
+          }
+        }
+        currentNode = currentNode.nextSibling;
+      }
+
+      // Insert at the specified index
+      insertBefore = index < blocks.length ? blocks[index] : null;
+    }
+
+    // If no specific position, insert before end comment
+    if (!insertBefore) {
+      insertBefore = endComment;
+    }
+
+    return {
+      parent: beginComment.parentNode!,
+      before: insertBefore,
+    };
   }
 
   private calculatePosition(block: Block, regions: Region[], blocks: Record<string, Block>): PositionInfo {
