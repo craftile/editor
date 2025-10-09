@@ -37,7 +37,7 @@ export const blockSchemas: BlockSchema[] = [
     accepts: [],
     meta: {
       name: 'Heading',
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4v7h5V4h2v16h-2v-7H6v7H4V4h2zm13 14h-3v-1.5l1-.63V9.13l-1-.63V7h3v1.5l-1 .63v6.74l1 .63V18z"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M6 4v7h5V4h2v16h-2v-7H6v7H4V4h2zm13 14h-3v-1.5l1-.63V9.13l-1-.63V7h3v1.5l-1 .63v6.74l1 .63V18z"/></svg>',
       category: 'Content',
       description: 'Heading block that demonstrates root tag changes (H1-H6)',
       previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Heading',
@@ -67,7 +67,7 @@ export const blockSchemas: BlockSchema[] = [
     accepts: [],
     meta: {
       name: 'Text',
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>',
       category: 'Content',
       description: 'Display text content with customizable styling',
       previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Text+Block',
@@ -105,7 +105,7 @@ export const blockSchemas: BlockSchema[] = [
     accepts: [],
     meta: {
       name: 'Button',
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3V8a3 3 0 00-3-3H8zM6 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V8z"/><path d="M8 11a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1z"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M8 5a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3V8a3 3 0 00-3-3H8zM6 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V8z"/><path d="M8 11a1 1 0 011-1h6a1 1 0 110 2H9a1 1 0 01-1-1z"/></svg>',
       category: 'Interactive',
       description: 'Clickable button with customizable text and styling',
       previewImageUrl: 'https://placehold.co/400x240/3b82f6/ffffff?text=Button',
@@ -122,7 +122,7 @@ export const blockSchemas: BlockSchema[] = [
     accepts: [],
     meta: {
       name: 'Image',
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm16 2v8l-4-4-6 6-2-2-4 4V6h16z"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm16 2v8l-4-4-6 6-2-2-4 4V6h16z"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>',
       category: 'Media',
       description: 'Display images with configurable dimensions',
       previewImageUrl: 'https://placehold.co/400x240/10b981/ffffff?text=Image',
@@ -245,7 +245,7 @@ export const blockSchemas: BlockSchema[] = [
     ],
     meta: {
       name: 'Container',
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h16v12H4V6z"/><path d="M6 8h4v2H6V8zm6 0h6v2h-6V8zm-6 4h6v2H6v-2zm8 0h4v2h-4v-2z"/></svg>',
+      icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h16v12H4V6z"/><path d="M6 8h4v2H6V8zm6 0h6v2h-6V8zm-6 4h6v2H6v-2zm8 0h4v2h-4v-2z"/></svg>',
       category: 'Layout',
       description: 'Flexible container for organizing other blocks',
     },

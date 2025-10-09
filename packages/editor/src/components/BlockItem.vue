@@ -168,7 +168,7 @@ function onChildMove(event: any) {
       >
         <icon-chevron-right class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-90': isExpanded }" />
       </button>
-      <div v-else class="w-4 h-full" />
+      <div v-else class="w-5 h-full" />
 
       <!-- Block Icon (show lock on hover for static blocks) -->
       <div class="w-4 h-4 mr-1 flex items-center justify-center relative">
@@ -176,7 +176,7 @@ function onChildMove(event: any) {
           v-if="blockIcon"
           v-html="blockIcon"
           :class="{ 'group-hover:opacity-0': isStatic }"
-          class="w-4 h-4 transition-opacity"
+          class="[&>svg]:w-4 [&>svg]:h-4 h-4 w-4 transition-opacity"
         />
         <icon-squares-plus v-else :class="{ 'group-hover:opacity-0': isStatic }" class="transition-opacity" />
         <icon-lock-closed
