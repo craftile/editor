@@ -247,11 +247,9 @@ export default class RawHtmlRenderer {
   }
 
   private handleHtmlEffects(htmlEffects: Record<string, string>, updates: UpdatesEvent) {
-    const { blocks, regions, changes } = updates;
+    const { blocks, regions } = updates;
 
-    // Process added blocks
-    for (const blockId of changes.added) {
-      const html = htmlEffects[blockId];
+    for (const [blockId, html] of Object.entries(htmlEffects)) {
       if (!html) {
         continue;
       }
@@ -263,28 +261,7 @@ export default class RawHtmlRenderer {
       }
 
       if (block.disabled) {
-        console.debug(`Skipping disabled block ${blockId} during add operation`);
-        continue;
-      }
-
-      const positionInfo = this.calculatePosition(block, regions, blocks);
-      this.insertBlock(block, html, positionInfo);
-    }
-
-    // Process updated blocks
-    for (const blockId of changes.updated) {
-      const html = htmlEffects[blockId];
-      if (!html) {
-        continue;
-      }
-
-      const block = blocks[blockId];
-      if (!block) {
-        console.warn(`Block data not found for ${blockId}`);
-        continue;
-      }
-
-      if (block.disabled) {
+        console.debug(`Skipping disabled block ${blockId}`);
         continue;
       }
 
@@ -292,12 +269,11 @@ export default class RawHtmlRenderer {
       const isCurrentlyInDOM = !!blockElement;
 
       if (!isCurrentlyInDOM) {
-        // this happen when was disabled and then re-enabled. we add it back to the dom
+        // Block not in DOM - insert it
         const positionInfo = this.calculatePosition(block, regions, blocks);
         this.insertBlock(block, html, positionInfo);
-
-        // TODO: notify inspector to track this new element
       } else {
+        // Block exists in DOM - update it
         this.updateBlockHtml(block, html);
       }
     }

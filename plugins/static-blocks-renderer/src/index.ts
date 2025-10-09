@@ -151,11 +151,33 @@ window.HtmlPreviewClient.init();
         clearBlockFromCache(blockId);
       });
 
+      // Track parent blocks that need re-rendering for repeated blocks
+      const parentsToRerender = new Set<string>();
+
       dirtyBlocks.forEach((blockId: string) => {
         const block = blocks[blockId];
 
         if (block) {
           effects.html[blockId] = renderBlock(block, blocks);
+
+          // If this block or any ancestor is repeated, mark parent for re-render
+          // This ensures all repeated instances get updated
+          let currentBlock: Block | undefined = block;
+          while (currentBlock) {
+            if (currentBlock.repeated && currentBlock.parentId) {
+              parentsToRerender.add(currentBlock.parentId);
+              break;
+            }
+            currentBlock = currentBlock.parentId ? blocks[currentBlock.parentId] : undefined;
+          }
+        }
+      });
+
+      // Generate HTML for parent blocks of repeated blocks
+      parentsToRerender.forEach((parentId) => {
+        const parent = updates.blocks[parentId];
+        if (parent && !effects.html[parentId]) {
+          effects.html[parentId] = renderBlock(parent, blocks);
         }
       });
 

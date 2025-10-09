@@ -34,6 +34,26 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
       pendingChanges.moved.size
     ) {
       const page = engine.getPage();
+
+      // For blocks that are repeated or have repeated ancestors, include their parent
+      // so renderers can regenerate parent HTML to update all repeated instances
+      const blocksToCheck = Array.from(pendingChanges.blocksToInclude);
+      blocksToCheck.forEach((blockId) => {
+        const block = page.blocks[blockId];
+        // Walk up parent chain to find first repeated block
+        let currentBlock: Block | undefined = block;
+        while (currentBlock) {
+          if (currentBlock.repeated && currentBlock.parentId) {
+            // Found a repeated block - include its parent
+            pendingChanges.blocksToInclude.add(currentBlock.parentId);
+            break;
+          }
+
+          // Move to parent
+          currentBlock = currentBlock.parentId ? page.blocks[currentBlock.parentId] : undefined;
+        }
+      });
+
       const dirtyBlocks: Record<string, Block> = {};
 
       pendingChanges.blocksToInclude.forEach((id) => {
