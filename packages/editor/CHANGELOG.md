@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.6.3
+
+### Patch Changes
+
+- [`c9d6181`](https://github.com/craftile/editor/commit/c9d6181fb8c2cc6bb5ecbe2797133b02779f7b3e) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix repeated blocks not updating in preview when edited. All instances of a repeated block now update correctly when the block or its descendants are modified.
+
+- Updated dependencies []:
+  - @craftile/core@0.6.3
+  - @craftile/event-bus@0.6.3
+  - @craftile/messenger@0.6.3
+  - @craftile/types@0.6.3
+
 ## 0.6.2
 
 ### Patch Changes
