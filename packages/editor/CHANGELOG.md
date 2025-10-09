@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.6.1
+
+### Patch Changes
+
+- [`d15e79e`](https://github.com/craftile/editor/commit/d15e79e04ec65e5acf948045b4a346d7ccb08387) Thanks [@eldomagan](https://github.com/eldomagan)! - Improve icon sizing and spacing consistency in BlockItem
+
+- Updated dependencies []:
+  - @craftile/core@0.6.1
+  - @craftile/event-bus@0.6.1
+  - @craftile/messenger@0.6.1
+  - @craftile/types@0.6.1
+
 ## 0.6.0
 
 ### Patch Changes
