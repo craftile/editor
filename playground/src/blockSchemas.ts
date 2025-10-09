@@ -719,4 +719,92 @@ export const blockSchemas: BlockSchema[] = [
       previewImageUrl: 'https://placehold.co/400x240/3b82f6/ffffff?text=Responsive+Hero',
     },
   },
+  // Private blocks demo - Accordion
+  {
+    type: 'accordion',
+    properties: [
+      { id: 'backgroundColor', type: 'color', label: 'Background', default: '#ffffff' },
+      { id: 'borderColor', type: 'color', label: 'Border Color', default: '#e5e7eb' },
+      { id: 'allowMultiple', type: 'boolean', label: 'Allow Multiple Open', default: false },
+    ],
+    accepts: ['accordion-row'],
+    presets: [
+      {
+        name: 'Basic Accordion',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h10v2H7z"/></svg>',
+        category: 'Interactive',
+        description: 'Accordion with three items',
+        previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Accordion',
+        children: [
+          {
+            type: 'accordion-row',
+            properties: {
+              title: 'Section 1',
+              isOpen: true,
+            },
+            children: [
+              {
+                type: 'text',
+                properties: {
+                  content: '<p>Content for the first section. This is expanded by default.</p>',
+                },
+              },
+            ],
+          },
+          {
+            type: 'accordion-row',
+            properties: {
+              title: 'Section 2',
+              isOpen: false,
+            },
+            children: [
+              {
+                type: 'text',
+                properties: {
+                  content: '<p>Content for the second section.</p>',
+                },
+              },
+            ],
+          },
+          {
+            type: 'accordion-row',
+            properties: {
+              title: 'Section 3',
+              isOpen: false,
+            },
+            children: [
+              {
+                type: 'text',
+                properties: {
+                  content: '<p>Content for the third section.</p>',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    meta: {
+      name: 'Accordion',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h10v2H7z"/></svg>',
+      category: 'Interactive',
+      description: 'Expandable accordion - demonstrates private blocks (accordion-row can only be used here)',
+      previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Accordion',
+    },
+  },
+  {
+    type: 'accordion-row',
+    properties: [
+      { id: 'title', type: 'text', label: 'Title', default: 'Accordion Item' },
+      { id: 'isOpen', type: 'boolean', label: 'Open by Default', default: false },
+    ],
+    accepts: ['*'],
+    private: true, // Private: can only be child of accordion
+    meta: {
+      name: 'Accordion Row',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4z"/></svg>',
+      category: 'Interactive',
+      description: 'Accordion row (private - only for use in accordion)',
+    },
+  },
 ];

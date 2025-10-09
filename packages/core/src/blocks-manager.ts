@@ -75,6 +75,7 @@ export class BlocksManager {
 
   /**
    * Validate if a block type can be a child of another type
+   * Private blocks can only be children if explicitly listed in parent's accepts array (no pattern matching)
    */
   canBeChild(childType: string, parentType: string): boolean {
     const parentSchema = this.get(parentType);
@@ -83,6 +84,15 @@ export class BlocksManager {
       return false;
     }
 
+    const childSchema = this.get(childType);
+    const isPrivate = childSchema?.private === true;
+
+    // Private blocks: only exact matches allowed (no patterns)
+    if (isPrivate) {
+      return parentSchema.accepts.includes(childType);
+    }
+
+    // Non-private blocks: existing pattern matching behavior
     return parentSchema.accepts.some((pattern) => this.matchesPattern(childType, pattern));
   }
 

@@ -208,4 +208,96 @@ export const blockRenderers: Record<string, BlockRenderer> = {
       ${escapeHtml(title)}
     </div>`;
   },
+
+  accordion: ({ props, editorAttributes, children, id }) => {
+    const backgroundColor = props.backgroundColor || '#ffffff';
+    const borderColor = props.borderColor || '#e5e7eb';
+
+    const style = `
+      background-color: ${escapeHtml(backgroundColor)};
+      border: 1px solid ${escapeHtml(borderColor)};
+      border-radius: 8px;
+      overflow: hidden;
+    `;
+
+    return `<div class="block" ${editorAttributes} style="${style}" data-allow-multiple="${props.allowMultiple || false}">
+      <!--BEGIN children: ${id}-->
+      ${children}
+      <!--END children: ${id}-->
+    </div>`;
+  },
+
+  'accordion-row': ({ props, editorAttributes, children, id }) => {
+    const title = escapeHtml(props.title || 'Accordion Item');
+    const isOpen = props.isOpen || false;
+
+    const headerStyle = `
+      padding: 16px;
+      background-color: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    `;
+
+    const contentStyle = `
+      padding: ${isOpen ? '16px' : '0 16px'};
+      max-height: ${isOpen ? 'none' : '0'};
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background-color: #ffffff;
+    `;
+
+    const iconStyle = `
+      transform: rotate(${isOpen ? '180deg' : '0deg'});
+      transition: transform 0.3s ease;
+    `;
+
+    return `<div class="block accordion-row" ${editorAttributes} data-is-open="${isOpen}">
+      <div class="accordion-header" style="${headerStyle}" onclick="
+        const row = this.parentElement;
+        const content = row.querySelector('.accordion-content');
+        const icon = this.querySelector('.accordion-icon');
+        const isOpen = row.dataset.isOpen === 'true';
+
+        // Get accordion element to check allowMultiple
+        const accordion = row.parentElement.closest('[data-allow-multiple]');
+        const allowMultiple = accordion ? accordion.dataset.allowMultiple === 'true' : false;
+
+        // If not allowing multiple, close other rows
+        if (!allowMultiple && !isOpen) {
+          const otherRows = accordion.querySelectorAll('.accordion-row');
+          otherRows.forEach(otherRow => {
+            if (otherRow !== row && otherRow.dataset.isOpen === 'true') {
+              const otherContent = otherRow.querySelector('.accordion-content');
+              const otherIcon = otherRow.querySelector('.accordion-icon');
+              otherRow.dataset.isOpen = 'false';
+              otherContent.style.maxHeight = '0';
+              otherContent.style.padding = '0 16px';
+              otherIcon.style.transform = 'rotate(0deg)';
+            }
+          });
+        }
+
+        // Toggle current row
+        row.dataset.isOpen = !isOpen;
+        content.style.maxHeight = isOpen ? '0' : content.scrollHeight + 'px';
+        content.style.padding = isOpen ? '0 16px' : '16px';
+        icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+      ">
+        <span>${title}</span>
+        <svg class="accordion-icon" style="${iconStyle}" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="accordion-content" style="${contentStyle}">
+        <!--BEGIN children: ${id}-->
+        ${children}
+        <!--END children: ${id}-->
+      </div>
+    </div>`;
+  },
 };

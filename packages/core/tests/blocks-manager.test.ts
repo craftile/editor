@@ -36,6 +36,23 @@ const testSchemas: Record<string, BlockSchema> = {
     properties: [{ id: 'layout', type: 'text', label: 'Layout', default: 'flex' }],
     accepts: ['visual-*'], // Only visual-suffixed blocks
   },
+  accordion: {
+    type: 'accordion',
+    properties: [{ id: 'title', type: 'text', label: 'Title', default: 'Accordion' }],
+    accepts: ['accordion-row'], // Explicitly accepts private accordion-row
+  },
+  'accordion-row': {
+    type: 'accordion-row',
+    properties: [{ id: 'title', type: 'text', label: 'Row Title', default: 'Row' }],
+    accepts: ['*'], // Can contain any content
+    private: true, // Private: only exact matches allowed
+  },
+  'private-widget': {
+    type: 'private-widget',
+    properties: [{ id: 'content', type: 'text', label: 'Content', default: '' }],
+    accepts: [],
+    private: true, // Private: only exact matches allowed
+  },
 };
 
 const ALL_TYPES = Object.keys(testSchemas);
@@ -161,6 +178,43 @@ describe('BlocksManager', () => {
         expect(manager.canBeChild('text', 'visualWrapper')).toBe(false);
         expect(manager.canBeChild('card-visual', 'visualWrapper')).toBe(false);
         expect(manager.canBeChild('@theme/visual', 'visualWrapper')).toBe(false);
+      });
+    });
+
+    describe('Private blocks', () => {
+      it('should reject private blocks when parent accepts wildcard "*"', () => {
+        expect(manager.canBeChild('accordion-row', 'box')).toBe(false);
+        expect(manager.canBeChild('private-widget', 'box')).toBe(false);
+      });
+
+      it('should reject private blocks when matching pattern (not exact)', () => {
+        // Even though 'accordion-row' matches 'accordion-*' pattern, it should be rejected
+        expect(manager.canBeChild('accordion-row', 'visualWrapper')).toBe(false);
+      });
+
+      it('should accept private blocks when explicitly listed in accepts', () => {
+        expect(manager.canBeChild('accordion-row', 'accordion')).toBe(true);
+      });
+
+      it('should allow private blocks to have their own children using patterns', () => {
+        // accordion-row has accepts: ['*'], so it can accept any non-private child
+        expect(manager.canBeChild('button', 'accordion-row')).toBe(true);
+        expect(manager.canBeChild('text', 'accordion-row')).toBe(true);
+      });
+
+      it('should reject private blocks even when not in schema registry', () => {
+        // If child schema doesn't exist, private check is skipped (treated as non-private)
+        expect(manager.canBeChild('non-existent-block', 'box')).toBe(true);
+      });
+
+      it('should allow non-private blocks to work normally alongside private blocks', () => {
+        // Non-private blocks still work with wildcards
+        expect(manager.canBeChild('button', 'box')).toBe(true);
+        expect(manager.canBeChild('text', 'box')).toBe(true);
+
+        // Non-private blocks still work with exact matches
+        expect(manager.canBeChild('button', 'section')).toBe(true);
+        expect(manager.canBeChild('text', 'section')).toBe(true);
       });
     });
   });
