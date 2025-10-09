@@ -19,6 +19,7 @@ const {
   toggle,
   remove,
   moveChild,
+  schema,
 } = useBlock(props.blockId);
 const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayersPanel();
 const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
@@ -32,6 +33,7 @@ const isStatic = computed(() => blockData.value?.static === true);
 
 const blockSchemaName = getBlockSchemaNameReactive(props.blockId);
 const blockLabel = getBlockLabelReactive(props.blockId);
+const blockIcon = computed(() => schema.value?.meta?.icon);
 
 const canInsertNextSibling = computed(() => {
   return !nextSibling.value || nextSibling.value.static !== true;
@@ -170,7 +172,13 @@ function onChildMove(event: any) {
 
       <!-- Block Icon (show lock on hover for static blocks) -->
       <div class="w-4 h-4 mr-1 flex items-center justify-center relative">
-        <icon-squares-plus :class="{ 'group-hover:opacity-0': isStatic }" class="transition-opacity" />
+        <span
+          v-if="blockIcon"
+          v-html="blockIcon"
+          :class="{ 'group-hover:opacity-0': isStatic }"
+          class="w-4 h-4 transition-opacity"
+        />
+        <icon-squares-plus v-else :class="{ 'group-hover:opacity-0': isStatic }" class="transition-opacity" />
         <icon-lock-closed
           v-if="isStatic"
           class="w-4 h-4 absolute opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"
@@ -225,7 +233,7 @@ function onChildMove(event: any) {
       </VueDraggable>
 
       <!-- Show add button when empty -->
-      <div v-if="!hasChildren" class="py-1">
+      <div v-if="!hasChildren" class="">
         <button
           @click="handleAddFirstChild($event)"
           class="flex items-center gap-1.5 w-full p-1.5 text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors"
