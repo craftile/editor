@@ -177,11 +177,12 @@ export class InsertBlockFromPresetCommand implements Command {
       const childBlock: Block = {
         type: presetChild.type,
         id: childId,
-        name: childSchema.meta?.name || presetChild.type, // Use schema name for child blocks
+        name: presetChild.name || childSchema.meta?.name || presetChild.type, // Preserve custom name from preset
         semanticId: presetChild.id, // Preserve semantic ID from preset
         properties: childProperties,
         children: [],
         parentId,
+        static: presetChild.static, // Preserve static flag
       };
 
       this.page.blocks[childId] = childBlock;

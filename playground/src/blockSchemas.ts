@@ -242,6 +242,67 @@ export const blockSchemas: BlockSchema[] = [
           },
         ],
       },
+      {
+        name: 'Footer with Static Links',
+        description: 'Footer container with static copyright and social links',
+        properties: {
+          direction: 'vertical',
+          gap: 16,
+          padding: 24,
+          backgroundColor: '#1f2937',
+        },
+        previewImageUrl: 'https://placehold.co/400x240/1f2937/ffffff?text=Footer',
+        children: [
+          {
+            type: 'text',
+            id: 'copyright',
+            name: 'Copyright Notice',
+            static: true, // Cannot be moved or removed
+            properties: {
+              content: '<p style="text-align: center;">© 2024 Company Name. All rights reserved.</p>',
+              fontSize: 'sm',
+              color: '#9ca3af',
+            },
+          },
+          {
+            type: 'container',
+            id: 'social-links',
+            name: 'Social Links',
+            properties: {
+              direction: 'horizontal',
+              gap: 12,
+              padding: 0,
+              backgroundColor: 'transparent',
+            },
+            children: [
+              {
+                type: 'button',
+                id: 'twitter-link',
+                name: 'Twitter',
+                static: true, // Cannot be moved or removed
+                properties: {
+                  text: 'Twitter',
+                  url: 'https://twitter.com',
+                  style: 'secondary',
+                  size: 'small',
+                },
+              },
+              {
+                type: 'button',
+                id: 'github-link',
+                name: 'GitHub',
+                static: true, // Cannot be moved or removed
+                properties: {
+                  text: 'GitHub',
+                  url: 'https://github.com',
+                  style: 'secondary',
+                  size: 'small',
+                },
+              },
+            ],
+          },
+        ],
+      },
     ],
     meta: {
       name: 'Container',

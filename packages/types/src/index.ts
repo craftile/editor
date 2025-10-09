@@ -41,6 +41,7 @@ export interface Block {
   properties: BlockProperties;
   disabled?: boolean;
   static?: boolean; // Block cannot be moved or removed
+  repeated?: boolean; // Block is part of a repeating pattern/list
   parentId?: string; // ID of parent block (undefined for top-level blocks)
   children: string[]; // Ordered array of child block IDs
 }
@@ -58,9 +59,11 @@ export interface PropertyField {
 
 export interface PresetChild {
   type: string;
-  id?: string;
+  id?: string; // Becomes semanticId
+  name?: string; // Custom display name
   properties?: Record<string, any>;
   children?: PresetChild[];
+  static?: boolean;
 }
 
 export interface BlockPreset {

@@ -378,4 +378,147 @@ describe('InsertBlockFromPresetCommand', () => {
       expect(textBlocks[1].semanticId).toBeUndefined();
     });
   });
+
+  describe('Preset Child Metadata', () => {
+    const schemaWithMetadataPreset: BlockSchema = {
+      type: 'container',
+      properties: [{ id: 'direction', type: 'select', label: 'Direction', default: 'vertical' }],
+      accepts: ['*'],
+      presets: [
+        {
+          name: 'Container with Custom Metadata',
+          children: [
+            {
+              type: 'text',
+              id: 'custom-text',
+              name: 'Custom Text Block', // Custom name
+              properties: { content: 'Custom content' },
+            },
+            {
+              type: 'text',
+              id: 'static-text',
+              name: 'Static Text', // Custom name
+              static: true, // Static flag
+              properties: { content: 'Cannot be removed' },
+            },
+            {
+              type: 'container',
+              name: 'Nested Container',
+              children: [
+                {
+                  type: 'text',
+                  name: 'Nested Static Text',
+                  static: true,
+                  properties: { content: 'Nested static' },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    beforeEach(() => {
+      blocksManager.register('container-metadata', schemaWithMetadataPreset);
+    });
+
+    it('should preserve custom name from preset child', () => {
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container-metadata',
+        presetIndex: 0,
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      const firstChild = page.blocks[insertedBlock.children[0]];
+      expect(firstChild.name).toBe('Custom Text Block');
+    });
+
+    it('should preserve static flag from preset child', () => {
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container-metadata',
+        presetIndex: 0,
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      const secondChild = page.blocks[insertedBlock.children[1]];
+      expect(secondChild.static).toBe(true);
+      expect(secondChild.name).toBe('Static Text');
+    });
+
+    it('should preserve static flag in nested children', () => {
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container-metadata',
+        presetIndex: 0,
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      // Get nested container
+      const nestedContainerId = insertedBlock.children[2];
+      const nestedContainer = page.blocks[nestedContainerId];
+      expect(nestedContainer.name).toBe('Nested Container');
+
+      // Check nested container's child
+      const nestedChildId = nestedContainer.children[0];
+      const nestedChild = page.blocks[nestedChildId];
+      expect(nestedChild.name).toBe('Nested Static Text');
+      expect(nestedChild.static).toBe(true);
+    });
+
+    it('should handle children without custom name or static flag', () => {
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container-metadata',
+        presetIndex: 0,
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      const firstChild = page.blocks[insertedBlock.children[0]];
+      // Should fall back to schema meta name, then type
+      expect(firstChild.name).toBe('Custom Text Block');
+      // Static should be undefined (not false)
+      expect(firstChild.static).toBeUndefined();
+    });
+
+    it('should combine custom name and static flag', () => {
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container-metadata',
+        presetIndex: 0,
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedId = command.getBlockId();
+      const insertedBlock = page.blocks[insertedId];
+
+      const secondChild = page.blocks[insertedBlock.children[1]];
+      expect(secondChild.name).toBe('Static Text');
+      expect(secondChild.static).toBe(true);
+      expect(secondChild.semanticId).toBe('static-text');
+    });
+  });
 });
