@@ -1,5 +1,15 @@
 # @craftile/types
 
+## 0.6.2
+
+### Patch Changes
+
+- [`da52cd9`](https://github.com/craftile/editor/commit/da52cd98d6e66cdfc61f36989c6a00091089ed15) Thanks [@eldomagan](https://github.com/eldomagan)! - Preserve child block metadata (name, static) when adding blocks from presets
+
+  ```
+
+  ```
+
 ## 0.6.1
 
 ## 0.6.0
