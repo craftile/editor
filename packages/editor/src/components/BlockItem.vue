@@ -29,6 +29,7 @@ const { engine, moveBlock, removeBlock, blocks } = useCraftileEngine();
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
 const isStatic = computed(() => blockData.value?.static === true);
+const isRepeated = computed(() => blockData.value?.repeated === true);
 
 const blockSchemaName = getBlockSchemaNameReactive(props.blockId);
 const blockLabel = getBlockLabelReactive(props.blockId);
@@ -176,13 +177,22 @@ function remove() {
 
         <!-- Block Icon (show lock on hover for static blocks) -->
         <div class="w-4 h-4 mr-1 flex items-center justify-center relative">
+          <!-- Show loop icon for repeated blocks -->
+          <icon-arrow-path
+            v-if="isRepeated"
+            :class="{ 'group-hover:opacity-0': isStatic }"
+            class="w-4 h-4 transition-opacity"
+          />
+          <!-- Show block's custom icon if not repeated -->
           <span
-            v-if="blockIcon"
+            v-else-if="blockIcon"
             v-html="blockIcon"
             :class="{ 'group-hover:opacity-0': isStatic }"
             class="[&>svg]:w-4 [&>svg]:h-4 h-4 w-4 transition-opacity"
           />
+          <!-- Fallback icon if no custom icon -->
           <icon-squares-plus v-else :class="{ 'group-hover:opacity-0': isStatic }" class="transition-opacity" />
+          <!-- Lock overlay for static blocks -->
           <icon-lock-closed
             v-if="isStatic"
             class="w-4 h-4 absolute opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"

@@ -57,7 +57,8 @@ export interface PropertyField {
   [key: string]: any;
 }
 
-export interface BlockStructure extends Omit<Block, 'children' | 'parentId'> {
+export interface BlockStructure extends Omit<Block, 'children' | 'parentId' | 'id'> {
+  id?: string;
   children?: BlockStructure[];
 }
 

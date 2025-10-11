@@ -35,6 +35,7 @@ declare module 'vue' {
     IconArrowLongRight: typeof import('~icons/heroicons/arrow-long-right')['default']
     IconArrowLongUp: typeof import('~icons/heroicons/arrow-long-up')['default']
     IconArrowLongUp16Solid: typeof import('~icons/heroicons/arrow-long-up16-solid')['default']
+    IconArrowPath: typeof import('~icons/heroicons/arrow-path')['default']
     IconArrowUpOnSquare: typeof import('~icons/heroicons/arrow-up-on-square')['default']
     IconArrowUturnLeft: typeof import('~icons/heroicons/arrow-uturn-left')['default']
     IconArrowUturnRight: typeof import('~icons/heroicons/arrow-uturn-right')['default']

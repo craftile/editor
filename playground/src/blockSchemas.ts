@@ -791,6 +791,69 @@ export const blockSchemas: BlockSchema[] = [
     accepts: ['accordion-row'],
     presets: [
       {
+        name: 'Repeated Rows Accordion',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h10v2H7z"/></svg>',
+        category: 'Interactive',
+        description: 'Accordion with repeated rows (demonstrates repeated block icon)',
+        previewImageUrl: 'https://placehold.co/400x240/ffffff/1f2937?text=Accordion',
+        children: [
+          {
+            type: 'accordion-row',
+            id: 'row-1',
+            repeated: true,
+            properties: {
+              title: 'Repeated Row 1',
+              isOpen: true,
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'text-1',
+                properties: {
+                  content: '<p>This row is marked as repeated. Notice the loop icon in the layers panel.</p>',
+                },
+              },
+            ],
+          },
+          {
+            type: 'accordion-row',
+            id: 'row-2',
+            repeated: true,
+            properties: {
+              title: 'Repeated Row 2',
+              isOpen: false,
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'text-2',
+                properties: {
+                  content: '<p>This is another repeated row with loop icon.</p>',
+                },
+              },
+            ],
+          },
+          {
+            type: 'accordion-row',
+            id: 'row-3',
+            repeated: true,
+            properties: {
+              title: 'Repeated Row 3',
+              isOpen: false,
+            },
+            children: [
+              {
+                type: 'text',
+                id: 'text-3',
+                properties: {
+                  content: '<p>All accordion rows in this example are marked as repeated.</p>',
+                },
+              },
+            ],
+          },
+        ],
+      },
+      {
         name: 'Basic Accordion',
         icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h10v2H7z"/></svg>',
         category: 'Interactive',

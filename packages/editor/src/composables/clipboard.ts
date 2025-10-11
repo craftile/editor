@@ -1,4 +1,4 @@
-import { computed, inject } from 'vue';
+import { computed, inject, toRaw } from 'vue';
 import { useCraftileEngine } from './craftile-engine';
 import type { CraftileEditor } from '../editor';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
@@ -60,6 +60,8 @@ export function useClipboard() {
       return;
     }
 
+    const rawCopied = toRaw(copied);
+
     const targetBlock = engine.getBlockById(targetBlockId)!;
     const parentId = targetBlock.parentId;
     let index: number | undefined;
@@ -70,14 +72,14 @@ export function useClipboard() {
       const targetIndex = parent.children.indexOf(targetBlockId);
       index = targetIndex + 1;
 
-      pasteBlock(copied, { parentId, index });
+      pasteBlock(rawCopied, { parentId, index });
     } else {
       const page = engine.getPage();
       for (const region of page.regions) {
         const targetIndex = region.blocks.indexOf(targetBlockId);
         if (targetIndex !== -1) {
           index = targetIndex + 1;
-          pasteBlock(copied, { regionName: region.name, index });
+          pasteBlock(rawCopied, { regionName: region.name, index });
           break;
         }
       }
