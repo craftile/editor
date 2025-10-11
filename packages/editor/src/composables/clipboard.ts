@@ -88,6 +88,35 @@ export function useClipboard() {
     uiManager.clearClipboard();
   }
 
+  function copyBlockAsJSON(blockId: string): void {
+    try {
+      const structure = engine.exportBlockAsNestedStructure(blockId);
+      const json = JSON.stringify(structure, null, 2);
+
+      navigator.clipboard.writeText(json).then(
+        () => {
+          uiManager.toast({
+            title: 'Block copied as JSON',
+            type: 'success',
+          });
+        },
+        (error) => {
+          console.error('Failed to copy to clipboard:', error);
+          uiManager.toast({
+            title: 'Failed to copy to clipboard',
+            type: 'error',
+          });
+        }
+      );
+    } catch (error) {
+      console.error('Failed to export block:', error);
+      uiManager.toast({
+        title: 'Failed to export block',
+        type: 'error',
+      });
+    }
+  }
+
   return {
     copiedBlock,
     hasCopiedBlock,
@@ -95,5 +124,6 @@ export function useClipboard() {
     canPasteAfter,
     pasteBlockAfter,
     clearClipboard,
+    copyBlockAsJSON,
   };
 }

@@ -28,6 +28,7 @@ export const en: I18n = {
     insertBlockAfter: 'Insert Block After',
     insertSiblingBefore: 'Insert Sibling Before',
     insertSiblingAfter: 'Insert Sibling After',
+    copyAsJson: 'Copy as JSON',
   },
   layers: {
     title: 'Layers',

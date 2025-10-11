@@ -11,7 +11,7 @@ const { t } = useI18n();
 const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
 const { open: openBlocksPopover, getInsertionContext } = useBlocksPopover();
 const { block: blockData, nextSibling, previousSibling } = useBlock(props.blockId);
-const { copyBlock, canPasteAfter, pasteBlockAfter, hasCopiedBlock } = useClipboard();
+const { copyBlock, canPasteAfter, pasteBlockAfter, hasCopiedBlock, copyBlockAsJSON } = useClipboard();
 
 const isStatic = computed(() => blockData.value?.static === true);
 const isRootBlock = computed(() => !blockData.value?.parentId);
@@ -180,6 +180,10 @@ const isPasteEnabled = computed(() => hasCopiedBlock.value && canPasteAfter(prop
 function handlePasteAfter() {
   pasteBlockAfter(props.blockId);
 }
+
+function handleCopyAsJSON() {
+  copyBlockAsJSON(props.blockId);
+}
 </script>
 
 <template>
@@ -283,6 +287,16 @@ function handlePasteAfter() {
         </Menu.Item>
 
         <Menu.Separator class="my-1 h-px bg-gray-200" />
+
+        <!-- Copy as JSON -->
+        <Menu.Item
+          value="copy-as-json"
+          @select="handleCopyAsJSON"
+          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+        >
+          <icon-code-bracket class="w-4 h-4" />
+          {{ t('block.copyAsJson') }}
+        </Menu.Item>
 
         <!-- Remove -->
         <Menu.Item

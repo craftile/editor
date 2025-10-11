@@ -29,6 +29,7 @@ export interface I18n {
     insertBlockAfter: string;
     insertSiblingBefore: string;
     insertSiblingAfter: string;
+    copyAsJson: string;
   };
   layers: {
     title: string;

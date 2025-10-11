@@ -44,6 +44,7 @@ declare module 'vue' {
     IconChevronRight: typeof import('~icons/heroicons/chevron-right')['default']
     IconClipboard: typeof import('~icons/heroicons/clipboard')['default']
     IconClipboardDocument: typeof import('~icons/heroicons/clipboard-document')['default']
+    IconCodeBracket: typeof import('~icons/heroicons/code-bracket')['default']
     IconDeviceTablet: typeof import('~icons/heroicons/device-tablet')['default']
     IconDocumentDuplicate: typeof import('~icons/heroicons/document-duplicate')['default']
     IconDocumentDuplicate16Solid: typeof import('~icons/heroicons/document-duplicate16-solid')['default']
