@@ -23,6 +23,10 @@ export interface I18n {
     moveToPrevious: string;
     enable: string;
     disable: string;
+    insertBlockBefore: string;
+    insertBlockAfter: string;
+    insertSiblingBefore: string;
+    insertSiblingAfter: string;
   };
   layers: {
     title: string;

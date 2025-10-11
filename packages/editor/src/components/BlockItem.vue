@@ -17,7 +17,6 @@ const {
   canHaveChildren,
   nextSibling,
   toggle,
-  remove,
   moveChild,
   schema,
 } = useBlock(props.blockId);
@@ -136,18 +135,19 @@ function onChildMove(event: any) {
 
 <template>
   <div v-if="blockData" :class="{ 'bg-gray-100': isActive, 'is-static': isStatic }" :data-block-id="blockData.id">
-    <div
-      :data-block-id="blockData.id"
-      :data-selected="isSelected ? 'true' : undefined"
-      class="flex items-center h-8 text-sm hover:bg-gray-50 data-selected:bg-accent/10 data-selected:border data-selected:border-accent/20 data-selected:hover:bg-accent/10 cursor-pointer rounded-md group transition-all duration-200"
-      :class="{
-        'text-gray-700': !blockData.disabled,
-        'text-gray-400': blockData.disabled,
-      }"
-      @click="selectBlock(blockData.id)"
-    >
-      <!-- Block Drag Handle -->
-      <!-- <div
+    <BlockContextMenu :block-id="blockData.id">
+      <div
+        :data-block-id="blockData.id"
+        :data-selected="isSelected ? 'true' : undefined"
+        class="flex items-center h-8 text-sm hover:bg-gray-50 data-selected:bg-accent/10 data-selected:border data-selected:border-accent/20 data-selected:hover:bg-accent/10 cursor-pointer rounded-md group transition-all duration-200"
+        :class="{
+          'text-gray-700': !blockData.disabled,
+          'text-gray-400': blockData.disabled,
+        }"
+        @click="selectBlock(blockData.id)"
+      >
+        <!-- Block Drag Handle -->
+        <!-- <div
         class="block-drag-handle mr-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
         :class="{ 'opacity-100': isDragging }"
       >
@@ -160,61 +160,52 @@ function onChildMove(event: any) {
         </svg>
       </div> -->
 
-      <!-- Expand/Collapse for blocks that can have children -->
-      <button
-        v-if="canHaveChildren"
-        @click.stop="() => toggleExpandedFn(props.blockId)"
-        class="h-full mr-0.5 px-1 flex items-center justify-center hover:bg-gray-200 rounded cursor-pointer"
-      >
-        <icon-chevron-right class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-90': isExpanded }" />
-      </button>
-      <div v-else class="w-5 h-full" />
-
-      <!-- Block Icon (show lock on hover for static blocks) -->
-      <div class="w-4 h-4 mr-1 flex items-center justify-center relative">
-        <span
-          v-if="blockIcon"
-          v-html="blockIcon"
-          :class="{ 'group-hover:opacity-0': isStatic }"
-          class="[&>svg]:w-4 [&>svg]:h-4 h-4 w-4 transition-opacity"
-        />
-        <icon-squares-plus v-else :class="{ 'group-hover:opacity-0': isStatic }" class="transition-opacity" />
-        <icon-lock-closed
-          v-if="isStatic"
-          class="w-4 h-4 absolute opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"
-        />
-      </div>
-
-      <!-- Block Name -->
-      <div class="flex-1 flex items-center gap-1 min-w-0">
-        <span class="shrink-0">{{ blockSchemaName }}</span>
-        <span v-if="blockLabel" class="italic text-gray-500 truncate text-xs">- {{ blockLabel }}</span>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-0.5">
-        <!-- Remove button - only show on hover when not disabled and not static -->
+        <!-- Expand/Collapse for blocks that can have children -->
         <button
-          v-show="!blockData.disabled && !isStatic"
-          @click.stop="remove"
-          class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-          :title="t('block.remove')"
+          v-if="canHaveChildren"
+          @click.stop="() => toggleExpandedFn(props.blockId)"
+          class="h-full mr-0.5 px-1 flex items-center justify-center hover:bg-gray-200 rounded cursor-pointer"
         >
-          <icon-trash class="w-4 h-4" />
+          <icon-chevron-right class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-90': isExpanded }" />
         </button>
+        <div v-else class="w-5 h-full" />
 
-        <!-- Eye button - always visible when disabled, only on hover when enabled -->
-        <button
-          @click.stop="() => toggle()"
-          class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700 transition-colors"
-          :class="{ 'opacity-100': blockData.disabled, 'opacity-0 group-hover:opacity-100': !blockData.disabled }"
-          :title="blockData.disabled ? t('block.show') : t('block.hide')"
-        >
-          <icon-eye-slash v-if="blockData.disabled" class="w-4 h-4" />
-          <icon-eye v-else class="w-4 h-4" />
-        </button>
+        <!-- Block Icon (show lock on hover for static blocks) -->
+        <div class="w-4 h-4 mr-1 flex items-center justify-center relative">
+          <span
+            v-if="blockIcon"
+            v-html="blockIcon"
+            :class="{ 'group-hover:opacity-0': isStatic }"
+            class="[&>svg]:w-4 [&>svg]:h-4 h-4 w-4 transition-opacity"
+          />
+          <icon-squares-plus v-else :class="{ 'group-hover:opacity-0': isStatic }" class="transition-opacity" />
+          <icon-lock-closed
+            v-if="isStatic"
+            class="w-4 h-4 absolute opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"
+          />
+        </div>
+
+        <!-- Block Name -->
+        <div class="flex-1 flex items-center gap-1 min-w-0">
+          <span class="shrink-0">{{ blockSchemaName }}</span>
+          <span v-if="blockLabel" class="italic text-gray-500 truncate text-xs">- {{ blockLabel }}</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-0.5">
+          <!-- Eye button - always visible when disabled, only on hover when enabled -->
+          <button
+            @click.stop="() => toggle()"
+            class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700 transition-colors"
+            :class="{ 'opacity-100': blockData.disabled, 'opacity-0 group-hover:opacity-100': !blockData.disabled }"
+            :title="blockData.disabled ? t('block.show') : t('block.hide')"
+          >
+            <icon-eye-slash v-if="blockData.disabled" class="w-4 h-4" />
+            <icon-eye v-else class="w-4 h-4" />
+          </button>
+        </div>
       </div>
-    </div>
+    </BlockContextMenu>
 
     <!-- Child Blocks - Always show when expanded and can have children to allow drops into empty containers -->
     <div v-if="canHaveChildren && isExpanded" class="ml-3 space-y-1">

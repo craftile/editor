@@ -22,6 +22,10 @@ export const en: I18n = {
     moveToPrevious: 'Move to Previous',
     enable: 'Enable',
     disable: 'Disable',
+    insertBlockBefore: 'Insert Block Before',
+    insertBlockAfter: 'Insert Block After',
+    insertSiblingBefore: 'Insert Sibling Before',
+    insertSiblingAfter: 'Insert Sibling After',
   },
   layers: {
     title: 'Layers',

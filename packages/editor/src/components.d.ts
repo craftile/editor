@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddBlockBtn: typeof import('./components/AddBlockBtn.vue')['default']
+    BlockContextMenu: typeof import('./components/BlockContextMenu.vue')['default']
     BlockItem: typeof import('./components/BlockItem.vue')['default']
     BlocksList: typeof import('./components/BlocksList.vue')['default']
     BlocksPopover: typeof import('./components/BlocksPopover.vue')['default']
@@ -26,11 +27,15 @@ declare module 'vue' {
     HeaderUndoButton: typeof import('./components/header/UndoButton.vue')['default']
     HoveredBlockOverlay: typeof import('./components/HoveredBlockOverlay.vue')['default']
     IconAdjustmentsHorizontal: typeof import('~icons/heroicons/adjustments-horizontal')['default']
+    IconArrowDownOnSquare: typeof import('~icons/heroicons/arrow-down-on-square')['default']
     IconArrowLeft: typeof import('~icons/heroicons/arrow-left')['default']
+    IconArrowLongDown: typeof import('~icons/heroicons/arrow-long-down')['default']
     IconArrowLongDown16Solid: typeof import('~icons/heroicons/arrow-long-down16-solid')['default']
     IconArrowLongLeft: typeof import('~icons/heroicons/arrow-long-left')['default']
     IconArrowLongRight: typeof import('~icons/heroicons/arrow-long-right')['default']
+    IconArrowLongUp: typeof import('~icons/heroicons/arrow-long-up')['default']
     IconArrowLongUp16Solid: typeof import('~icons/heroicons/arrow-long-up16-solid')['default']
+    IconArrowUpOnSquare: typeof import('~icons/heroicons/arrow-up-on-square')['default']
     IconArrowUturnLeft: typeof import('~icons/heroicons/arrow-uturn-left')['default']
     IconArrowUturnRight: typeof import('~icons/heroicons/arrow-uturn-right')['default']
     IconCheck: typeof import('~icons/heroicons/check')['default']
