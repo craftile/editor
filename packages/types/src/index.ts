@@ -57,19 +57,14 @@ export interface PropertyField {
   [key: string]: any;
 }
 
-export interface PresetChild {
-  type: string;
-  id?: string; // Becomes semanticId
-  name?: string; // Custom display name
-  properties?: Record<string, any>;
-  children?: PresetChild[];
-  static?: boolean;
+export interface BlockStructure extends Omit<Block, 'children' | 'parentId'> {
+  children?: BlockStructure[];
 }
 
 export interface BlockPreset {
   name: string;
   properties?: Record<string, any>;
-  children?: PresetChild[];
+  children?: BlockStructure[];
   icon?: string;
   category?: string;
   description?: string;

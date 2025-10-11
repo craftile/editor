@@ -1,5 +1,5 @@
 import { ref, onUnmounted, computed, toRaw, nextTick, type Ref } from 'vue';
-import type { Block, Page, Region } from '@craftile/types';
+import type { Block, BlockStructure, Page, Region } from '@craftile/types';
 import type { EngineConfig } from '../types';
 import { Engine } from '../engine';
 
@@ -54,6 +54,14 @@ export interface UseBlocksEngineReturn {
   setBlockName: (blockId: string, name: string) => void;
   toggleBlock: (blockId: string, disabled?: boolean) => void;
   duplicateBlock: (blockId: string) => string;
+  pasteBlock: (
+    structure: BlockStructure,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
+    }
+  ) => string;
 
   undo: () => boolean;
   redo: () => boolean;
@@ -275,6 +283,23 @@ export function useBlocksEngine(
     return newBlockId;
   };
 
+  const pasteBlock = (
+    structure: BlockStructure,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
+    }
+  ): string => {
+    const blockId = engine.pasteBlock(structure, options);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+
+    return blockId;
+  };
+
   const undo = (): boolean => {
     const result = engine.undo();
 
@@ -332,6 +357,7 @@ export function useBlocksEngine(
     setBlockName,
     toggleBlock,
     duplicateBlock,
+    pasteBlock,
 
     // History methods
     undo,

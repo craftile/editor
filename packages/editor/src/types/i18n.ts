@@ -17,6 +17,8 @@ export interface I18n {
   block: {
     show: string;
     hide: string;
+    copy: string;
+    pasteAfter: string;
     duplicate: string;
     remove: string;
     moveToNext: string;

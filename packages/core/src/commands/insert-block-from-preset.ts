@@ -1,11 +1,12 @@
-import type { Block, BlockSchema, Page, PresetChild } from '@craftile/types';
+import type { Block, BlockProperties, BlockSchema, BlockStructure, Page } from '@craftile/types';
 import type { Command, EngineEmitFn } from '../types';
 import { generateId } from '../utils';
 import type { BlocksManager } from '../blocks-manager';
 
 export interface InsertBlockFromPresetOptions {
   blockType: string;
-  presetIndex: number;
+  presetIndex?: number;
+  presetData?: BlockStructure;
   parentId?: string;
   regionName?: string;
   index?: number;
@@ -16,7 +17,8 @@ export interface InsertBlockFromPresetOptions {
 export class InsertBlockFromPresetCommand implements Command {
   private page: Page;
   private blockType: string;
-  private presetIndex: number;
+  private presetIndex?: number;
+  private presetData?: BlockStructure;
   private parentId?: string;
   private regionName?: string;
   private index?: number;
@@ -32,6 +34,7 @@ export class InsertBlockFromPresetCommand implements Command {
     this.page = page;
     this.blockType = options.blockType;
     this.presetIndex = options.presetIndex;
+    this.presetData = options.presetData;
     this.parentId = options.parentId;
     this.regionName = options.regionName;
     this.index = options.index;
@@ -39,41 +42,81 @@ export class InsertBlockFromPresetCommand implements Command {
     this.blocksManager = options.blocksManager;
     this.emit = options.emit;
 
+    if (options.presetIndex === undefined && !options.presetData) {
+      throw new Error('Either presetIndex or presetData must be provided');
+    }
+
     const blockSchema = this.blocksManager.get(this.blockType);
     if (!blockSchema) {
       throw new Error(`Block type '${this.blockType}' not found`);
     }
 
-    const preset = blockSchema.presets?.[this.presetIndex];
-    if (!preset) {
-      throw new Error(`Preset at index ${this.presetIndex} not found for block type '${this.blockType}'`);
+    let properties: BlockProperties | undefined;
+
+    if (options.presetData) {
+      properties = options.presetData.properties;
+    } else if (options.presetIndex !== undefined) {
+      const preset = blockSchema.presets?.[options.presetIndex];
+      if (!preset) {
+        throw new Error(`Preset at index ${options.presetIndex} not found for block type '${this.blockType}'`);
+      }
+
+      properties = preset.properties;
     }
 
-    this.properties = this.buildProperties(blockSchema, preset.properties);
+    this.properties = this.buildProperties(blockSchema, properties);
   }
 
   apply(): void {
     const blockSchema = this.blocksManager.get(this.blockType);
-    const preset = blockSchema?.presets?.[this.presetIndex];
 
-    if (!preset) {
-      throw new Error(`Preset at index ${this.presetIndex} not found`);
+    if (this.presetData) {
+      // Handle BlockStructure (paste operation)
+      this.insertedBlock = {
+        type: this.blockType,
+        id: this.blockId,
+        name: this.presetData.name || blockSchema?.meta?.name || this.blockType,
+        semanticId: this.presetData.semanticId || this.presetData.id,
+        properties: this.properties,
+        children: [],
+        parentId: undefined,
+        static: this.presetData.static,
+        disabled: this.presetData.disabled,
+        repeated: this.presetData.repeated,
+      };
+
+      this.page.blocks[this.blockId] = this.insertedBlock;
+      this.createdBlockIds.push(this.blockId);
+
+      if (this.presetData.children && this.presetData.children.length > 0) {
+        this.insertedBlock.children = this.createChildrenFromPreset(this.presetData.children, this.blockId);
+      }
+    } else if (this.presetIndex !== undefined) {
+      // Handle BlockPreset from schema (preset insertion)
+      const preset = blockSchema?.presets?.[this.presetIndex];
+      if (!preset) {
+        throw new Error(`Preset at index ${this.presetIndex} not found`);
+      }
+
+      this.insertedBlock = {
+        type: this.blockType,
+        id: this.blockId,
+        name: preset.name,
+        properties: this.properties,
+        children: [],
+        parentId: undefined,
+      };
+
+      this.page.blocks[this.blockId] = this.insertedBlock;
+      this.createdBlockIds.push(this.blockId);
+
+      if (preset.children && preset.children.length > 0) {
+        this.insertedBlock.children = this.createChildrenFromPreset(preset.children, this.blockId);
+      }
     }
 
-    this.insertedBlock = {
-      type: this.blockType,
-      id: this.blockId,
-      name: preset.name,
-      properties: this.properties,
-      children: [],
-      parentId: undefined,
-    };
-
-    this.page.blocks[this.blockId] = this.insertedBlock;
-    this.createdBlockIds.push(this.blockId);
-
-    if (preset.children && preset.children.length > 0) {
-      this.insertedBlock.children = this.createChildrenFromPreset(preset.children, this.blockId);
+    if (!this.insertedBlock) {
+      throw new Error('Failed to create block');
     }
 
     // Insert the root block in the appropriate location
@@ -160,37 +203,39 @@ export class InsertBlockFromPresetCommand implements Command {
     return this.insertedBlock;
   }
 
-  private createChildrenFromPreset(presetChildren: PresetChild[], parentId: string): string[] {
+  private createChildrenFromPreset(structures: BlockStructure[], parentId: string): string[] {
     const childIds: string[] = [];
 
-    for (const presetChild of presetChildren) {
+    for (const structure of structures) {
       const childId = generateId();
-      const childSchema = this.blocksManager.get(presetChild.type);
+      const childSchema = this.blocksManager.get(structure.type);
 
       if (!childSchema) {
-        console.warn(`Block type '${presetChild.type}' not found, skipping child`);
+        console.warn(`Block type '${structure.type}' not found, skipping child`);
         continue;
       }
 
-      const childProperties = this.buildProperties(childSchema, presetChild.properties);
+      const childProperties = this.buildProperties(childSchema, structure.properties);
 
       const childBlock: Block = {
-        type: presetChild.type,
+        type: structure.type,
         id: childId,
-        name: presetChild.name || childSchema.meta?.name || presetChild.type, // Preserve custom name from preset
-        semanticId: presetChild.id, // Preserve semantic ID from preset
+        name: structure.name || childSchema.meta?.name || structure.type,
+        semanticId: structure.semanticId || structure.id,
         properties: childProperties,
         children: [],
         parentId,
-        static: presetChild.static, // Preserve static flag
+        static: structure.static,
+        disabled: structure.disabled,
+        repeated: structure.repeated,
       };
 
       this.page.blocks[childId] = childBlock;
       this.createdBlockIds.push(childId);
 
       // Recursively create nested children
-      if (presetChild.children && presetChild.children.length > 0) {
-        childBlock.children = this.createChildrenFromPreset(presetChild.children, childId);
+      if (structure.children && structure.children.length > 0) {
+        childBlock.children = this.createChildrenFromPreset(structure.children, childId);
       }
 
       childIds.push(childId);

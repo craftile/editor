@@ -58,6 +58,7 @@ declare global {
   const useBlockLabel: typeof import('./composables/block-label')['useBlockLabel']
   const useBlocksPopover: typeof import('./composables/blocks-popover')['useBlocksPopover']
   const useBreakpoints: typeof import('./composables/breakpoints')['useBreakpoints']
+  const useClipboard: typeof import('./composables/clipboard')['useClipboard']
   const useCraftileEngine: typeof import('./composables/craftile-engine')['useCraftileEngine']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
@@ -145,6 +146,7 @@ declare module 'vue' {
     readonly useBlockLabel: UnwrapRef<typeof import('./composables/block-label')['useBlockLabel']>
     readonly useBlocksPopover: UnwrapRef<typeof import('./composables/blocks-popover')['useBlocksPopover']>
     readonly useBreakpoints: UnwrapRef<typeof import('./composables/breakpoints')['useBreakpoints']>
+    readonly useClipboard: UnwrapRef<typeof import('./composables/clipboard')['useClipboard']>
     readonly useCraftileEngine: UnwrapRef<typeof import('./composables/craftile-engine')['useCraftileEngine']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>

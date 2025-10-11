@@ -1,6 +1,6 @@
 import { EventBus } from '@craftile/event-bus';
 import type { EngineConfig, EngineEvents } from './types';
-import type { Block, BlockSchema, Page } from '@craftile/types';
+import type { Block, BlockSchema, BlockStructure, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
 import { InsertBlockCommand } from './commands/insert-block';
@@ -270,6 +270,87 @@ export class Engine extends EventBus<EngineEvents> {
 
   getBlockById(blockId: string): Block | undefined {
     return this.page.blocks[blockId];
+  }
+
+  /**
+   * Export a block and its children as a nested structure
+   * Useful for copying blocks or creating presets from existing blocks
+   */
+  exportBlockAsNestedStructure(blockId: string): BlockStructure {
+    const block = this.page.blocks[blockId];
+    if (!block) {
+      throw new Error(`Block not found: ${blockId}`);
+    }
+
+    const structure: BlockStructure = {
+      type: block.type,
+      id: block.id,
+      semanticId: block.semanticId,
+      properties: structuredClone(block.properties),
+      name: block.name,
+      static: block.static,
+      disabled: block.disabled,
+      repeated: block.repeated,
+      children: [],
+    };
+
+    if (block.children && block.children.length > 0) {
+      structure.children = block.children.map((childId) => this.exportBlockAsNestedStructure(childId));
+    }
+
+    return structure;
+  }
+
+  /**
+   * Paste a block from a nested structure
+   *
+   * @param structure - The block structure to paste
+   * @param options - Optional configuration for block insertion
+   * @param options.parentId - ID of parent block (for nested blocks)
+   * @param options.regionName - Target region name (defaults to 'main')
+   * @param options.index - Position to insert at (defaults to end)
+   * @returns The ID of the newly inserted block
+   * @throws {Error} When block type is not registered or parent-child relationship is invalid
+   * @emits block:insert - When the block is successfully inserted
+   */
+  pasteBlock(
+    structure: BlockStructure,
+    options?: {
+      parentId?: string;
+      regionName?: string;
+      index?: number;
+    }
+  ): string {
+    const blockSchema = this.blocksManager.get(structure.type);
+    if (!blockSchema) {
+      throw new Error(`Block type '${structure.type}' is not registered`);
+    }
+
+    if (options?.parentId) {
+      const parentBlock = this.page.blocks[options.parentId];
+      if (!parentBlock) {
+        throw new Error(`Parent block not found: ${options.parentId}`);
+      }
+
+      if (!this.blocksManager.canBeChild(structure.type, parentBlock.type)) {
+        throw new Error(`Block type '${structure.type}' cannot be a child of '${parentBlock.type}'`);
+      }
+    }
+
+    const command = new InsertBlockFromPresetCommand(this.page, {
+      blockType: structure.type,
+      presetData: structure,
+      parentId: options?.parentId,
+      regionName: options?.regionName,
+      index: options?.index,
+      blocksManager: this.blocksManager,
+      emit: this.emit.bind(this),
+    });
+
+    command.apply();
+    this.historyManager.addCommand(command);
+
+    return command.getBlockId();
   }
 
   /**

@@ -24,7 +24,7 @@ const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayers
 const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
 const { open: openBlocksPopover } = useBlocksPopover();
-const { engine, moveBlock, blocks } = useCraftileEngine();
+const { engine, moveBlock, removeBlock, blocks } = useCraftileEngine();
 
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
@@ -131,6 +131,10 @@ function onChildDragEnd(event: SortableEvent) {
 function onChildMove(event: any) {
   return canAcceptChild(event);
 }
+
+function remove() {
+  removeBlock(props.blockId);
+}
 </script>
 
 <template>
@@ -202,6 +206,16 @@ function onChildMove(event: any) {
           >
             <icon-eye-slash v-if="blockData.disabled" class="w-4 h-4" />
             <icon-eye v-else class="w-4 h-4" />
+          </button>
+
+          <!-- Remove button - only visible on hover and when not static -->
+          <button
+            v-if="!isStatic"
+            @click.stop="() => remove()"
+            class="p-1 hover:bg-red-100 rounded text-gray-500 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+            :title="t('block.remove')"
+          >
+            <icon-trash class="w-4 h-4" />
           </button>
         </div>
       </div>

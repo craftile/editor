@@ -1,5 +1,6 @@
 import { createToaster } from '@ark-ui/vue/toast';
 import type { EventBus } from '@craftile/event-bus';
+import type { BlockStructure } from '@craftile/types';
 import type {
   ConfigurationPanel,
   HeaderAction,
@@ -23,6 +24,9 @@ export interface UIState {
   layersPanel: {
     expandedBlocks: Set<string>;
   };
+  clipboard: {
+    copiedBlock: BlockStructure | null;
+  };
 }
 
 export class UIManager {
@@ -45,6 +49,9 @@ export class UIManager {
       selectedBlockId: null,
       layersPanel: {
         expandedBlocks: new Set<string>(),
+      },
+      clipboard: {
+        copiedBlock: null,
       },
     });
 
@@ -182,5 +189,19 @@ export class UIManager {
 
   removeKeyboardShortcut(key: string): void {
     this.state.keyboardShortcuts.delete(key);
+  }
+
+  copyBlock(block: BlockStructure): void {
+    this.state.clipboard.copiedBlock = block;
+    this.events.emit('ui:clipboard:copy', { block });
+  }
+
+  getCopiedBlock(): BlockStructure | null {
+    return this.state.clipboard.copiedBlock;
+  }
+
+  clearClipboard(): void {
+    this.state.clipboard.copiedBlock = null;
+    this.events.emit('ui:clipboard:clear', {});
   }
 }

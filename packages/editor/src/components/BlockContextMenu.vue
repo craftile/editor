@@ -11,6 +11,7 @@ const { t } = useI18n();
 const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
 const { open: openBlocksPopover, getInsertionContext } = useBlocksPopover();
 const { block: blockData, nextSibling, previousSibling } = useBlock(props.blockId);
+const { copyBlock, canPasteAfter, pasteBlockAfter, hasCopiedBlock } = useClipboard();
 
 const isStatic = computed(() => blockData.value?.static === true);
 const isRootBlock = computed(() => !blockData.value?.parentId);
@@ -169,6 +170,16 @@ const insertBeforeLabel = computed(() =>
 const insertAfterLabel = computed(() =>
   isRootBlock.value ? t('block.insertBlockAfter') : t('block.insertSiblingAfter')
 );
+
+function handleCopyBlock() {
+  copyBlock(props.blockId);
+}
+
+const isPasteEnabled = computed(() => hasCopiedBlock.value && canPasteAfter(props.blockId));
+
+function handlePasteAfter() {
+  pasteBlockAfter(props.blockId);
+}
 </script>
 
 <template>
@@ -180,6 +191,27 @@ const insertAfterLabel = computed(() =>
       <Menu.Content
         class="bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[180px] focus:outline-none z-50"
       >
+        <!-- Copy -->
+        <Menu.Item
+          value="copy"
+          @select="handleCopyBlock"
+          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+        >
+          <icon-clipboard-document class="w-4 h-4" />
+          {{ t('block.copy') }}
+        </Menu.Item>
+
+        <!-- Paste After -->
+        <Menu.Item
+          value="paste-after"
+          :disabled="!isPasteEnabled"
+          @select="handlePasteAfter"
+          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
+        >
+          <icon-clipboard class="w-4 h-4" />
+          {{ t('block.pasteAfter') }}
+        </Menu.Item>
+
         <!-- Duplicate -->
         <Menu.Item
           value="duplicate"

@@ -16,6 +16,8 @@ export const en: I18n = {
   block: {
     show: 'Show',
     hide: 'Hide',
+    copy: 'Copy',
+    pasteAfter: 'Paste After',
     duplicate: 'Duplicate',
     remove: 'Remove',
     moveToNext: 'Move to Next',
