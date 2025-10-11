@@ -1,5 +1,7 @@
 # @craftile/preview-client-html
 
+## 0.7.0
+
 ## 0.6.3
 
 ### Patch Changes

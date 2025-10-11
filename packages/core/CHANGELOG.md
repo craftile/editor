@@ -1,5 +1,17 @@
 # @craftile/core
 
+## 0.7.0
+
+### Minor Changes
+
+- [`a18d794`](https://github.com/craftile/editor/commit/a18d794b83d71277b9d5d038b37fdbff19a22f0a) Thanks [@eldomagan](https://github.com/eldomagan)! - Add copy and paste functionality for blocks. Blocks can now be copied and pasted within the editor. The copied block persists across page changes and can be pasted at any compatible location using the context menu.
+
+### Patch Changes
+
+- Updated dependencies [[`a18d794`](https://github.com/craftile/editor/commit/a18d794b83d71277b9d5d038b37fdbff19a22f0a)]:
+  - @craftile/types@0.7.0
+  - @craftile/event-bus@0.7.0
+
 ## 0.6.3
 
 ### Patch Changes
