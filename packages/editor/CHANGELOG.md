@@ -1,5 +1,23 @@
 # @craftile/editor
 
+## 0.7.0
+
+### Minor Changes
+
+- [`7d5f5f0`](https://github.com/craftile/editor/commit/7d5f5f03d1b370b7b2dd660efac854ab42aac606) Thanks [@eldomagan](https://github.com/eldomagan)! - Add context menu to block items in layers panel. Right-click on any block item to access all block actions including duplicate, enable/disable, move, insert blocks before/after, and remove.
+
+- [`75548fa`](https://github.com/craftile/editor/commit/75548fabb5114441c52f0528feef00710cd3fc58) Thanks [@eldomagan](https://github.com/eldomagan)! - Add "Copy as JSON" option to block context menu. Blocks can now be exported as JSON to the system clipboard, making it easy to share block structures or use them in other tools.
+
+- [`a18d794`](https://github.com/craftile/editor/commit/a18d794b83d71277b9d5d038b37fdbff19a22f0a) Thanks [@eldomagan](https://github.com/eldomagan)! - Add copy and paste functionality for blocks. Blocks can now be copied and pasted within the editor. The copied block persists across page changes and can be pasted at any compatible location using the context menu.
+
+### Patch Changes
+
+- Updated dependencies [[`a18d794`](https://github.com/craftile/editor/commit/a18d794b83d71277b9d5d038b37fdbff19a22f0a)]:
+  - @craftile/core@0.7.0
+  - @craftile/types@0.7.0
+  - @craftile/event-bus@0.7.0
+  - @craftile/messenger@0.7.0
+
 ## 0.6.3
 
 ### Patch Changes
