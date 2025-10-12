@@ -1,5 +1,11 @@
 # @craftile/types
 
+## 0.7.1
+
+### Patch Changes
+
+- [`865d3e1`](https://github.com/craftile/editor/commit/865d3e1a6b28df019f346ebbeb31765d938c2702) Thanks [@eldomagan](https://github.com/eldomagan)! - Display loop icon for repeated blocks in layers panel. Repeated blocks now show an arrow-path icon instead of their default block icon, making it easier to identify blocks that are part of a repeating pattern.
+
 ## 0.7.0
 
 ### Minor Changes
