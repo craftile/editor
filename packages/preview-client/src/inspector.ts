@@ -47,14 +47,28 @@ export class Inspector {
   enable() {
     this.active = true;
     document.body.classList.add('craftile-inspector-active');
+
+    // Re-track selected block if it exists
+    if (this.currentSelectedBlock) {
+      this.trackSelectedBlock();
+    }
   }
 
   disable() {
     this.active = false;
     document.body.classList.remove('craftile-inspector-active');
     this.currentHoveredBlock = null;
-    this.currentSelectedBlock = null;
     this.overlayButtonHovered = false;
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
+    }
   }
 
   private handleOverlayButtonEnter() {
@@ -95,6 +109,10 @@ export class Inspector {
   }
 
   private handleScroll() {
+    if (!this.active) {
+      return;
+    }
+
     if (this.currentSelectedBlock) {
       this.sendSelectedBlockPosition();
     }
@@ -180,6 +198,10 @@ export class Inspector {
   }
 
   private sendSelectedBlockPosition(updates: boolean = false) {
+    if (!this.currentSelectedBlock) {
+      return;
+    }
+
     const position = this.computeElementPositioning(this.currentSelectedBlock!);
     this.messenger.send(updates ? 'craftile.preview.update-selected-block' : 'craftile.preview.block-select', {
       blockRect: position.rect,
@@ -205,12 +227,16 @@ export class Inspector {
     }
 
     this.resizeObserver = new ResizeObserver(() => {
-      this.sendSelectedBlockPosition(true);
+      if (this.active && this.currentSelectedBlock) {
+        this.sendSelectedBlockPosition(true);
+      }
     });
     this.resizeObserver.observe(this.currentSelectedBlock);
 
     this.mutationObserver = new MutationObserver(() => {
-      this.sendSelectedBlockPosition(true);
+      if (this.active && this.currentSelectedBlock) {
+        this.sendSelectedBlockPosition(true);
+      }
     });
 
     this.mutationObserver.observe(this.currentSelectedBlock, {
