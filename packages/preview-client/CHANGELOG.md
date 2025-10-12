@@ -1,5 +1,11 @@
 # @craftile/preview-client
 
+## 0.7.1
+
+### Patch Changes
+
+- [`959a468`](https://github.com/craftile/editor/commit/959a468208e1ab8a69a4f895a07859f9845a8918) Thanks [@eldomagan](https://github.com/eldomagan)! - Improve inspector performance by properly managing observers lifecycle. ResizeObserver and MutationObserver are now disconnected when inspector is disabled and reconnected when re-enabled.
+
 ## 0.7.0
 
 ## 0.6.3
