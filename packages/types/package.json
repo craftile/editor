@@ -1,6 +1,6 @@
 {
   "name": "@craftile/types",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Shared TypeScript type definitions for Craftile Editor",
   "keywords": [
     "craftile",
