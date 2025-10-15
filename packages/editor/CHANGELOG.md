@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.7.2
+
+### Patch Changes
+
+- [`7e70822`](https://github.com/craftile/editor/commit/7e708225d7cb605c1966ff172d220cc256b5d689) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix reactivity issue when updating block properties. Use toRaw() to unwrap Vue proxies before passing property values to the engine, preventing potential structuredClone errors.
+
+- Updated dependencies []:
+  - @craftile/core@0.7.2
+  - @craftile/event-bus@0.7.2
+  - @craftile/messenger@0.7.2
+  - @craftile/types@0.7.2
+
 ## 0.7.1
 
 ### Patch Changes
