@@ -1,6 +1,6 @@
 {
   "name": "@craftile/plugin-static-blocks-renderer",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Craftile plugin for static HTML block rendering",
   "keywords": [
     "craftile",
