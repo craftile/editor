@@ -69,7 +69,21 @@ function updateProperty(propertyId: string, value: any) {
     return;
   }
 
-  setBlockProperty(selectedBlock.value.id, propertyId, toRaw(value));
+  const unwrapValue = (val: any): any => {
+    const raw = toRaw(val);
+
+    if (Array.isArray(raw)) {
+      return raw.map(unwrapValue);
+    }
+
+    if (raw && typeof raw === 'object' && raw.constructor === Object) {
+      return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, unwrapValue(v)]));
+    }
+
+    return raw;
+  };
+
+  setBlockProperty(selectedBlock.value.id, propertyId, unwrapValue(value));
 }
 </script>
 
