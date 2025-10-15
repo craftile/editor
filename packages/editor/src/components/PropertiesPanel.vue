@@ -69,7 +69,7 @@ function updateProperty(propertyId: string, value: any) {
     return;
   }
 
-  setBlockProperty(selectedBlock.value.id, propertyId, value);
+  setBlockProperty(selectedBlock.value.id, propertyId, toRaw(value));
 }
 </script>
 
