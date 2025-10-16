@@ -1,5 +1,11 @@
 # @craftile/types
 
+## 0.8.0
+
+### Minor Changes
+
+- [`1e939d3`](https://github.com/craftile/editor/commit/1e939d305f2cb66d759413d3938ac3c371933b3d) Thanks [@eldomagan](https://github.com/eldomagan)! - Add support for ghost/data blocks - blocks that exist in the editor data structure but are not rendered in the live preview. Ghost blocks serve as data holders (e.g., collection items) and can be selected in the layers panel to edit their properties, but no overlay is displayed in the preview since they have no DOM representation.
+
 ## 0.7.3
 
 ## 0.7.2

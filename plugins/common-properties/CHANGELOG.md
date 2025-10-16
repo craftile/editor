@@ -1,5 +1,7 @@
 # @craftile/plugin-common-properties
 
+## 0.8.0
+
 ## 0.7.3
 
 ## 0.7.2
