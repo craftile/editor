@@ -30,6 +30,7 @@ const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
 const isStatic = computed(() => blockData.value?.static === true);
 const isRepeated = computed(() => blockData.value?.repeated === true);
+const isGhost = computed(() => blockData.value?.ghost === true);
 
 const blockSchemaName = getBlockSchemaNameReactive(props.blockId);
 const blockLabel = getBlockLabelReactive(props.blockId);
@@ -146,7 +147,8 @@ function remove() {
         :data-selected="isSelected ? 'true' : undefined"
         class="flex items-center h-8 text-sm hover:bg-gray-50 data-selected:bg-accent/10 data-selected:border data-selected:border-accent/20 data-selected:hover:bg-accent/10 cursor-pointer rounded-md group transition-all duration-200"
         :class="{
-          'text-gray-700': !blockData.disabled,
+          'text-gray-700': !blockData.disabled && !isGhost,
+          'text-gray-500': isGhost && !blockData.disabled,
           'text-gray-400': blockData.disabled,
         }"
         @click="selectBlock(blockData.id)"
@@ -177,13 +179,19 @@ function remove() {
 
         <!-- Block Icon (show lock on hover for static blocks) -->
         <div class="w-4 h-4 mr-1 flex items-center justify-center relative">
+          <!-- Show cube icon for ghost blocks -->
+          <icon-cube
+            v-if="isGhost"
+            :class="{ 'group-hover:opacity-0': isStatic }"
+            class="w-4 h-4 transition-opacity text-gray-400"
+          />
           <!-- Show loop icon for repeated blocks -->
           <icon-arrow-path
-            v-if="isRepeated"
+            v-else-if="isRepeated"
             :class="{ 'group-hover:opacity-0': isStatic }"
             class="w-4 h-4 transition-opacity"
           />
-          <!-- Show block's custom icon if not repeated -->
+          <!-- Show block's custom icon if not repeated or ghost -->
           <span
             v-else-if="blockIcon"
             v-html="blockIcon"

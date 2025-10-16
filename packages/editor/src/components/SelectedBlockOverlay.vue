@@ -17,7 +17,13 @@ const toolbarElement = ref<HTMLElement>();
 const toolbarDimensions = ref({ width: 200, height: 42 }); // Default fallback values
 
 const isVisible = computed(() => {
-  return isEnabled.value && selectedBlockRect.value && iframeRect.value && !selectedBlock.value?.disabled;
+  return (
+    isEnabled.value &&
+    selectedBlockRect.value &&
+    iframeRect.value &&
+    !selectedBlock.value?.disabled &&
+    !selectedBlock.value?.ghost
+  );
 });
 
 const isStaticBlock = computed(() => {
@@ -114,6 +120,7 @@ const toolbarStyle = computed(() => {
   return style;
 });
 </script>
+
 <template>
   <div v-if="isVisible" class="absolute inset-0 w-full h-full pointer-events-none z-10" :style="wrapperStyle">
     <!-- Selected block label -->

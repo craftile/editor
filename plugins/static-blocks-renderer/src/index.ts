@@ -30,6 +30,11 @@ export default (options: StaticBlocksRendererOptions = {}): CraftileEditorPlugin
     }
 
     function renderBlock(block: Block, blocks: Record<string, Block>): string {
+      // Ghost blocks are not rendered in preview
+      if (block.ghost === true) {
+        return '';
+      }
+
       const cacheKey = `${block.id}:${JSON.stringify(block.properties)}:${block.children.join(',')}`;
 
       if (renderCache.has(cacheKey)) {

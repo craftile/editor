@@ -300,4 +300,59 @@ export const blockRenderers: Record<string, BlockRenderer> = {
       </div>
     </div>`;
   },
+  'collection-list': ({ props, children, editorAttributes }) => {
+    const gap = props.gap || 16;
+
+    const style = `
+      display: flex;
+      flex-direction: column;
+      gap: ${gap}px;
+      padding: 20px;
+      background-color: #f9fafb;
+      border-radius: 8px;
+    `;
+
+    return `<div class="block collection-list" ${editorAttributes} style="${style}">
+      <!--BEGIN children: ${editorAttributes}-->
+      ${children}
+      <!--END children: ${editorAttributes}-->
+    </div>`;
+  },
+  'collection-item': ({ props, editorAttributes }) => {
+    // Ghost blocks should not render - but this is a fallback
+    // The renderer plugin already handles ghost blocks by returning empty string
+    return `<div ${editorAttributes} style="display: none;" data-ghost="true"></div>`;
+  },
+  'collection-card': ({ block, editorAttributes }) => {
+    // In a real implementation, this would read data from ghost collection-item siblings
+    // For demo purposes, we'll show a placeholder card
+    const style = `
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    `;
+
+    // Get parent block to access collection items
+    // This is a simplified demo - in production you'd have proper data binding
+    const title = 'Collection Card';
+    const description = 'This card would display data from ghost collection-item blocks';
+    const price = '$0.00';
+
+    return `<div class="block collection-card" ${editorAttributes} style="${style}">
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">${title}</h3>
+          <p style="margin: 0 0 12px 0; color: #6b7280; font-size: 14px;">${description}</p>
+          <div style="font-size: 20px; font-weight: 700; color: #6366f1;">${price}</div>
+        </div>
+      </div>
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+        <span style="display: inline-block; padding: 4px 12px; background: #ede9fe; color: #7c3aed; border-radius: 4px; font-size: 12px; font-weight: 500;">
+          Repeated Block
+        </span>
+      </div>
+    </div>`;
+  },
 };

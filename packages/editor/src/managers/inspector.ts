@@ -1,4 +1,5 @@
 import type { EventBus } from '@craftile/event-bus';
+import type { Engine } from '@craftile/core';
 import type { PreviewManager } from './preview';
 import type { UIManager } from './ui';
 
@@ -21,11 +22,13 @@ export class InspectorManager {
   private events: EventBus;
   private preview: PreviewManager;
   private ui: UIManager;
+  private engine: Engine;
 
-  constructor(events: EventBus, preview: PreviewManager, ui: UIManager) {
+  constructor(events: EventBus, preview: PreviewManager, ui: UIManager, engine: Engine) {
     this.events = events;
     this.preview = preview;
     this.ui = ui;
+    this.engine = engine;
 
     this.state = reactive({
       enabled: true,
@@ -61,6 +64,13 @@ export class InspectorManager {
     });
 
     this.events.on('ui:block:select', (data: { blockId: string }) => {
+      // Don't send selection to preview for ghost blocks (they don't exist in DOM)
+      const page = this.engine.getPage();
+      const block = page.blocks[data.blockId];
+      if (block?.ghost === true) {
+        return;
+      }
+
       this.preview.sendMessage('craftile.editor.select-block', { blockId: data.blockId });
     });
 

@@ -83,6 +83,7 @@ export class InsertBlockFromPresetCommand implements Command {
         static: this.presetData.static,
         disabled: this.presetData.disabled,
         repeated: this.presetData.repeated,
+        ghost: this.presetData.ghost,
       };
 
       this.page.blocks[this.blockId] = this.insertedBlock;
@@ -228,6 +229,7 @@ export class InsertBlockFromPresetCommand implements Command {
         static: structure.static,
         disabled: structure.disabled,
         repeated: structure.repeated,
+        ghost: structure.ghost,
       };
 
       this.page.blocks[childId] = childBlock;

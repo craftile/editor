@@ -931,4 +931,90 @@ export const blockSchemas: BlockSchema[] = [
       description: 'Accordion row (private - only for use in accordion)',
     },
   },
+  {
+    type: 'collection-list',
+    properties: [
+      { id: 'gap', type: 'number', label: 'Gap', default: 16 },
+    ],
+    accepts: ['collection-item', 'collection-card'],
+    presets: [
+      {
+        name: 'Product Collection',
+        description: 'Collection list with ghost data items and a repeated card',
+        properties: { gap: 20 },
+        children: [
+          {
+            type: 'collection-item',
+            ghost: true,
+            properties: {
+              title: 'Product 1',
+              description: 'Description for product 1',
+              price: '$29.99',
+              image: 'https://placehold.co/300x200/6366f1/white?text=Product+1',
+            },
+          },
+          {
+            type: 'collection-item',
+            ghost: true,
+            properties: {
+              title: 'Product 2',
+              description: 'Description for product 2',
+              price: '$39.99',
+              image: 'https://placehold.co/300x200/8b5cf6/white?text=Product+2',
+            },
+          },
+          {
+            type: 'collection-item',
+            ghost: true,
+            properties: {
+              title: 'Product 3',
+              description: 'Description for product 3',
+              price: '$49.99',
+              image: 'https://placehold.co/300x200/ec4899/white?text=Product+3',
+            },
+          },
+          {
+            type: 'collection-card',
+            repeated: true,
+            properties: {},
+          },
+        ],
+      },
+    ],
+    meta: {
+      name: 'Collection List',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>',
+      category: 'Collections',
+      description: 'Collection list - demonstrates ghost blocks as data holders',
+    },
+  },
+  {
+    type: 'collection-item',
+    properties: [
+      { id: 'title', type: 'text', label: 'Title', default: 'Item Title' },
+      { id: 'description', type: 'text', label: 'Description', default: 'Item description' },
+      { id: 'price', type: 'text', label: 'Price', default: '$0.00' },
+      { id: 'image', type: 'text', label: 'Image URL', default: 'https://placehold.co/300x200' },
+    ],
+    accepts: [],
+    private: true,
+    meta: {
+      name: 'Collection Item',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>',
+      category: 'Collections',
+      description: 'Collection item (ghost block - holds data, not rendered)',
+    },
+  },
+  {
+    type: 'collection-card',
+    properties: [],
+    accepts: [],
+    private: true,
+    meta: {
+      name: 'Collection Card',
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>',
+      category: 'Collections',
+      description: 'Collection card (repeated block that displays collection item data)',
+    },
+  },
 ];

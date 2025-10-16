@@ -42,6 +42,7 @@ export interface Block {
   disabled?: boolean;
   static?: boolean; // Block cannot be moved or removed
   repeated?: boolean; // Block is part of a repeating pattern/list
+  ghost?: boolean; // Block exists in data but is not rendered in preview (data holder only)
   parentId?: string; // ID of parent block (undefined for top-level blocks)
   children: string[]; // Ordered array of child block IDs
 }

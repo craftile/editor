@@ -57,7 +57,7 @@ export class CraftileEditor {
     this.preview = new PreviewManager();
     this.ui = new UIManager(this.events);
     this.plugins = new PluginsManager(this);
-    this.inspector = new InspectorManager(this.events, this.preview, this.ui);
+    this.inspector = new InspectorManager(this.events, this.preview, this.ui, this.engine);
 
     this.blockLabelFunction = options.blockLabelFunction;
     this.blockFilterFunction = options.blockFilterFunction;
