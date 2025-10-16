@@ -1,5 +1,7 @@
 # @craftile/preview-client-html
 
+## 0.8.0
+
 ## 0.7.3
 
 ## 0.7.2
