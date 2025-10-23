@@ -31,5 +31,6 @@ export function useInspector() {
     toggle: () => editor.inspector.toggle(),
 
     updateIframeRect: (rect: DOMRect) => editor.inspector.setIframeRect(rect),
+    clearHoveredBlock: () => editor.inspector.clearHoveredBlock(),
   };
 }

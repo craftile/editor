@@ -1,8 +1,9 @@
 <script setup lang="ts">
 const { currentDeviceData } = useDeviceMode();
 const { currentPreviewUrl, registerFrame, sendMessage } = usePreview();
-const { updateIframeRect } = useInspector();
+const { updateIframeRect, clearHoveredBlock } = useInspector();
 const { open: openBlocksPopover, getInsertionContext } = useBlocksPopover();
+const { clearSelection } = useSelectedBlock();
 
 const canvasContainer = ref<HTMLElement>();
 const previewWrapper = ref<HTMLElement>();
@@ -59,6 +60,8 @@ const updateIframePosition = () => {
 };
 
 const onFrameLoad = (event: Event) => {
+  clearSelection();
+  clearHoveredBlock();
   registerFrame(event.target as HTMLIFrameElement);
   updateIframePosition();
 };
