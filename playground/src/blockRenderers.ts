@@ -157,6 +157,54 @@ export const blockRenderers: Record<string, BlockRenderer> = {
     </button>`;
   },
 
+  'link-card': ({ props, editorAttributes }) => {
+    const title = escapeHtml(props.title || 'Link Card Title');
+    const description = escapeHtml(props.description || 'Click to visit this link');
+    const url = escapeHtml(props.url || 'https://example.com');
+    const backgroundColor = escapeHtml(props.backgroundColor || '#f9fafb');
+
+    const style = `
+      display: block;
+      background-color: ${backgroundColor};
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    `;
+
+    const hoverStyle = `
+      onmouseover="this.style.borderColor='#6366f1'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(99, 102, 241, 0.1)';"
+      onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+    `;
+
+    return `<a
+      href="${url}"
+      class="block link-card"
+      ${editorAttributes}
+      style="${style}"
+      ${hoverStyle}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div style="display: flex; align-items: flex-start; gap: 12px;">
+        <svg style="flex-shrink: 0; width: 24px; height: 24px; color: #6366f1; margin-top: 2px;" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13.544 10.456a4.368 4.368 0 00-6.176 0l-3.089 3.088a4.367 4.367 0 106.177 6.177L12 18.177a1 1 0 11-1.414 1.414l-1.544 1.544a6.368 6.368 0 01-9.005-9.005l3.089-3.088a6.367 6.367 0 019.005 0 1 1 0 01-1.415 1.414h.001z"/>
+          <path d="M10.456 13.544a4.368 4.368 0 006.176 0l3.089-3.088a4.367 4.367 0 10-6.177-6.177L12 5.823a1 1 0 111.414-1.414l1.544-1.544a6.368 6.368 0 019.005 9.005l-3.089 3.088a6.367 6.367 0 01-9.005 0 1 1 0 011.415-1.414h-.001z"/>
+        </svg>
+        <div style="flex: 1; min-width: 0;">
+          <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #111827;">${title}</h3>
+          <p style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5;">${description}</p>
+          <div style="margin-top: 12px; font-size: 13px; color: #6366f1; font-weight: 500;">
+            ${url} →
+          </div>
+        </div>
+      </div>
+    </a>`;
+  },
+
   image: ({ props, editorAttributes }: any) => {
     const src = props.src || '';
     const alt = props.alt || '';

@@ -112,6 +112,23 @@ export const blockSchemas: BlockSchema[] = [
     },
   },
   {
+    type: 'link-card',
+    properties: [
+      { id: 'title', type: 'text', label: 'Title', default: 'Link Card Title' },
+      { id: 'description', type: 'text', label: 'Description', default: 'Click to visit this link' },
+      { id: 'url', type: 'text', label: 'URL', default: 'https://example.com' },
+      { id: 'backgroundColor', type: 'color', label: 'Background', default: '#f9fafb' },
+    ],
+    accepts: [],
+    meta: {
+      name: 'Link Card',
+      icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M13.544 10.456a4.368 4.368 0 00-6.176 0l-3.089 3.088a4.367 4.367 0 106.177 6.177L12 18.177a1 1 0 11-1.414 1.414l-1.544 1.544a6.368 6.368 0 01-9.005-9.005l3.089-3.088a6.367 6.367 0 019.005 0 1 1 0 01-1.415 1.414h.001z"/><path d="M10.456 13.544a4.368 4.368 0 006.176 0l3.089-3.088a4.367 4.367 0 10-6.177-6.177L12 5.823a1 1 0 111.414-1.414l1.544-1.544a6.368 6.368 0 019.005 9.005l-3.089 3.088a6.367 6.367 0 01-9.005 0 1 1 0 011.415-1.414h-.001z"/></svg>',
+      category: 'Interactive',
+      description: 'Clickable card with link - demonstrates click prevention (first click selects, second click navigates)',
+      previewImageUrl: 'https://placehold.co/400x240/6366f1/ffffff?text=Link+Card',
+    },
+  },
+  {
     type: 'image',
     properties: [
       { id: 'src', type: 'text', label: 'Image URL', default: 'https://placehold.co/300x200' },

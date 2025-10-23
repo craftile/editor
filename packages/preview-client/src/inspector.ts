@@ -125,7 +125,7 @@ export class Inspector {
   private setupGlobalEventListeners() {
     document.addEventListener('mouseover', this.handleGlobalHover.bind(this));
     document.addEventListener('mouseout', this.handleGlobalLeave.bind(this));
-    document.addEventListener('click', this.handleGlobalClick.bind(this));
+    document.addEventListener('click', this.handleGlobalClick.bind(this), { capture: true });
   }
 
   private handleGlobalHover(e: Event) {
@@ -173,11 +173,17 @@ export class Inspector {
       return;
     }
 
-    e.stopPropagation();
-
     const blockId = blockElement.getAttribute('data-block');
+    if (!blockId) {
+      return;
+    }
 
-    if (blockId) {
+    const isAlreadySelected = this.currentSelectedBlock === blockElement;
+
+    if (!isAlreadySelected) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
       this.currentSelectedBlock = blockElement;
       this.sendSelectedBlockPosition();
       this.trackSelectedBlock();
