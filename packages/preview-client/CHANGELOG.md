@@ -1,5 +1,11 @@
 # @craftile/preview-client
 
+## 0.8.1
+
+### Patch Changes
+
+- [`6c542eb`](https://github.com/craftile/editor/commit/6c542ebd5e2269888cad98c3f4480f99b4dfa6e6) Thanks [@eldomagan](https://github.com/eldomagan)! - Prevent click events on first block selection in inspector. When a clickable element (link, button, accordion) inside a block is clicked while inspector is active, the first click selects the block and prevents the action from executing. The second click (when block is already selected) allows the click to execute normally.
+
 ## 0.8.0
 
 ## 0.7.3

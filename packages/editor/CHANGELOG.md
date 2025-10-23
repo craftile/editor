@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 0.8.1
+
+### Patch Changes
+
+- [`b9a6a8e`](https://github.com/craftile/editor/commit/b9a6a8e489dcc68b81ec7a2d633935f19a61c26c) Thanks [@eldomagan](https://github.com/eldomagan)! - Clear selection and hover overlay state when preview page changes. When a new preview page loads (via loadFromHtml or URL change), both the selected block and hovered block states are now cleared to prevent stale overlays and references to blocks that no longer exist in the new preview.
+
+- Updated dependencies []:
+  - @craftile/core@0.8.1
+  - @craftile/event-bus@0.8.1
+  - @craftile/messenger@0.8.1
+  - @craftile/types@0.8.1
+
 ## 0.8.0
 
 ### Minor Changes
