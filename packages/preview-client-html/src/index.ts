@@ -33,6 +33,8 @@ export default class RawHtmlRenderer {
   private elementCache = new Map<string, HTMLElement>();
   private regionCommentsCache = new Map<string, RegionComments>();
   private childrenCommentsCache = new Map<string, RegionComments>();
+  private pendingScripts = new Set<HTMLScriptElement>();
+  private scriptExecutionCount = { total: 0, completed: 0, failed: 0 };
 
   constructor(previewClient?: PreviewClient, options?: HtmlPreviewClientOptions) {
     this.previewClient = previewClient || new PreviewClient();
@@ -179,6 +181,189 @@ export default class RawHtmlRenderer {
     if (effects.html) {
       this.handleHtmlEffects(effects.html, { blocks, regions, changes });
     }
+
+    if (effects.css) {
+      this.handleCssEffects(effects.css);
+    }
+
+    if (effects.js) {
+      this.handleJsEffects(effects.js);
+    }
+  }
+
+  private handleCssEffects(cssEffects: string[]): void {
+    for (const styleHtml of cssEffects) {
+      this.injectStyleElement(styleHtml);
+    }
+  }
+
+  private injectStyleElement(styleHtml: string): void {
+    const temp = document.createElement('div');
+    temp.innerHTML = styleHtml;
+    const styleElement = temp.firstElementChild as HTMLStyleElement | HTMLLinkElement;
+
+    if (!styleElement || (styleElement.tagName !== 'STYLE' && styleElement.tagName !== 'LINK')) {
+      console.warn('Invalid CSS element provided:', styleHtml);
+      return;
+    }
+
+    const id = styleElement.id;
+
+    // If element has ID and already exists, replace it
+    if (id) {
+      const existing = document.getElementById(id);
+      if (existing && (existing.tagName === 'STYLE' || existing.tagName === 'LINK')) {
+        existing.parentNode?.replaceChild(styleElement, existing);
+        return;
+      }
+    }
+
+    // For inline styles without ID, check for duplicate content
+    if (styleElement.tagName === 'STYLE' && !id) {
+      const content = styleElement.textContent?.trim();
+      if (content) {
+        const existingStyles = document.querySelectorAll('style:not([id])');
+        for (const existing of existingStyles) {
+          if (existing.textContent?.trim() === content) {
+            return;
+          }
+        }
+      }
+    }
+
+    // For link elements without ID, check for duplicate href+rel
+    if (styleElement.tagName === 'LINK' && !id) {
+      const href = styleElement.getAttribute('href');
+      const rel = styleElement.getAttribute('rel');
+      if (href) {
+        const existingLinks = document.querySelectorAll('link:not([id])');
+        for (const existing of existingLinks) {
+          if (existing.getAttribute('href') === href && existing.getAttribute('rel') === rel) {
+            return;
+          }
+        }
+      }
+    }
+
+    document.head.appendChild(styleElement);
+  }
+
+  private handleJsEffects(jsElements: string[]): void {
+    this.pendingScripts.clear();
+    this.scriptExecutionCount = { total: 0, completed: 0, failed: 0 };
+
+    const validScripts = jsElements.filter((jsHtml) => jsHtml?.trim());
+    this.scriptExecutionCount.total = validScripts.length;
+
+    if (validScripts.length === 0) {
+      this.emitScriptExecutionComplete();
+      return;
+    }
+
+    for (const jsHtml of validScripts) {
+      this.injectScriptElement(jsHtml);
+    }
+  }
+
+  private injectScriptElement(scriptHtml: string): void {
+    const temp = document.createElement('div');
+    temp.innerHTML = scriptHtml;
+    const scriptElement = temp.firstElementChild as HTMLScriptElement;
+
+    if (!scriptElement || scriptElement.tagName !== 'SCRIPT') {
+      console.warn('Invalid script element provided:', scriptHtml);
+      this.onScriptCompleted(false); // Count as failed
+      return;
+    }
+
+    const id = scriptElement.id;
+
+    // If script has ID and already exists, replace it
+    if (id) {
+      const existing = document.getElementById(id) as HTMLScriptElement;
+      if (existing && existing.tagName === 'SCRIPT') {
+        this.pendingScripts.delete(existing);
+        existing.parentNode?.replaceChild(scriptElement, existing);
+        this.trackScriptExecution(scriptElement);
+        return;
+      }
+    }
+
+    // For inline scripts without ID, check for duplicate content
+    if (!scriptElement.src && !id) {
+      const content = scriptElement.textContent?.trim();
+      if (content) {
+        const existingScripts = document.querySelectorAll('script:not([src]):not([id])');
+        for (const existing of existingScripts) {
+          if (existing.textContent?.trim() === content) {
+            this.onScriptCompleted(true);
+            return;
+          }
+        }
+      }
+    }
+
+    // For external scripts without ID, check for duplicate src
+    if (scriptElement.src && !id) {
+      const src = scriptElement.src;
+      const existingScripts = document.querySelectorAll('script[src]:not([id])') as NodeListOf<HTMLScriptElement>;
+      for (const existing of existingScripts) {
+        if (existing.src === src) {
+          this.onScriptCompleted(true);
+          return;
+        }
+      }
+    }
+
+    document.head.appendChild(scriptElement);
+    this.trackScriptExecution(scriptElement);
+  }
+
+  private trackScriptExecution(scriptElement: HTMLScriptElement): void {
+    if (scriptElement.src) {
+      this.pendingScripts.add(scriptElement);
+
+      const onLoad = () => {
+        this.pendingScripts.delete(scriptElement);
+        this.onScriptCompleted(true);
+        scriptElement.removeEventListener('load', onLoad);
+        scriptElement.removeEventListener('error', onError);
+      };
+
+      const onError = () => {
+        this.pendingScripts.delete(scriptElement);
+        this.onScriptCompleted(false);
+        scriptElement.removeEventListener('load', onLoad);
+        scriptElement.removeEventListener('error', onError);
+      };
+
+      scriptElement.addEventListener('load', onLoad);
+      scriptElement.addEventListener('error', onError);
+    } else {
+      this.onScriptCompleted(true);
+    }
+  }
+
+  private onScriptCompleted(success: boolean): void {
+    if (success) {
+      this.scriptExecutionCount.completed++;
+    } else {
+      this.scriptExecutionCount.failed++;
+    }
+
+    const totalProcessed = this.scriptExecutionCount.completed + this.scriptExecutionCount.failed;
+    if (totalProcessed >= this.scriptExecutionCount.total) {
+      this.emitScriptExecutionComplete();
+    }
+  }
+
+  private emitScriptExecutionComplete(): void {
+    this.previewClient.emit('scripts.execution.complete', {
+      total: this.scriptExecutionCount.total,
+      completed: this.scriptExecutionCount.completed,
+      failed: this.scriptExecutionCount.failed,
+      success: this.scriptExecutionCount.failed === 0,
+    });
   }
 
   private handleDirectUpdates(data: WindowMessages['craftile.editor.updates']) {
