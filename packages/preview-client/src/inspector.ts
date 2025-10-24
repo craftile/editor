@@ -39,7 +39,9 @@ export class Inspector {
     // Update selected block if it matches and re-track it
     if (this.currentSelectedBlock?.dataset.block === blockId) {
       this.currentSelectedBlock = newElement;
-      this.sendSelectedBlockPosition(true);
+      requestAnimationFrame(() => {
+        this.sendSelectedBlockPosition(true);
+      });
       this.trackSelectedBlock();
     }
   }
