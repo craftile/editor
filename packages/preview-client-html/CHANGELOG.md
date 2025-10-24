@@ -1,5 +1,11 @@
 # @craftile/preview-client-html
 
+## 0.9.0
+
+### Minor Changes
+
+- [`3a83938`](https://github.com/craftile/editor/commit/3a839385af461944b668eafc74556cd98d7a9f04) Thanks [@eldomagan](https://github.com/eldomagan)! - Add CSS and JS effects injection with deduplication and execution tracking. CSS styles/links and JS scripts are injected only once, preventing duplicates. Script execution is tracked and a 'scripts.execution.complete' event is emitted with success/failure stats when all scripts finish loading.
+
 ## 0.8.1
 
 ## 0.8.0

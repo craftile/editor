@@ -1,5 +1,11 @@
 # @craftile/preview-client
 
+## 0.9.0
+
+### Patch Changes
+
+- [`7d4c00a`](https://github.com/craftile/editor/commit/7d4c00a702a86ccfcf2dfd5da66096a02997d6d4) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix position update timing when block DOM elements are replaced. Use requestAnimationFrame to defer position measurement until after browser layout is complete.
+
 ## 0.8.1
 
 ### Patch Changes
