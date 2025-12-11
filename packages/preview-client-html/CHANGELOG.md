@@ -1,5 +1,7 @@
 # @craftile/preview-client-html
 
+## 0.10.0
+
 ## 0.9.0
 
 ### Minor Changes
