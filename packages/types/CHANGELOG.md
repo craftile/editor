@@ -1,5 +1,11 @@
 # @craftile/types
 
+## 0.10.0
+
+### Minor Changes
+
+- [`b4edf64`](https://github.com/craftile/editor/commit/b4edf64c5994c4b5341fb71604c24d89e9e0a27a) Thanks [@eldomagan](https://github.com/eldomagan)! - Add info field support to PropertyField. Property fields can now include an optional `info` property that displays helper text below the field to provide additional context and guidance to users.
+
 ## 0.9.0
 
 ## 0.8.1
