@@ -51,6 +51,7 @@ export interface PropertyField {
   id: string;
   type: string;
   label?: string;
+  info?: string;
   default?: any;
   group?: string; // Optional group name for organizing properties in UI
   visibleIf?: VisibilityRule; // Conditional visibility based on other property values

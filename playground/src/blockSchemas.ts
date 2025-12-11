@@ -9,6 +9,7 @@ export const blockSchemas: BlockSchema[] = [
         id: 'level',
         type: 'select',
         label: 'Heading Level',
+        info: 'Choose the semantic heading level (H1-H6) for better SEO and accessibility',
         default: 'h2',
         variant: 'segment',
         options: [
@@ -77,11 +78,12 @@ export const blockSchemas: BlockSchema[] = [
     type: 'button',
     properties: [
       { id: 'text', type: 'text', label: 'Button Text', default: 'Click me' },
-      { id: 'url', type: 'text', label: 'URL', default: '#' },
+      { id: 'url', type: 'text', label: 'URL', info: 'Enter the destination URL or use # for placeholder', default: '#' },
       {
         id: 'style',
         type: 'select',
         label: 'Style',
+        info: 'Select the visual style of the button',
         default: 'primary',
         variant: 'segment',
         options: [
@@ -603,6 +605,7 @@ export const blockSchemas: BlockSchema[] = [
         id: 'showImage',
         type: 'boolean',
         label: 'Show Image',
+        info: 'Toggle to show/hide image fields below',
         default: false,
         variant: 'switch',
       },
@@ -754,6 +757,7 @@ export const blockSchemas: BlockSchema[] = [
         id: 'fontSize',
         type: 'select',
         label: 'Font Size',
+        info: 'Set different font sizes for each device breakpoint',
         responsive: true, // Enable responsive mode
         default: '3xl',
         options: [
@@ -768,6 +772,7 @@ export const blockSchemas: BlockSchema[] = [
         id: 'padding',
         type: 'number',
         label: 'Padding (px)',
+        info: 'Adjust padding for each device size independently',
         responsive: true, // Enable responsive mode
         default: 40,
         min: 0,

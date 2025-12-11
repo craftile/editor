@@ -44,41 +44,45 @@ const handleDeviceChange = (deviceId: string) => {
 };
 </script>
 <template>
-  <!-- Responsive Field Wrapper -->
-  <ResponsivePropertyField
-    v-if="field.responsive"
-    :field="field"
-    :model-value="modelValue"
-    :current-device="responsiveCurrentDevice"
-    :available-devices="availableDevices"
-    @update:model-value="handleInput"
-    @change-device="handleDeviceChange"
-  />
-
-  <!-- Regular Field -->
-  <div v-else>
-    <!-- Vue Component Rendering -->
-    <component
-      v-if="isVueComponent(fieldRenderer) || isComponentString(fieldRenderer)"
-      :is="fieldRenderer"
+  <div>
+    <!-- Responsive Field Wrapper -->
+    <ResponsivePropertyField
+      v-if="field.responsive"
       :field="field"
       :model-value="modelValue"
+      :current-device="responsiveCurrentDevice"
+      :available-devices="availableDevices"
       @update:model-value="handleInput"
+      @change-device="handleDeviceChange"
     />
 
-    <!-- Framework-Agnostic Render Function -->
-    <PropertyFieldRenderWrapper
-      v-else-if="isHtmlRenderFunction(fieldRenderer)"
-      :render-fn="fieldRenderer"
-      :field="field"
-      :value="modelValue"
-      :on-change="handleInput"
-    />
+    <!-- Regular Field -->
+    <div v-else>
+      <component
+        v-if="isVueComponent(fieldRenderer) || isComponentString(fieldRenderer)"
+        :is="fieldRenderer"
+        :field="field"
+        :model-value="modelValue"
+        @update:model-value="handleInput"
+      />
 
-    <div v-else class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-      <p class="text-sm text-red-600">
-        Unknown field type: <code class="font-mono">{{ field.type }}</code>
-      </p>
+      <PropertyFieldRenderWrapper
+        v-else-if="isHtmlRenderFunction(fieldRenderer)"
+        :render-fn="fieldRenderer"
+        :field="field"
+        :value="modelValue"
+        :on-change="handleInput"
+      />
+
+      <div v-else class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-sm text-red-600">
+          Unknown field type: <code class="font-mono">{{ field.type }}</code>
+        </p>
+      </div>
     </div>
+
+    <p v-if="field.info" class="text-[0.625rem] text-gray-500 mt-1 italic">
+      {{ field.info }}
+    </p>
   </div>
 </template>
