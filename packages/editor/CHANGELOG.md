@@ -1,5 +1,23 @@
 # @craftile/editor
 
+## 0.11.0
+
+### Minor Changes
+
+- [`8e0a7af`](https://github.com/craftile/editor/commit/8e0a7af1c72feb856e35eccc85123ea5e295885e) Thanks [@eldomagan](https://github.com/eldomagan)! - Make visibility rule evaluation viewport-aware for responsive properties. When evaluating `visibleIf` conditions, the system now checks the device-specific value of responsive properties based on the current viewport, rather than the entire responsive object. This allows fields to show/hide dynamically based on responsive property values as users switch between device breakpoints.
+
+### Patch Changes
+
+- [`97026bc`](https://github.com/craftile/editor/commit/97026bc650c540bd4631a6c6dad0aa5f890cd281) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix ConfigurationHeader actions menu positioning.
+
+- [`cd9d14d`](https://github.com/craftile/editor/commit/cd9d14de043a1cefc04dd574b9d001ca941c6488) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix property field responsive device selector positioning.
+
+- Updated dependencies []:
+  - @craftile/core@0.11.0
+  - @craftile/event-bus@0.11.0
+  - @craftile/messenger@0.11.0
+  - @craftile/types@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes
