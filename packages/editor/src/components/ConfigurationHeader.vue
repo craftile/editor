@@ -219,11 +219,11 @@ function handleRemoveBlock() {
       </div>
 
       <!-- Actions Menu -->
-      <Menu.Root>
+      <Menu.Root :positioning="{ strategy: 'fixed', placement: 'bottom-end' }">
         <Menu.Trigger class="flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 transition-colors">
           <icon-ellipsis-vertical class="w-4 h-4 text-gray-600" />
         </Menu.Trigger>
-        <Menu.Positioner>
+        <Menu.Positioner class="!z-10">
           <Menu.Content
             class="bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[160px] focus:outline-none"
           >
