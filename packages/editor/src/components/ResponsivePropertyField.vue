@@ -89,7 +89,7 @@ const fieldRenderer = computed(() => {
 
 <template>
   <div class="relative">
-    <div class="flex items-center justify-end gap-3 absolute right-0 top-0 z-5">
+    <div class="flex items-center justify-end gap-3 absolute right-0 top-0">
       <Tooltip title="Reset to default value">
         <button
           v-if="hasOverride"
@@ -105,12 +105,17 @@ const fieldRenderer = computed(() => {
       </Tooltip>
 
       <!-- Device Selector -->
-      <Select.Root :model-value="[currentDevice]" :collection="deviceCollection" @value-change="handleDeviceSelect">
+      <Select.Root
+        :model-value="[currentDevice]"
+        :collection="deviceCollection"
+        @value-change="handleDeviceSelect"
+        :positioning="{ strategy: 'fixed', placement: 'bottom-end' }"
+      >
         <Select.Trigger class="flex items-center gap-1 relative">
           <component :is="getIconComponent(currentDeviceData.icon)" class="w-4 h-4 text-gray-600" />
         </Select.Trigger>
 
-        <Select.Positioner>
+        <Select.Positioner class="">
           <Select.Content class="bg-white border border-gray-200 rounded-lg shadow-lg p-1 min-w-[160px] z-50">
             <Select.Item
               v-for="item in deviceCollection.items"
