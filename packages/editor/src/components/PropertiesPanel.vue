@@ -5,6 +5,7 @@ import { evaluateVisibilityRule } from '../utils';
 const { t } = useI18n();
 const { selectedBlock } = useSelectedBlock();
 const { engine, setBlockProperty } = useCraftileEngine();
+const { currentDevice } = useDeviceMode();
 
 const propertyFields = computed(() => {
   if (!selectedBlock.value) {
@@ -17,9 +18,12 @@ const propertyFields = computed(() => {
     return [];
   }
 
+  // Map 'fit' device to '_default' for visibility evaluation
+  const deviceId = currentDevice.value === 'fit' ? '_default' : currentDevice.value;
+
   return schema.properties.filter((field) => {
     if (!field.visibleIf) return true;
-    return evaluateVisibilityRule(field.visibleIf, selectedBlock.value?.properties || {});
+    return evaluateVisibilityRule(field.visibleIf, selectedBlock.value?.properties || {}, deviceId);
   });
 });
 

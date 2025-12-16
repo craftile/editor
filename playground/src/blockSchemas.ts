@@ -792,13 +792,26 @@ export const blockSchemas: BlockSchema[] = [
         ],
       },
       { id: 'backgroundColor', type: 'color', label: 'Background', default: '#3b82f6' },
+      {
+        id: 'subtitle',
+        type: 'text',
+        label: 'Subtitle',
+        default: 'This field is visible when font size is 4xl or 5xl',
+        info: 'Only visible when fontSize is 4xl or 5xl (check current viewport)',
+        // This field will only appear when fontSize is 4xl or 5xl for the current device
+        visibleIf: {
+          field: 'fontSize',
+          operator: 'in',
+          value: ['4xl', '5xl'],
+        },
+      },
     ],
     accepts: [],
     meta: {
       name: 'Responsive Hero',
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>',
       category: 'Testing',
-      description: 'Hero block demonstrating responsive properties with device-specific values',
+      description: 'Hero block demonstrating responsive properties with device-specific values and viewport-aware conditional visibility',
       previewImageUrl: 'https://placehold.co/400x240/3b82f6/ffffff?text=Responsive+Hero',
     },
   },

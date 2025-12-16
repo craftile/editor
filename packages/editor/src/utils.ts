@@ -1,5 +1,6 @@
 import type { Component } from 'vue';
 import type { VisibilityRule, VisibilityCondition, VisibilityLogicGroup, BlockProperties } from '@craftile/types';
+import { getDeviceValue, isResponsiveValue } from './utils/responsive';
 
 /**
  * Check if a render value is a Vue component
@@ -37,9 +38,13 @@ function isVisibilityLogicGroup(rule: VisibilityRule): rule is VisibilityLogicGr
 /**
  * Evaluate a single visibility condition against a context object
  */
-function evaluateCondition(condition: VisibilityCondition, context: BlockProperties): boolean {
+function evaluateCondition(condition: VisibilityCondition, context: BlockProperties, currentDevice?: string): boolean {
   const { field, operator, value } = condition;
-  const fieldValue = context?.[field];
+  let fieldValue = context?.[field];
+
+  if (currentDevice && isResponsiveValue(fieldValue)) {
+    fieldValue = getDeviceValue(fieldValue, currentDevice);
+  }
 
   switch (operator) {
     case 'equals':
@@ -95,6 +100,7 @@ function evaluateCondition(condition: VisibilityCondition, context: BlockPropert
  *
  * @param rule - Rule object, logic group, or array (array === implicit AND)
  * @param context - Block properties object
+ * @param currentDevice - Optional current device ID for evaluating responsive properties
  * @returns boolean indicating whether the field should be visible
  *
  * @example
@@ -113,15 +119,23 @@ function evaluateCondition(condition: VisibilityCondition, context: BlockPropert
  *   ]},
  *   { type: 'image', status: 'published' }
  * ) // true
+ *
+ * // Responsive property condition
+ * evaluateVisibilityRule(
+ *   { field: 'fontSize', operator: 'equals', value: '2xl' },
+ *   { fontSize: { _default: '3xl', tablet: '2xl' } },
+ *   'tablet'
+ * ) // true
  * ```
  */
 export function evaluateVisibilityRule(
   rule: VisibilityRule | VisibilityRule[],
-  context: BlockProperties = {}
+  context: BlockProperties = {},
+  currentDevice?: string
 ): boolean {
   // Array treated as implicit AND of conditions
   if (Array.isArray(rule)) {
-    return rule.every((r) => evaluateVisibilityRule(r, context));
+    return rule.every((r) => evaluateVisibilityRule(r, context, currentDevice));
   }
 
   if (!rule || typeof rule !== 'object') return true;
@@ -130,18 +144,18 @@ export function evaluateVisibilityRule(
   if (isVisibilityLogicGroup(rule)) {
     if (rule.and) {
       if (!Array.isArray(rule.and)) return true;
-      return rule.and.every((r) => evaluateVisibilityRule(r, context));
+      return rule.and.every((r) => evaluateVisibilityRule(r, context, currentDevice));
     }
 
     if (rule.or) {
       if (!Array.isArray(rule.or)) return false;
-      return rule.or.some((r) => evaluateVisibilityRule(r, context));
+      return rule.or.some((r) => evaluateVisibilityRule(r, context, currentDevice));
     }
   }
 
   // Handle single condition
   if (isVisibilityCondition(rule)) {
-    return evaluateCondition(rule, context);
+    return evaluateCondition(rule, context, currentDevice);
   }
 
   return true;
