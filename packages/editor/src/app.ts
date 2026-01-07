@@ -1,5 +1,7 @@
 import { CraftileEditor, type CraftileEditorOptions } from './editor';
 
+export { CraftileEditor };
+
 export interface CreateCraftileEditorOptions extends CraftileEditorOptions {
   el?: string | HTMLElement;
 }
