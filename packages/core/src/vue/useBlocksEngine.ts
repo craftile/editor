@@ -28,7 +28,7 @@ export interface UseBlocksEngineReturn {
     blockType: string,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ) => string;
@@ -37,7 +37,7 @@ export interface UseBlocksEngineReturn {
     presetIndex: number,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ) => string;
@@ -47,7 +47,7 @@ export interface UseBlocksEngineReturn {
     options: {
       targetParentId?: string;
       targetIndex?: number;
-      targetRegionName?: string;
+      targetRegionId?: string;
     }
   ) => void;
   setBlockProperty: (blockId: string, propertyKey: string, propertyValue: any) => void;
@@ -58,7 +58,7 @@ export interface UseBlocksEngineReturn {
     structure: BlockStructure,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ) => string;
@@ -195,7 +195,7 @@ export function useBlocksEngine(
     blockType: string,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ): string => {
@@ -213,7 +213,7 @@ export function useBlocksEngine(
     presetIndex: number,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ): string => {
@@ -239,7 +239,7 @@ export function useBlocksEngine(
     options: {
       targetParentId?: string;
       targetIndex?: number;
-      targetRegionName?: string;
+      targetRegionId?: string;
     }
   ): void => {
     engine.moveBlock(blockId, options);
@@ -287,7 +287,7 @@ export function useBlocksEngine(
     structure: BlockStructure,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ): string => {

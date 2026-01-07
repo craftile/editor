@@ -2,6 +2,8 @@ import { PreviewClient } from '@craftile/preview-client';
 import type { Block, MoveInstruction, Region, UpdatesEvent, WindowMessages } from '@craftile/types';
 import morphdom from 'morphdom';
 
+const getRegionId = (r: Region) => r.id || r.name;
+
 type MorphdomFunction = typeof morphdom;
 export type MorphdomOptions = Parameters<MorphdomFunction>[2];
 
@@ -17,7 +19,7 @@ interface RegionComments {
 
 interface PositionInfo {
   parentId?: string;
-  regionName?: string;
+  regionId?: string;
   position?: number;
   afterId?: string;
   beforeId?: string;
@@ -86,17 +88,17 @@ export default class RawHtmlRenderer {
       }
 
       if (text.startsWith('BEGIN region: ')) {
-        const regionName = text.substring('BEGIN region: '.length);
-        pendingRegions.set(regionName, node);
+        const regionId = text.substring('BEGIN region: '.length);
+        pendingRegions.set(regionId, node);
       } else if (text.startsWith('END region: ')) {
-        const regionName = text.substring('END region: '.length);
-        const beginComment = pendingRegions.get(regionName);
+        const regionId = text.substring('END region: '.length);
+        const beginComment = pendingRegions.get(regionId);
         if (beginComment) {
-          this.regionCommentsCache.set(regionName, {
+          this.regionCommentsCache.set(regionId, {
             begin: beginComment,
             end: node,
           });
-          pendingRegions.delete(regionName);
+          pendingRegions.delete(regionId);
         }
       }
     }
@@ -580,7 +582,7 @@ export default class RawHtmlRenderer {
       return;
     }
 
-    const { parentId, regionName, position, afterId, beforeId } = positionInfo;
+    const { parentId, regionId, position, afterId, beforeId } = positionInfo;
 
     if (parentId) {
       const parentElement = this.getElementCached(parentId);
@@ -591,10 +593,10 @@ export default class RawHtmlRenderer {
       }
 
       this.insertElementByPosition(newElement, parentElement, position, afterId, beforeId);
-    } else if (regionName) {
-      const insertionPoint = this.findRegionInsertionPoint(regionName, position, afterId, beforeId);
+    } else if (regionId) {
+      const insertionPoint = this.findRegionInsertionPoint(regionId, position, afterId, beforeId);
       if (!insertionPoint) {
-        console.error(`Failed to find insertion point for region: ${regionName}`);
+        console.error(`Failed to find insertion point for region: ${regionId}`);
         return;
       }
 
@@ -718,15 +720,15 @@ export default class RawHtmlRenderer {
   }
 
   private findRegionInsertionPoint(
-    regionName: string,
+    regionId: string,
     position?: number,
     afterId?: string,
     beforeId?: string,
     excludeBlockId?: string
   ): InsertionPoint | null {
-    const regionComments = this.regionCommentsCache.get(regionName);
+    const regionComments = this.regionCommentsCache.get(regionId);
     if (!regionComments) {
-      console.error(`Region comments not found for region: ${regionName}`);
+      console.error(`Region comments not found for region: ${regionId}`);
       return null;
     }
 
@@ -851,7 +853,7 @@ export default class RawHtmlRenderer {
         if (position !== -1) {
           const { afterId, beforeId } = this.findAdjacentSiblings(region.blocks, position, blocks);
           return {
-            regionName: region.name,
+            regionId: getRegionId(region),
             position,
             afterId,
             beforeId,

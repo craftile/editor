@@ -1,4 +1,5 @@
 import { computed, inject, toRaw } from 'vue';
+import { getRegionId } from '@craftile/core';
 import { useCraftileEngine } from './craftile-engine';
 import type { CraftileEditor } from '../editor';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
@@ -79,7 +80,7 @@ export function useClipboard() {
         const targetIndex = region.blocks.indexOf(targetBlockId);
         if (targetIndex !== -1) {
           index = targetIndex + 1;
-          pasteBlock(rawCopied, { regionName: region.name, index });
+          pasteBlock(rawCopied, { regionId: getRegionId(region), index });
           break;
         }
       }

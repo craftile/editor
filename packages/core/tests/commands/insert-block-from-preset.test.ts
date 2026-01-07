@@ -216,7 +216,7 @@ describe('InsertBlockFromPresetCommand', () => {
       const command = new InsertBlockFromPresetCommand(page, {
         blockType: 'container',
         presetIndex: 0,
-        regionName: 'main',
+        regionId: 'main',
         blocksManager,
         emit: mockEmit,
       });

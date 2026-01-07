@@ -77,7 +77,7 @@ describe('InsertBlockCommand', () => {
         block: insertedBlock,
         parentId: undefined,
         index: 2, // Should be at end of main region
-        regionName: 'main',
+        regionId: 'main',
       });
     });
 

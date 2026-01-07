@@ -15,8 +15,8 @@ export interface Command {
 // Event system types
 export interface EngineEvents {
   'page:set': { previousPage?: Page; newPage: Page };
-  'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionName?: string };
-  'block:remove': { blockId: string; block: Block; parentId?: string };
+  'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionId?: string };
+  'block:remove': { blockId: string; block: Block; parentId?: string; regionId?: string };
   'block:toggle': { blockId: string; disabled: boolean; oldValue?: boolean };
   'block:property:set': { blockId: string; key: string; value: any; oldValue: any };
   'block:update': { blockId: string; block: Block; property: string; value: any; oldValue: any };
@@ -24,9 +24,9 @@ export interface EngineEvents {
     blockId: string;
     targetParentId?: string;
     targetIndex?: number;
-    targetRegionName?: string;
+    targetRegionId?: string;
     sourceParentId?: string | null;
-    sourceRegionName?: string | null;
+    sourceRegionId?: string | null;
     sourceIndex: number;
   };
   'block:duplicate': {
@@ -35,7 +35,7 @@ export interface EngineEvents {
     newBlock: Block;
     parentId?: string;
     index?: number;
-    regionName?: string;
+    regionId?: string;
   };
   undo: { command: any };
   redo: { command: any };

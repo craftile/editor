@@ -1,11 +1,12 @@
 import type { Block, Page } from '@craftile/types';
 import type { Command, EngineEmitFn } from '../types';
+import { getRegionId } from '../utils';
 
 export interface MoveBlockOptions {
   blockId: string;
   targetParentId?: string;
   targetIndex?: number;
-  targetRegionName?: string;
+  targetRegionId?: string;
   emit: EngineEmitFn;
 }
 
@@ -14,13 +15,13 @@ export class MoveBlockCommand implements Command {
   private blockId: string;
   private targetParentId?: string;
   private targetIndex?: number;
-  private targetRegionName?: string;
+  private targetRegionId?: string;
 
   // State for reverting
   private blockToMove?: Block;
   private originalParentId?: string;
   private originalIndex!: number;
-  private originalRegionName?: string;
+  private originalRegionId?: string;
 
   private emit: EngineEmitFn;
 
@@ -29,7 +30,7 @@ export class MoveBlockCommand implements Command {
     this.blockId = options.blockId;
     this.targetParentId = options.targetParentId;
     this.targetIndex = options.targetIndex;
-    this.targetRegionName = options.targetRegionName;
+    this.targetRegionId = options.targetRegionId;
     this.emit = options.emit;
   }
 
@@ -60,7 +61,7 @@ export class MoveBlockCommand implements Command {
       const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         this.originalIndex = region.blocks.indexOf(this.blockId);
-        this.originalRegionName = region.name;
+        this.originalRegionId = getRegionId(region);
         region.blocks.splice(this.originalIndex, 1);
       }
     }
@@ -78,11 +79,11 @@ export class MoveBlockCommand implements Command {
     } else {
       this.blockToMove.parentId = undefined;
 
-      const regionName = this.targetRegionName || this.page.regions[0].name || 'main';
-      let targetRegion = this.page.regions.find((r) => r.name === regionName);
+      const regionId = this.targetRegionId || getRegionId(this.page.regions[0]) || 'main';
+      let targetRegion = this.page.regions.find((r) => getRegionId(r) === regionId);
 
       if (!targetRegion) {
-        targetRegion = { name: regionName, blocks: [] };
+        targetRegion = { id: regionId, name: regionId, blocks: [] };
         this.page.regions.push(targetRegion);
       }
 
@@ -97,9 +98,9 @@ export class MoveBlockCommand implements Command {
       blockId: this.blockId,
       targetParentId: this.targetParentId,
       targetIndex: this.targetIndex,
-      targetRegionName: this.targetRegionName,
+      targetRegionId: this.targetRegionId,
       sourceParentId: this.originalParentId || null,
-      sourceRegionName: this.originalRegionName || null,
+      sourceRegionId: this.originalRegionId || null,
       sourceIndex: this.originalIndex,
     });
   }
@@ -134,8 +135,8 @@ export class MoveBlockCommand implements Command {
       if (originalParent) {
         originalParent.children.splice(this.originalIndex, 0, this.blockId);
       }
-    } else if (this.originalRegionName) {
-      const region = this.page.regions.find((r) => r.name === this.originalRegionName);
+    } else if (this.originalRegionId) {
+      const region = this.page.regions.find((r) => getRegionId(r) === this.originalRegionId);
       if (region) {
         region.blocks.splice(this.originalIndex, 0, this.blockId);
       }
@@ -145,9 +146,9 @@ export class MoveBlockCommand implements Command {
       blockId: this.blockId,
       targetParentId: this.originalParentId,
       targetIndex: this.originalIndex,
-      targetRegionName: this.originalRegionName,
+      targetRegionId: this.originalRegionId,
       sourceParentId: this.targetParentId || null,
-      sourceRegionName: this.targetRegionName || null,
+      sourceRegionId: this.targetRegionId || null,
       sourceIndex: this.targetIndex || 0,
     });
   }
@@ -164,16 +165,16 @@ export class MoveBlockCommand implements Command {
     return this.targetIndex;
   }
 
-  getTargetRegionName(): string | undefined {
-    return this.targetRegionName;
+  getTargetRegionId(): string | undefined {
+    return this.targetRegionId;
   }
 
   getSourceParentId(): string | null {
     return this.originalParentId || null;
   }
 
-  getSourceRegionName(): string | null {
-    return this.originalRegionName || null;
+  getSourceRegionId(): string | null {
+    return this.originalRegionId || null;
   }
 
   getSourceIndex(): number {

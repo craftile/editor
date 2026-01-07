@@ -22,7 +22,7 @@ export class Engine extends EventBus<EngineEvents> {
 
     this.blocksManager = config.blocksManager || new BlocksManager();
     this.historyManager = new HistoryManager();
-    this.setPage(config.page ? config.page : { blocks: {}, regions: [{ name: 'main', blocks: [] }] });
+    this.setPage(config.page ? config.page : { blocks: {}, regions: [{ id: 'main', name: 'main', blocks: [] }] });
 
     if (config.blockSchemas && config.blockSchemas.length > 0) {
       config.blockSchemas.forEach((schema) => {
@@ -37,7 +37,7 @@ export class Engine extends EventBus<EngineEvents> {
    * @param blockType - The type of block to insert (must be registered)
    * @param options - Optional configuration for block insertion
    * @param options.parentId - ID of parent block (for nested blocks)
-   * @param options.regionName - Target region name (defaults to 'main')
+   * @param options.regionId - Target region id (defaults to 'main')
    * @param options.index - Position to insert at (defaults to end)
    * @returns The ID of the newly inserted block
    * @throws {Error} When block type is not registered or parent-child relationship is invalid
@@ -47,7 +47,7 @@ export class Engine extends EventBus<EngineEvents> {
     blockType: string,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ): string {
@@ -70,7 +70,7 @@ export class Engine extends EventBus<EngineEvents> {
     const command = new InsertBlockCommand(this.page, {
       blockType,
       parentId: options?.parentId,
-      regionName: options?.regionName,
+      regionId: options?.regionId,
       index: options?.index,
       blockSchema,
       emit: this.emit.bind(this),
@@ -89,7 +89,7 @@ export class Engine extends EventBus<EngineEvents> {
    * @param presetIndex - Index of the preset in the block schema's presets array
    * @param options - Optional configuration for block insertion
    * @param options.parentId - ID of parent block (for nested blocks)
-   * @param options.regionName - Target region name (defaults to 'main')
+   * @param options.regionId - Target region id (defaults to 'main')
    * @param options.index - Position to insert at (defaults to end)
    * @returns The ID of the newly inserted block
    * @throws {Error} When block type is not registered, preset not found, or parent-child relationship is invalid
@@ -100,7 +100,7 @@ export class Engine extends EventBus<EngineEvents> {
     presetIndex: number,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ): string {
@@ -128,7 +128,7 @@ export class Engine extends EventBus<EngineEvents> {
       blockType,
       presetIndex,
       parentId: options?.parentId,
-      regionName: options?.regionName,
+      regionId: options?.regionId,
       index: options?.index,
       blocksManager: this.blocksManager,
       emit: this.emit.bind(this),
@@ -164,14 +164,14 @@ export class Engine extends EventBus<EngineEvents> {
    * @param options - Optional configuration for block move operation
    * @param options.targetParentId - ID of target parent block
    * @param options.targetIndex - position in the target parent block children
-   * @param options.targetRegionName - target region name
+   * @param options.targetRegionId - target region id
    */
   moveBlock(
     blockId: string,
     options?: {
       targetParentId?: string;
       targetIndex?: number;
-      targetRegionName?: string;
+      targetRegionId?: string;
     }
   ): void {
     const block = this.page.blocks[blockId];
@@ -191,7 +191,7 @@ export class Engine extends EventBus<EngineEvents> {
       blockId,
       targetParentId: options?.targetParentId,
       targetIndex: options?.targetIndex,
-      targetRegionName: options?.targetRegionName,
+      targetRegionId: options?.targetRegionId,
       emit: this.emit.bind(this),
     });
 
@@ -307,7 +307,7 @@ export class Engine extends EventBus<EngineEvents> {
    * @param structure - The block structure to paste
    * @param options - Optional configuration for block insertion
    * @param options.parentId - ID of parent block (for nested blocks)
-   * @param options.regionName - Target region name (defaults to 'main')
+   * @param options.regionId - Target region id (defaults to 'main')
    * @param options.index - Position to insert at (defaults to end)
    * @returns The ID of the newly inserted block
    * @throws {Error} When block type is not registered or parent-child relationship is invalid
@@ -317,7 +317,7 @@ export class Engine extends EventBus<EngineEvents> {
     structure: BlockStructure,
     options?: {
       parentId?: string;
-      regionName?: string;
+      regionId?: string;
       index?: number;
     }
   ): string {
@@ -341,7 +341,7 @@ export class Engine extends EventBus<EngineEvents> {
       blockType: structure.type,
       presetData: structure,
       parentId: options?.parentId,
-      regionName: options?.regionName,
+      regionId: options?.regionId,
       index: options?.index,
       blocksManager: this.blocksManager,
       emit: this.emit.bind(this),
@@ -373,13 +373,14 @@ export class Engine extends EventBus<EngineEvents> {
     this.page = structuredClone(newPage);
 
     if (this.page.regions.length === 0) {
-      this.page.regions = [{ name: 'main', blocks: Object.keys(this.page.blocks) }];
+      this.page.regions = [{ id: 'main', name: 'main', blocks: Object.keys(this.page.blocks) }];
     }
 
     // Initialize regions if not present
     if (this.page.regions.length === 0) {
       this.page.regions = [
         {
+          id: 'main',
           name: 'main',
           blocks: Object.values(this.page.blocks)
             .filter((block) => !block.parentId)

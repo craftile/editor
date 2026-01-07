@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
+import { getRegionId } from '@craftile/core';
 import CollapseAllIcon from './CollapseAllIcon.vue';
 import type { InsertBlockContext } from '../composables/blocks-popover';
 
@@ -26,14 +27,14 @@ eventBus.on('ui:block:select', (data: { blockId: string }) => {
 // TODO: check the issue where region item is incorrectly inferred as true | Region
 const regionList = computed(() => (Array.isArray(regions.value) ? regions.value : []));
 
-function onRegionBlockDragEnd(event: SortableEvent, regionName: string) {
+function onRegionBlockDragEnd(event: SortableEvent, regionId: string) {
   const { oldIndex, newIndex } = event;
 
   if (typeof newIndex === 'undefined' || oldIndex === newIndex) {
     return;
   }
 
-  const region = regionList.value.find((r) => r.name === regionName);
+  const region = regionList.value.find((r) => getRegionId(r) === regionId);
   if (!region) {
     return;
   }
@@ -44,7 +45,7 @@ function onRegionBlockDragEnd(event: SortableEvent, regionName: string) {
     return;
   }
 
-  moveBlock(movedBlockId, { targetRegionName: regionName, targetIndex: newIndex });
+  moveBlock(movedBlockId, { targetRegionId: regionId, targetIndex: newIndex });
 }
 
 function onRegionBlockMove(event: any) {
@@ -53,11 +54,11 @@ function onRegionBlockMove(event: any) {
   }
 }
 
-function addBlockToRegion(event: Event, regionName: string) {
+function addBlockToRegion(event: Event, regionId: string) {
   const button = event.target as HTMLElement;
 
   const context: InsertBlockContext = {
-    regionName,
+    regionId,
     index: 0,
   };
 
@@ -74,14 +75,14 @@ function addBlockToRegion(event: Event, regionName: string) {
       <h2>{{ t('layers.header') }}</h2>
     </div>
     <div class="flex-1 overflow-y-auto">
-      <div v-for="region in regionList" :key="region.name" class="not-last:border-b px-4 mt-2">
+      <div v-for="region in regionList" :key="getRegionId(region)" class="not-last:border-b px-4 mt-2">
         <div class="flex items-center justify-between">
           <h3 class="text-sm capitalize">{{ region.name }}</h3>
           <button
             v-if="region.blocks.length > 0"
             class="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700 transition-colors"
             :title="t('layers.collapseAll')"
-            @click="collapseRegion(region.name)"
+            @click="collapseRegion(getRegionId(region))"
           >
             <CollapseAllIcon class="w-4 h-4" />
           </button>
@@ -94,7 +95,7 @@ function addBlockToRegion(event: Event, regionName: string) {
             chosen-class="chosen-block"
             drag-class="drag-block"
             filter=".is-static"
-            @end="(event) => onRegionBlockDragEnd(event, region.name)"
+            @end="(event) => onRegionBlockDragEnd(event, getRegionId(region))"
             @move="onRegionBlockMove"
           >
             <BlockItem v-for="blockId in region.blocks" :key="blockId" :block-id="blockId" :level="0" />
@@ -103,7 +104,7 @@ function addBlockToRegion(event: Event, regionName: string) {
           <!-- Show add block button when region is empty -->
           <div v-if="region.blocks.length === 0" class="flex items-center justify-center py-2">
             <button
-              @click="addBlockToRegion($event, region.name)"
+              @click="addBlockToRegion($event, getRegionId(region))"
               class="flex w-full items-center gap-2 px-2 py-1 text-sm text-accent/90 hover:text-accent hover:bg-accent-foreground rounded-lg transition-colors cursor-pointer"
             >
               <icon-plus class="w-4 h-4" />

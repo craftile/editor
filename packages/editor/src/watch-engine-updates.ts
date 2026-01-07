@@ -144,9 +144,9 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
   );
 
   cleanupFunctions.push(
-    engine.on('block:move', ({ blockId, sourceParentId, targetParentId, targetIndex, targetRegionName }) => {
+    engine.on('block:move', ({ blockId, sourceParentId, targetParentId, targetIndex, targetRegionId }) => {
       pendingChanges.moved.set(blockId, {
-        toRegion: targetRegionName,
+        toRegion: targetRegionId,
         toParent: targetParentId,
         toIndex: targetIndex ?? 0,
       });

@@ -276,15 +276,18 @@ const editor = createCraftileEditor({
     },
     regions: [
       {
-        name: 'header',
+        id: 'header',
+        name: 'Header Section',
         blocks: ['header-container'],
       },
       {
-        name: 'main',
+        id: 'main',
+        name: 'Main Content',
         blocks: ['main-container'],
       },
       {
-        name: 'footer',
+        id: 'footer',
+        name: 'Footer Section',
         blocks: ['footer-container'],
       },
     ],

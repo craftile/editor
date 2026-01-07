@@ -1,5 +1,5 @@
 import type { CraftileEditorPlugin } from '@craftile/editor';
-import type { Block, UpdatesEvent } from '@craftile/types';
+import type { Block, Region, UpdatesEvent } from '@craftile/types';
 
 // Import the HTML preview client CDN code
 import previewClientCode from '@craftile/preview-client-html/html.cdn.js?raw';
@@ -13,6 +13,8 @@ export interface StaticBlocksRendererOptions {
   scripts?: string[];
   blockRenderers?: Record<string, BlockRenderer>;
 }
+
+const getRegionId = (region: Region) => region.id || region.name;
 
 export default (options: StaticBlocksRendererOptions = {}): CraftileEditorPlugin => {
   return ({ editor }) => {
@@ -86,7 +88,8 @@ export default (options: StaticBlocksRendererOptions = {}): CraftileEditorPlugin
             .map((blockId: string) => renderBlock(page.blocks[blockId], page.blocks))
             .join('\n');
 
-          return `<!--BEGIN region: ${region.name}-->\n${blocksHtml}\n<!--END region: ${region.name}-->`;
+          const regionId = getRegionId(region);
+          return `<!--BEGIN region: ${regionId}-->\n${blocksHtml}\n<!--END region: ${regionId}-->`;
         })
         .join('\n');
 

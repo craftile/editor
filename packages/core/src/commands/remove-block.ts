@@ -1,4 +1,5 @@
 import type { Block, Page } from '@craftile/types';
+import { getRegionId } from '../utils';
 import type { Command, EngineEmitFn } from '../types';
 
 export interface RemoveBlockOptions {
@@ -12,7 +13,7 @@ export class RemoveBlockCommand implements Command {
   private removedBlock?: Block;
   private originalIndex?: number;
   private originalParentId?: string;
-  private regionName?: string;
+  private regionId?: string;
   private emit: EngineEmitFn;
 
   constructor(page: Page, options: RemoveBlockOptions) {
@@ -42,7 +43,7 @@ export class RemoveBlockCommand implements Command {
       const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         this.originalIndex = region.blocks.indexOf(this.blockId);
-        this.regionName = region.name;
+        this.regionId = getRegionId(region);
         region.blocks.splice(this.originalIndex, 1);
       }
     }
@@ -68,8 +69,8 @@ export class RemoveBlockCommand implements Command {
       if (parent) {
         parent.children.splice(this.originalIndex, 0, this.blockId);
       }
-    } else if (this.regionName) {
-      const region = this.page.regions.find((r) => r.name === this.regionName);
+    } else if (this.regionId) {
+      const region = this.page.regions.find((r) => getRegionId(r) === this.regionId);
       if (region) {
         region.blocks.splice(this.originalIndex, 0, this.blockId);
       }
@@ -80,7 +81,7 @@ export class RemoveBlockCommand implements Command {
       block: this.removedBlock,
       parentId: this.originalParentId,
       index: this.originalIndex,
-      regionName: this.regionName,
+      regionId: this.regionId,
     });
   }
 

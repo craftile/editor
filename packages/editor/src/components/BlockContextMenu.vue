@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getRegionId } from '@craftile/core';
 import { Menu } from '@ark-ui/vue';
 
 interface Props {
@@ -31,7 +32,7 @@ const blockPositionInfo = computed(() => {
     if (blockIndex !== -1) {
       return {
         parentType: 'region',
-        parentId: region.name,
+        parentId: getRegionId(region),
         currentIndex: blockIndex,
         siblingCount: region.blocks.length,
       };
@@ -100,7 +101,7 @@ function handleMoveToPrevious() {
 
   if (blockPositionInfo.value.parentType === 'region') {
     moveBlock(props.blockId, {
-      targetRegionName: blockPositionInfo.value.parentId,
+      targetRegionId: blockPositionInfo.value.parentId,
       targetIndex: newIndex,
     });
   } else if (blockPositionInfo.value.parentType === 'block') {
@@ -120,7 +121,7 @@ function handleMoveToNext() {
 
   if (blockPositionInfo.value.parentType === 'region') {
     moveBlock(props.blockId, {
-      targetRegionName: blockPositionInfo.value.parentId,
+      targetRegionId: blockPositionInfo.value.parentId,
       targetIndex: newIndex,
     });
   } else if (blockPositionInfo.value.parentType === 'block') {

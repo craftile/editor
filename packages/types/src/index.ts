@@ -84,7 +84,8 @@ export interface BlockSchema {
 }
 
 export interface Region {
-  name: string;
+  id?: string; // Optional unique identifier (falls back to name if not provided)
+  name: string; // Display label
   blocks: string[]; // Array of block IDs in this region
 }
 

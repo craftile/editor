@@ -1,4 +1,5 @@
 import type { Command, EngineEmitFn } from '../types';
+import { getRegionId } from '../utils';
 import type { Block, Page } from '@craftile/types';
 import { generateId } from '../utils';
 
@@ -16,7 +17,7 @@ export class DuplicateBlockCommand implements Command {
   private duplicatedBlock?: Block;
   private parentId?: string | null;
   private insertIndex!: number;
-  private regionName?: string | null;
+  private regionId?: string | null;
   private emit: EngineEmitFn;
 
   constructor(page: Page, options: DuplicateBlockOptions) {
@@ -45,7 +46,7 @@ export class DuplicateBlockCommand implements Command {
       newBlock: this.duplicatedBlock,
       parentId: this.parentId || undefined,
       index: this.insertIndex,
-      regionName: this.regionName || undefined,
+      regionId: this.regionId || undefined,
     });
   }
 
@@ -77,8 +78,8 @@ export class DuplicateBlockCommand implements Command {
     return this.insertIndex;
   }
 
-  getRegionName(): string | null | undefined {
-    return this.regionName;
+  getRegionId(): string | null | undefined {
+    return this.regionId;
   }
 
   private cloneBlockWithNewIds(block: Block, newId: string, newParentId?: string): Block {
@@ -125,10 +126,10 @@ export class DuplicateBlockCommand implements Command {
       const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         const index = region.blocks.indexOf(this.blockId);
-        this.regionName = region.name;
+        this.regionId = getRegionId(region);
         this.insertIndex = index + 1;
       } else {
-        this.regionName = this.page.regions[0].name || 'main';
+        this.regionId = getRegionId(this.page.regions[0]) || 'main';
         this.insertIndex = this.page.regions[0].blocks.length || 0;
       }
     }
@@ -147,10 +148,10 @@ export class DuplicateBlockCommand implements Command {
 
       targetParent.children.splice(this.insertIndex, 0, this.duplicatedBlockId);
     } else {
-      let targetRegion = this.page.regions.find((r) => r.name === this.regionName);
+      let targetRegion = this.page.regions.find((r) => r.name === this.regionId);
 
       if (!targetRegion) {
-        targetRegion = { name: this.regionName || 'main', blocks: [] };
+        targetRegion = { name: this.regionId || 'main', blocks: [] };
         this.page.regions.push(targetRegion);
       }
 
@@ -177,7 +178,7 @@ export class DuplicateBlockCommand implements Command {
     } else {
       // Remove from region
       if (this.page.regions) {
-        const targetRegion = this.page.regions.find((r) => r.name === this.regionName);
+        const targetRegion = this.page.regions.find((r) => r.name === this.regionId);
         if (targetRegion) {
           const index = targetRegion.blocks.indexOf(this.duplicatedBlockId);
           if (index !== -1) {

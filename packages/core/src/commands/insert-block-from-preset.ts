@@ -1,4 +1,5 @@
 import type { Block, BlockProperties, BlockSchema, BlockStructure, Page } from '@craftile/types';
+import { getRegionId } from '../utils';
 import type { Command, EngineEmitFn } from '../types';
 import { generateId } from '../utils';
 import type { BlocksManager } from '../blocks-manager';
@@ -8,7 +9,7 @@ export interface InsertBlockFromPresetOptions {
   presetIndex?: number;
   presetData?: BlockStructure;
   parentId?: string;
-  regionName?: string;
+  regionId?: string;
   index?: number;
   blocksManager: BlocksManager;
   emit: EngineEmitFn;
@@ -20,7 +21,7 @@ export class InsertBlockFromPresetCommand implements Command {
   private presetIndex?: number;
   private presetData?: BlockStructure;
   private parentId?: string;
-  private regionName?: string;
+  private regionId?: string;
   private index?: number;
   private blockId: string;
   private properties: Record<string, any>;
@@ -36,7 +37,7 @@ export class InsertBlockFromPresetCommand implements Command {
     this.presetIndex = options.presetIndex;
     this.presetData = options.presetData;
     this.parentId = options.parentId;
-    this.regionName = options.regionName;
+    this.regionId = options.regionId;
     this.index = options.index;
     this.blockId = generateId();
     this.blocksManager = options.blocksManager;
@@ -139,11 +140,11 @@ export class InsertBlockFromPresetCommand implements Command {
       }
     } else {
       // Insert as top-level block
-      const targetRegionName = this.regionName || this.page.regions[0].name;
-      let targetRegion = this.page.regions.find((r) => r.name === targetRegionName);
+      const targetRegionId = this.regionId || getRegionId(this.page.regions[0]);
+      let targetRegion = this.page.regions.find((r) => getRegionId(r) === targetRegionId);
 
       if (!targetRegion) {
-        targetRegion = { name: targetRegionName, blocks: [] };
+        targetRegion = { id: targetRegionId, name: targetRegionId, blocks: [] };
         this.page.regions.push(targetRegion);
       }
 
@@ -161,7 +162,7 @@ export class InsertBlockFromPresetCommand implements Command {
       block: this.insertedBlock,
       parentId: this.parentId,
       index: this.actualIndex,
-      regionName: this.regionName || this.page.regions[0].name,
+      regionId: this.regionId || getRegionId(this.page.regions[0]),
     });
   }
 
@@ -181,8 +182,8 @@ export class InsertBlockFromPresetCommand implements Command {
         parent.children.splice(this.actualIndex, 1);
       }
     } else {
-      const targetRegionName = this.regionName || this.page.regions[0].name;
-      const targetRegion = this.page.regions.find((r) => r.name === targetRegionName);
+      const targetRegionId = this.regionId || getRegionId(this.page.regions[0]);
+      const targetRegion = this.page.regions.find((r) => getRegionId(r) === targetRegionId);
 
       if (targetRegion && this.actualIndex !== undefined) {
         targetRegion.blocks.splice(this.actualIndex, 1);

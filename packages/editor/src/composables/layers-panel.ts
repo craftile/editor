@@ -1,3 +1,4 @@
+import { getRegionId } from '@craftile/core';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import type { CraftileEditor } from '../editor';
 
@@ -40,9 +41,9 @@ export function useLayersPanel() {
     });
   };
 
-  const collapseRegion = (regionName: string) => {
+  const collapseRegion = (regionId: string) => {
     const page = editor.engine.getPage();
-    const region = page.regions.find((r: any) => r.name === regionName);
+    const region = page.regions.find((r: any) => getRegionId(r) === regionId);
 
     if (!region) {
       return;

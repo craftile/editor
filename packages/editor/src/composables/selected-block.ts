@@ -1,3 +1,4 @@
+import { getRegionId } from '@craftile/core';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import type { CraftileEditor } from '../editor';
 
@@ -37,7 +38,7 @@ export function useSelectedBlock() {
       if (blockIndex !== -1) {
         return {
           parentType: 'region',
-          parentId: region.name,
+          parentId: getRegionId(region),
           currentIndex: blockIndex,
           siblingCount: region.blocks.length,
         };
@@ -87,7 +88,7 @@ export function useSelectedBlock() {
 
     if (positionInfo.value.parentType === 'region') {
       moveBlock(selectedBlock.value.id, {
-        targetRegionName: positionInfo.value.parentId,
+        targetRegionId: positionInfo.value.parentId,
         targetIndex: newIndex,
       });
     } else if (positionInfo.value.parentType === 'block') {
@@ -107,7 +108,7 @@ export function useSelectedBlock() {
 
     if (positionInfo.value.parentType === 'region') {
       moveBlock(selectedBlock.value.id, {
-        targetRegionName: positionInfo.value.parentId,
+        targetRegionId: positionInfo.value.parentId,
         targetIndex: newIndex,
       });
     } else if (positionInfo.value.parentType === 'block') {

@@ -1,11 +1,12 @@
 import type { BlockSchema } from '@craftile/types';
+import { getRegionId } from '@craftile/core';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import type { CraftileEditor } from '../editor';
 
 export interface InsertBlockContext {
   parentId?: string;
   index?: number;
-  regionName?: string;
+  regionId?: string;
 }
 
 export interface BlockSchemaOption {
@@ -110,7 +111,7 @@ export function useBlocksPopover() {
     const targetBlock = editor.engine.getBlockById(targetBlockId);
 
     if (!targetBlock) {
-      return { regionName: 'main' };
+      return { regionId: 'main' };
     }
 
     // If the block has a parent, insert as sibling
@@ -132,14 +133,14 @@ export function useBlocksPopover() {
       if (blockIndex !== -1) {
         const insertIndex = position === 'before' ? blockIndex : blockIndex + 1;
         return {
-          regionName: region.name,
+          regionId: getRegionId(region),
           index: insertIndex,
         };
       }
     }
 
     // Fallback: insert at end of main region
-    return { regionName: 'main' };
+    return { regionId: 'main' };
   };
 
   return {

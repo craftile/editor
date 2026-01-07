@@ -76,7 +76,7 @@ describe('MoveBlockCommand', () => {
     it('should move block to different region', () => {
       const command = new MoveBlockCommand(page, {
         blockId: 'block-1',
-        targetRegionName: 'sidebar',
+        targetRegionId: 'sidebar',
         targetIndex: 0,
         emit: mockEmit,
       });
@@ -157,7 +157,7 @@ describe('MoveBlockCommand', () => {
 
       const command = new MoveBlockCommand(page, {
         blockId: 'block-1',
-        targetRegionName: 'sidebar',
+        targetRegionId: 'sidebar',
         targetIndex: 0,
         emit: mockEmit,
       });

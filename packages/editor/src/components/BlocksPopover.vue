@@ -95,13 +95,13 @@ const handleBlockSelect = (option: BlockSchemaOption) => {
   if (option.presetIndex !== undefined) {
     blockId = insertBlockFromPreset(option.blockType, option.presetIndex, {
       parentId: insertionContext.value.parentId,
-      regionName: insertionContext.value.regionName,
+      regionId: insertionContext.value.regionId,
       index: insertionContext.value.index,
     });
   } else {
     blockId = insertBlock(option.blockType, {
       parentId: insertionContext.value.parentId,
-      regionName: insertionContext.value.regionName,
+      regionId: insertionContext.value.regionId,
       index: insertionContext.value.index,
     });
   }
