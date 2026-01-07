@@ -1,5 +1,25 @@
 # @craftile/editor
 
+## 1.0.1
+
+### Patch Changes
+
+- [`bc2bb69`](https://github.com/craftile/editor/commit/bc2bb69226b0abcd71baadd634abc4286e77a2e2) Thanks [@eldomagan](https://github.com/eldomagan)! - feat(editor): export CraftileEditor class
+
+  Export the `CraftileEditor` class from the main package entry point, allowing users to import it directly for type annotations and advanced usage.
+
+  ```typescript
+  // Now available
+  import { CraftileEditor } from '@craftile/editor';
+  import type { CraftileEditor } from '@craftile/editor';
+  ```
+
+- Updated dependencies []:
+  - @craftile/core@1.0.1
+  - @craftile/event-bus@1.0.1
+  - @craftile/messenger@1.0.1
+  - @craftile/types@1.0.1
+
 ## 1.0.0
 
 ### Patch Changes
