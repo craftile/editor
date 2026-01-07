@@ -76,6 +76,10 @@ export class UIManager {
   }
 
   clearSelectedBlock(): void {
+    if (!this.state.selectedBlockId) {
+      return;
+    }
+
     this.state.selectedBlockId = null;
     this.events.emit('ui:block:clear-selection', { blockId: null });
   }
