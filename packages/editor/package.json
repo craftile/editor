@@ -1,6 +1,6 @@
 {
   "name": "@craftile/editor",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "description": "Vue.js-based editor UI components for craftile blocks engine",
   "keywords": [
     "craftile",
