@@ -1,5 +1,11 @@
 # @craftile/plugin-common-properties
 
+## 1.0.2
+
+### Patch Changes
+
+- [`3761cf1`](https://github.com/craftile/editor/commit/3761cf1bcc68137d6da52413ea5c2ba1a61f14ee) Thanks [@eldomagan](https://github.com/eldomagan)! - Replace native HTML number input with Ark UI NumberInput component in Range field for consistency and better UX
+
 ## 1.0.1
 
 ## 1.0.0

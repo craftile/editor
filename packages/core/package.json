@@ -1,6 +1,6 @@
 {
   "name": "@craftile/core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Framework-agnostic block editor engine for Craftile",
   "keywords": [
     "craftile",
