@@ -61,7 +61,7 @@ export const blockSchemas: BlockSchema[] = [
           { value: 'xl', label: 'Extra Large' },
         ],
       },
-      { id: 'rangeField', type: 'range', label: 'Range field', default: 50 },
+      { id: 'rangeField', type: 'range', label: 'Range field', default: 50, unit: 'px' },
 
       { id: 'color', type: 'color', label: 'Color', default: '#000000' },
     ],
@@ -78,7 +78,13 @@ export const blockSchemas: BlockSchema[] = [
     type: 'button',
     properties: [
       { id: 'text', type: 'text', label: 'Button Text', default: 'Click me' },
-      { id: 'url', type: 'text', label: 'URL', info: 'Enter the destination URL or use # for placeholder', default: '#' },
+      {
+        id: 'url',
+        type: 'text',
+        label: 'URL',
+        info: 'Enter the destination URL or use # for placeholder',
+        default: '#',
+      },
       {
         id: 'style',
         type: 'select',
@@ -126,7 +132,8 @@ export const blockSchemas: BlockSchema[] = [
       name: 'Link Card',
       icon: '<svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor"><path d="M13.544 10.456a4.368 4.368 0 00-6.176 0l-3.089 3.088a4.367 4.367 0 106.177 6.177L12 18.177a1 1 0 11-1.414 1.414l-1.544 1.544a6.368 6.368 0 01-9.005-9.005l3.089-3.088a6.367 6.367 0 019.005 0 1 1 0 01-1.415 1.414h.001z"/><path d="M10.456 13.544a4.368 4.368 0 006.176 0l3.089-3.088a4.367 4.367 0 10-6.177-6.177L12 5.823a1 1 0 111.414-1.414l1.544-1.544a6.368 6.368 0 019.005 9.005l-3.089 3.088a6.367 6.367 0 01-9.005 0 1 1 0 011.415-1.414h-.001z"/></svg>',
       category: 'Interactive',
-      description: 'Clickable card with link - demonstrates click prevention (first click selects, second click navigates)',
+      description:
+        'Clickable card with link - demonstrates click prevention (first click selects, second click navigates)',
       previewImageUrl: 'https://placehold.co/400x240/6366f1/ffffff?text=Link+Card',
     },
   },
@@ -811,7 +818,8 @@ export const blockSchemas: BlockSchema[] = [
       name: 'Responsive Hero',
       icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>',
       category: 'Testing',
-      description: 'Hero block demonstrating responsive properties with device-specific values and viewport-aware conditional visibility',
+      description:
+        'Hero block demonstrating responsive properties with device-specific values and viewport-aware conditional visibility',
       previewImageUrl: 'https://placehold.co/400x240/3b82f6/ffffff?text=Responsive+Hero',
     },
   },
@@ -968,9 +976,7 @@ export const blockSchemas: BlockSchema[] = [
   },
   {
     type: 'collection-list',
-    properties: [
-      { id: 'gap', type: 'number', label: 'Gap', default: 16 },
-    ],
+    properties: [{ id: 'gap', type: 'number', label: 'Gap', default: 16 }],
     accepts: ['collection-item', 'collection-card'],
     presets: [
       {

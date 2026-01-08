@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Field } from '@ark-ui/vue/field';
 import { Slider } from '@ark-ui/vue/slider';
+import { NumberInput } from '@ark-ui/vue/number-input';
 import type { PropertyField } from '@craftile/types';
 
 interface RangeField extends PropertyField {
@@ -29,6 +29,18 @@ const sliderValue = computed({
     value.value = newValues[0];
   },
 });
+
+// Ark UI NumberInput expects string values, so we need to convert
+const stringValue = computed({
+  get: () => {
+    const currentValue = value.value ?? props.field.default ?? props.field.min ?? 0;
+    return currentValue.toString();
+  },
+  set: (val: string) => {
+    const num = parseFloat(val);
+    value.value = isNaN(num) ? undefined : num;
+  },
+});
 </script>
 
 <template>
@@ -49,19 +61,16 @@ const sliderValue = computed({
         />
       </Slider.Control>
 
-      <Field.Root
-        class="flex flex-none items-center w-16 px-2 h-8 rounded border border-gray-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-accent"
-      >
-        <Field.Input
-          class="w-full text-sm outline-none appearance-none"
-          type="number"
-          v-model="value"
-          :min="min"
-          :max="max"
-          :step="step"
-        />
-        <div v-if="field.unit" class="text-sm text-gray-500">{{ field.unit }}</div>
-      </Field.Root>
+      <NumberInput.Root v-model="stringValue" :min="min" :max="max" :step="step" class="flex-none w-16">
+        <NumberInput.Control
+          class="flex items-center h-8 border border-gray-300 rounded overflow-hidden focus-within:outline-none focus-within:ring-2 focus-within:ring-accent focus-within:border-transparent"
+        >
+          <NumberInput.Input class="w-full px-2 text-sm focus:outline-none appearance-none" />
+          <div v-if="field.unit" class="px-1 text-sm text-gray-500 border-gray-300">
+            {{ field.unit }}
+          </div>
+        </NumberInput.Control>
+      </NumberInput.Root>
     </div>
   </Slider.Root>
 </template>

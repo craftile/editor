@@ -439,4 +439,4 @@ editor.ui.registerHeaderAction({
   order: 100,
 });
 
-editor.events.on('updates', console.log);
+editor.engine.on('block:property:set', console.log);
