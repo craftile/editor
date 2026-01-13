@@ -616,6 +616,7 @@ export default class RawHtmlRenderer {
       blockId: block.id,
       blockType: block.type,
       block,
+      element: newElement,
       html,
       positionInfo,
     });
