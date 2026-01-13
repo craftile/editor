@@ -1,5 +1,11 @@
 # @craftile/preview-client-html
 
+## 1.0.3
+
+### Patch Changes
+
+- [`e1d0387`](https://github.com/craftile/editor/commit/e1d03877e683b5d308a827c541330d232cad4507) Thanks [@eldomagan](https://github.com/eldomagan)! - Add element reference to block.insert.after event payload for consistency with block.update.after event
+
 ## 1.0.2
 
 ## 1.0.1
