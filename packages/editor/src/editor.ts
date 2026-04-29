@@ -99,7 +99,16 @@ export class CraftileEditor {
         provide(CRAFTILE_EDITOR_SYMBOL, this);
 
         const stopWatching = this.setupEngineWatcher(this.previewUpdateDelay ?? 150);
-        onBeforeUnmount(stopWatching);
+        const stopRemoveListener = this.engine.on('block:remove', ({ blockId }) => {
+          if (this.ui.state.selectedBlockId === blockId) {
+            this.ui.clearSelectedBlock();
+          }
+        });
+
+        onBeforeUnmount(() => {
+          stopWatching();
+          stopRemoveListener();
+        });
 
         return () => h(Editor);
       },

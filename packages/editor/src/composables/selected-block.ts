@@ -134,7 +134,6 @@ export function useSelectedBlock() {
   const remove = () => {
     if (selectedBlockId.value) {
       removeBlock(selectedBlockId.value);
-      clearSelection();
     }
   };
 
