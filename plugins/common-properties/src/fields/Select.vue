@@ -78,20 +78,22 @@ const selectedValues = computed({
       </Select.Trigger>
     </Select.Control>
 
-    <Select.Positioner class="w-[var(--reference-width)]">
-      <Select.Content class="bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto z-50">
-        <Select.Item
-          v-for="item in selectItems.items"
-          :key="item.value"
-          :item="item"
-          class="flex items-center px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 cursor-pointer data-[state=checked]:bg-accent-foreground data-[state=checked]:text-accent"
-        >
-          <Select.ItemText>{{ item.label }}</Select.ItemText>
-          <Select.ItemIndicator class="ml-auto">
-            <icon-check class="w-4 h-4 text-accent" />
-          </Select.ItemIndicator>
-        </Select.Item>
-      </Select.Content>
-    </Select.Positioner>
+    <Teleport to=".__craftile">
+      <Select.Positioner class="w-[var(--reference-width)]">
+        <Select.Content class="bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto z-50">
+          <Select.Item
+            v-for="item in selectItems.items"
+            :key="item.value"
+            :item="item"
+            class="flex items-center px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 cursor-pointer data-[state=checked]:bg-accent-foreground data-[state=checked]:text-accent"
+          >
+            <Select.ItemText>{{ item.label }}</Select.ItemText>
+            <Select.ItemIndicator class="ml-auto">
+              <icon-check class="w-4 h-4 text-accent" />
+            </Select.ItemIndicator>
+          </Select.Item>
+        </Select.Content>
+      </Select.Positioner>
+    </Teleport>
   </Select.Root>
 </template>

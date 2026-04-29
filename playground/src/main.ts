@@ -158,7 +158,11 @@ const editor = createCraftileEditor({
           placeholder: 'Enter your message here...',
 
           // Styling group properties
-          fontSize: 'lg',
+          fontSize: {
+            _default: 'lg',
+            tablet: 'md',
+            mobile: 'sm',
+          },
           color: '#1f2937',
           backgroundColor: '#e0f2fe',
 
