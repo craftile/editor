@@ -161,6 +161,29 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
         pendingChanges.blocksToInclude.add(targetParentId);
       }
 
+      // When the moved block lives in (or used to live in) a repeated context,
+      // a preview client doing an optimistic single-element DOM move would corrupt
+      // sibling rendered instances. Mark parents as updated so consumers skip the
+      // optimistic move and rely on the html-effects refresh.
+      const page = engine.getPage();
+      const inRepeatedContext = (startId: string | null | undefined): boolean => {
+        let current: Block | undefined = startId ? page.blocks[startId] : undefined;
+        while (current) {
+          if (current.repeated) return true;
+          current = current.parentId ? page.blocks[current.parentId] : undefined;
+        }
+        return false;
+      };
+
+      if (inRepeatedContext(blockId) || inRepeatedContext(sourceParentId)) {
+        if (sourceParentId && !pendingChanges.added.has(sourceParentId)) {
+          pendingChanges.updated.add(sourceParentId);
+        }
+        if (targetParentId && !pendingChanges.added.has(targetParentId)) {
+          pendingChanges.updated.add(targetParentId);
+        }
+      }
+
       scheduleEmit();
     })
   );
