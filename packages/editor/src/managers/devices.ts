@@ -1,3 +1,5 @@
+const CUSTOM_DEVICES_STORAGE_KEY = 'craftile-editor:custom-devices';
+
 export interface DevicePreset {
   id: string;
   label: string;
@@ -42,7 +44,7 @@ export class DevicesManager {
 
     this.state = reactive({
       currentDevice: deviceExists ? defaultDevice : 'fit',
-      savedCustomDevices: [],
+      savedCustomDevices: this.loadCustomDevices(),
     });
   }
 
@@ -67,7 +69,12 @@ export class DevicesManager {
   }
 
   addCustomDevice(device: DevicePreset): void {
+    if (this.state.savedCustomDevices.some((d) => d.id === device.id)) {
+      return;
+    }
+
     this.state.savedCustomDevices.push(device);
+    this.saveCustomDevices();
   }
 
   removeCustomDevice(deviceId: string): void {
@@ -80,9 +87,41 @@ export class DevicesManager {
     if (this.state.currentDevice === deviceId) {
       this.state.currentDevice = 'fit';
     }
+
+    this.saveCustomDevices();
   }
 
   getAllDevices(): DevicePreset[] {
     return [...this.devicePresets, ...this.state.savedCustomDevices];
+  }
+
+  private loadCustomDevices(): DevicePreset[] {
+    try {
+      const raw = localStorage.getItem(CUSTOM_DEVICES_STORAGE_KEY);
+      if (!raw) return [];
+
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+
+      return parsed.filter(
+        (item): item is DevicePreset =>
+          item !== null &&
+          typeof item === 'object' &&
+          typeof item.id === 'string' &&
+          typeof item.label === 'string' &&
+          typeof item.width === 'number' &&
+          (item.icon === undefined || typeof item.icon === 'string')
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  private saveCustomDevices(): void {
+    try {
+      localStorage.setItem(CUSTOM_DEVICES_STORAGE_KEY, JSON.stringify(this.state.savedCustomDevices));
+    } catch {
+      // localStorage may throw on quota / disabled storage; non-fatal
+    }
   }
 }

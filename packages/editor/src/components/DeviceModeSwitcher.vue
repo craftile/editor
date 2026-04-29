@@ -125,16 +125,16 @@ export default {
             </button>
           </div>
 
-          <div class="mt-4">
+          <div v-if="savedCustomDevices.length > 0" class="mt-4">
             <h5>{{ t('header.savedCustomDevices') }}</h5>
             <div class="flex flex-col gap-1 mt-2">
               <div
-                v-for="(device, index) in savedCustomDevices"
-                :key="index"
+                v-for="device in savedCustomDevices"
+                :key="device.id"
                 role="button"
                 class="flex items-center gap-2 rounded text-left text-sm text-gray-700 px-3 py-2 cursor-pointer"
-                :class="{ 'text-accent! bg-accent/8': currentDevice === `custom-${device.width}` }"
-                @click="handleSetDeviceMode(`custom-${device.width}`)"
+                :class="{ 'text-accent! bg-accent/8': currentDevice === device.id }"
+                @click="handleSetDeviceMode(device.id)"
               >
                 <icon-device-tablet class="w-5 h-5 flex-none" />
                 <span class="flex-1">{{ device.width }}px</span>
