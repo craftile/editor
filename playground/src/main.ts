@@ -138,6 +138,11 @@ const editor = createCraftileEditor({
             tablet: 30,
             mobile: 20,
           },
+          borderRadius: {
+            _default: 8,
+            tablet: 12,
+            mobile: 16,
+          },
           textAlign: 'center',
           backgroundColor: '#3b82f6',
         },

@@ -786,6 +786,18 @@ export const blockSchemas: BlockSchema[] = [
         max: 100,
       },
       {
+        id: 'borderRadius',
+        type: 'range',
+        label: 'Border Radius',
+        info: 'Set a different border radius per device',
+        responsive: true,
+        default: 8,
+        min: 0,
+        max: 32,
+        step: 1,
+        unit: 'px',
+      },
+      {
         id: 'textAlign',
         type: 'select',
         label: 'Text Alignment',

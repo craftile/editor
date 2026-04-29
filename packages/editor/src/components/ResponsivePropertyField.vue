@@ -89,7 +89,7 @@ const fieldRenderer = computed(() => {
 
 <template>
   <div class="relative">
-    <div class="flex items-center justify-end gap-3 absolute right-0 top-0">
+    <div class="flex items-center justify-end gap-3 absolute right-0 top-0 z-5">
       <Tooltip title="Reset to default value">
         <button
           v-if="hasOverride"
@@ -115,26 +115,28 @@ const fieldRenderer = computed(() => {
           <component :is="getIconComponent(currentDeviceData.icon)" class="w-4 h-4 text-gray-600" />
         </Select.Trigger>
 
-        <Select.Positioner class="">
-          <Select.Content class="bg-white border border-gray-200 rounded-lg shadow-lg p-1 min-w-[160px] z-50">
-            <Select.Item
-              v-for="item in deviceCollection.items"
-              :key="item.value"
-              :item="item"
-              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded cursor-pointer data-[state=checked]:bg-accent/10 data-[state=checked]:text-accent"
-            >
-              <Select.ItemText class="flex items-center gap-2">
-                <component :is="getIconComponent(item.icon)" class="w-4 h-4" />
-                {{ item.label }}
-              </Select.ItemText>
+        <Teleport to=".__craftile">
+          <Select.Positioner class="">
+            <Select.Content class="bg-white border border-gray-200 rounded-lg shadow-lg p-1 min-w-[160px] z-50">
+              <Select.Item
+                v-for="item in deviceCollection.items"
+                :key="item.value"
+                :item="item"
+                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded cursor-pointer data-[state=checked]:bg-accent/10 data-[state=checked]:text-accent"
+              >
+                <Select.ItemText class="flex items-center gap-2">
+                  <component :is="getIconComponent(item.icon)" class="w-4 h-4" />
+                  {{ item.label }}
+                </Select.ItemText>
 
-              <!-- Check indicator for selected -->
-              <Select.ItemIndicator class="ml-auto">
-                <icon-check class="w-4 h-4 text-accent" />
-              </Select.ItemIndicator>
-            </Select.Item>
-          </Select.Content>
-        </Select.Positioner>
+                <!-- Check indicator for selected -->
+                <Select.ItemIndicator class="ml-auto">
+                  <icon-check class="w-4 h-4 text-accent" />
+                </Select.ItemIndicator>
+              </Select.Item>
+            </Select.Content>
+          </Select.Positioner>
+        </Teleport>
       </Select.Root>
     </div>
 
