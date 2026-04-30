@@ -1,5 +1,11 @@
 # @craftile/plugin-common-properties
 
+## 1.0.4
+
+### Patch Changes
+
+- [`3bf7da6`](https://github.com/craftile/editor/commit/3bf7da6c972944e10e9927a456ffadcfadce3e8a) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix Select field dropdown getting clipped when the field is rendered inside an `overflow: hidden` ancestor (e.g. an `Accordion.ItemContent` for grouped properties). `Select.Positioner` now teleports to `.__craftile` so the dropdown escapes the clipping ancestor.
+
 ## 1.0.3
 
 ## 1.0.2
