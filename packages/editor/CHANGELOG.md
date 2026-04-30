@@ -1,5 +1,29 @@
 # @craftile/editor
 
+## 1.0.4
+
+### Patch Changes
+
+- [`fde8f70`](https://github.com/craftile/editor/commit/fde8f70a3857d90886f5b898cbea304ccdb573e3) Thanks [@eldomagan](https://github.com/eldomagan)! - Constrain dynamic block children to a single contiguous slot. A parent's dynamic children (children without `static: true`) must now form one uninterrupted run. Once the user places a dynamic block in a particular gap relative to the parent's static children, further dynamic blocks have to land in that same gap. Insertion between two adjacent static siblings is rejected outright. The rule is enforced in `InsertBlockCommand`, `InsertBlockFromPresetCommand`, and `MoveBlockCommand` with validate before mutate semantics, so a rejected operation leaves the page untouched (no orphaned blocks in `page.blocks`, no preset subtree leak, no event emitted). The same check drives the editor UI: disallowed `+` buttons in the layers panel, the right click context menu's insert and move items, and the popover's allowed schemas all hide or disable on slot violations. Engine throws are caught at the popover, drag end, paste after, and context menu call sites and surfaced as error toasts.
+
+- [`0bbabc3`](https://github.com/craftile/editor/commit/0bbabc384c1689f63933a8708e40673cd460b151) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix child reorders corrupting the preview iframe when the parent is rendered as multiple DOM instances (e.g., blocks with a `repeated: true` ancestor). When the moved block lives in a repeated context, source and target parent IDs are now included in `changes.updated` so preview clients skip the optimistic single-element DOM move and rely on the html-effects refresh to keep every rendered instance in sync. Non-repeated layouts continue to use the optimistic move and feel instant.
+
+- [`36f9a37`](https://github.com/craftile/editor/commit/36f9a373cf59dd5da74d7e4882ba8b0efd5e2532) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix block insert/move/re-enable landing in the wrong DOM slot when preceded by disabled siblings. Disabled blocks are excluded from the preview DOM but still occupy a slot in the data tree, so positioning by raw data-tree index produced an off-by-N error. The editor now resolves sibling refs (`afterId`/`beforeId`) from the full engine state, skipping disabled blocks, and ships them in `UpdatesEvent.changes.positions`. The preview client uses these refs to anchor inserts and moves, so DOM order matches data-tree intent regardless of disabled siblings.
+
+- [`feac71e`](https://github.com/craftile/editor/commit/feac71e650bfbb92689410593f3d225ffa5ed8f3) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix responsive property switcher dropdown opening at wrong position. The `Select.Positioner` is now teleported to `.__craftile` so Floating UI computes coordinates against the editor root instead of the in-tree absolute container, which caused the dropdown to open at the viewport top-left.
+
+- [`8d843ef`](https://github.com/craftile/editor/commit/8d843efda01c0d9e4a6d2ab60e43d15d0058f062) Thanks [@eldomagan](https://github.com/eldomagan)! - Fix the selection toolbar staying visible (and snapping to the top-left of the canvas) after deleting the selected block from the layer panel or context menu. The editor now listens to the engine's `block:remove` event and clears the UI selection when the removed block was selected, so every delete path (layers panel, context menu, future plugin/keyboard removals) properly tears down the toolbar and the preview client's selection observers.
+
+- [`8222a1c`](https://github.com/craftile/editor/commit/8222a1c8a28d16dbd2dea033f2a872ea14636fa5) Thanks [@eldomagan](https://github.com/eldomagan)! - Persist user-saved custom devices to localStorage so they survive page reloads. The `savedCustomDevices` array on `DevicesManager` was previously reset to `[]` on every editor construction; it now restores from `localStorage` under the key `craftile-editor:custom-devices` and writes through on add / remove. Loaded entries are shape-validated (id, label, width, optional icon).
+
+- [`7d6f2eb`](https://github.com/craftile/editor/commit/7d6f2ebeefff5b83fed77f8e64eee3c8c8a27017) Thanks [@eldomagan](https://github.com/eldomagan)! - Redesign toast notifications with stacked, decreasing-width layout matching the Ark UI docs aesthetic. The previous implementation wrapped Ark UI's `Toast.Root` in a styled `<div>`, which prevented the `--x / --y / --scale / --z-index / --height / --opacity` CSS variables (set by the toast machine) from taking effect, so multiple toasts didn't visually stack. Styles now live directly on `Toast.Root`, enabling the smooth translate/scale transitions when toasts enter, swap positions, or close. Type theming switches to filled colored surfaces for `success` / `warning` / `error` and a clean white surface for `info`, with a single `--toast-bg / --toast-fg / --toast-border` variable pattern.
+
+- Updated dependencies [[`fde8f70`](https://github.com/craftile/editor/commit/fde8f70a3857d90886f5b898cbea304ccdb573e3), [`36f9a37`](https://github.com/craftile/editor/commit/36f9a373cf59dd5da74d7e4882ba8b0efd5e2532)]:
+  - @craftile/core@1.0.4
+  - @craftile/types@1.0.4
+  - @craftile/event-bus@1.0.4
+  - @craftile/messenger@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes
