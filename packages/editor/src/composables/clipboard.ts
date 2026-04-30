@@ -67,23 +67,30 @@ export function useClipboard() {
     const parentId = targetBlock.parentId;
     let index: number | undefined;
 
-    if (parentId) {
-      const parent = engine.getBlockById(parentId)!;
+    try {
+      if (parentId) {
+        const parent = engine.getBlockById(parentId)!;
 
-      const targetIndex = parent.children.indexOf(targetBlockId);
-      index = targetIndex + 1;
+        const targetIndex = parent.children.indexOf(targetBlockId);
+        index = targetIndex + 1;
 
-      pasteBlock(rawCopied, { parentId, index });
-    } else {
-      const page = engine.getPage();
-      for (const region of page.regions) {
-        const targetIndex = region.blocks.indexOf(targetBlockId);
-        if (targetIndex !== -1) {
-          index = targetIndex + 1;
-          pasteBlock(rawCopied, { regionId: getRegionId(region), index });
-          break;
+        pasteBlock(rawCopied, { parentId, index });
+      } else {
+        const page = engine.getPage();
+        for (const region of page.regions) {
+          const targetIndex = region.blocks.indexOf(targetBlockId);
+          if (targetIndex !== -1) {
+            index = targetIndex + 1;
+            pasteBlock(rawCopied, { regionId: getRegionId(region), index });
+            break;
+          }
         }
       }
+    } catch (error) {
+      uiManager.toast({
+        title: error instanceof Error ? error.message : String(error),
+        type: 'error',
+      });
     }
   }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getRegionId } from '@craftile/core';
+import { canInsertDynamicChildAt, getRegionId } from '@craftile/core';
 import { Menu } from '@ark-ui/vue';
 
 interface Props {
@@ -9,9 +9,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const { t } = useI18n();
-const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock } = useCraftileEngine();
+const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock, blocks, regions } = useCraftileEngine();
 const { open: openBlocksPopover, getInsertionContext } = useBlocksPopover();
-const { block: blockData, nextSibling, previousSibling } = useBlock(props.blockId);
+const { block: blockData, parent, index: blockIndex } = useBlock(props.blockId);
+const { toaster } = useUI();
 const { copyBlock, canPasteAfter, pasteBlockAfter, hasCopiedBlock, copyBlockAsJSON } = useClipboard();
 
 const isStatic = computed(() => blockData.value?.static === true);
@@ -58,28 +59,50 @@ const blockPositionInfo = computed(() => {
   return null;
 });
 
+const siblingsList = computed(() => {
+  return parent.value?.children ?? regions.value.find((r) => r.blocks.includes(props.blockId))?.blocks;
+});
+
 const canMoveToPrevious = computed(() => {
-  if (!blockData.value || isStatic.value) {
+  if (!blockData.value || isStatic.value || !blockPositionInfo.value) {
     return false;
   }
-
-  return blockPositionInfo.value && blockPositionInfo.value.currentIndex > 0;
+  if (blockPositionInfo.value.currentIndex <= 0) {
+    return false;
+  }
+  if (!siblingsList.value) {
+    return true;
+  }
+  const prospective = siblingsList.value.filter((id) => id !== props.blockId);
+  return canInsertDynamicChildAt(prospective, blocks.value, blockPositionInfo.value.currentIndex - 1);
 });
 
 const canMoveToNext = computed(() => {
-  if (!blockData.value || isStatic.value) {
+  if (!blockData.value || isStatic.value || !blockPositionInfo.value) {
     return false;
   }
-
-  return blockPositionInfo.value && blockPositionInfo.value.currentIndex < blockPositionInfo.value.siblingCount - 1;
+  if (blockPositionInfo.value.currentIndex >= blockPositionInfo.value.siblingCount - 1) {
+    return false;
+  }
+  if (!siblingsList.value) {
+    return true;
+  }
+  const prospective = siblingsList.value.filter((id) => id !== props.blockId);
+  return canInsertDynamicChildAt(prospective, blocks.value, blockPositionInfo.value.currentIndex + 1);
 });
 
 const canInsertBefore = computed(() => {
-  return !previousSibling.value || previousSibling.value.static !== true;
+  if (blockIndex.value === undefined || blockIndex.value < 0 || !siblingsList.value) {
+    return true;
+  }
+  return canInsertDynamicChildAt(siblingsList.value, blocks.value, blockIndex.value);
 });
 
 const canInsertAfter = computed(() => {
-  return !nextSibling.value || nextSibling.value.static !== true;
+  if (blockIndex.value === undefined || blockIndex.value < 0 || !siblingsList.value) {
+    return true;
+  }
+  return canInsertDynamicChildAt(siblingsList.value, blocks.value, blockIndex.value + 1);
 });
 
 const contextTriggerRef = ref<any>(null);
@@ -92,6 +115,17 @@ function handleToggleBlock() {
   toggleBlock(props.blockId);
 }
 
+function tryMove(fn: () => void) {
+  try {
+    fn();
+  } catch (error) {
+    toaster.create({
+      title: error instanceof Error ? error.message : String(error),
+      type: 'error',
+    });
+  }
+}
+
 function handleMoveToPrevious() {
   if (!blockData.value || !blockPositionInfo.value) {
     return;
@@ -99,17 +133,19 @@ function handleMoveToPrevious() {
 
   const newIndex = blockPositionInfo.value.currentIndex - 1;
 
-  if (blockPositionInfo.value.parentType === 'region') {
-    moveBlock(props.blockId, {
-      targetRegionId: blockPositionInfo.value.parentId,
-      targetIndex: newIndex,
-    });
-  } else if (blockPositionInfo.value.parentType === 'block') {
-    moveBlock(props.blockId, {
-      targetParentId: blockPositionInfo.value.parentId,
-      targetIndex: newIndex,
-    });
-  }
+  tryMove(() => {
+    if (blockPositionInfo.value!.parentType === 'region') {
+      moveBlock(props.blockId, {
+        targetRegionId: blockPositionInfo.value!.parentId,
+        targetIndex: newIndex,
+      });
+    } else if (blockPositionInfo.value!.parentType === 'block') {
+      moveBlock(props.blockId, {
+        targetParentId: blockPositionInfo.value!.parentId,
+        targetIndex: newIndex,
+      });
+    }
+  });
 }
 
 function handleMoveToNext() {
@@ -119,17 +155,19 @@ function handleMoveToNext() {
 
   const newIndex = blockPositionInfo.value.currentIndex + 1;
 
-  if (blockPositionInfo.value.parentType === 'region') {
-    moveBlock(props.blockId, {
-      targetRegionId: blockPositionInfo.value.parentId,
-      targetIndex: newIndex,
-    });
-  } else if (blockPositionInfo.value.parentType === 'block') {
-    moveBlock(props.blockId, {
-      targetParentId: blockPositionInfo.value.parentId,
-      targetIndex: newIndex,
-    });
-  }
+  tryMove(() => {
+    if (blockPositionInfo.value!.parentType === 'region') {
+      moveBlock(props.blockId, {
+        targetRegionId: blockPositionInfo.value!.parentId,
+        targetIndex: newIndex,
+      });
+    } else if (blockPositionInfo.value!.parentType === 'block') {
+      moveBlock(props.blockId, {
+        targetParentId: blockPositionInfo.value!.parentId,
+        targetIndex: newIndex,
+      });
+    }
+  });
 }
 
 function handleInsertBefore() {

@@ -1,6 +1,7 @@
 import type { Block, Page } from '@craftile/types';
 import type { Command, EngineEmitFn } from '../types';
-import { getRegionId } from '../utils';
+import type { ResolvedTarget } from '../utils';
+import { canInsertDynamicChildAt, clampIndex, getRegionId, resolveRegionId } from '../utils';
 
 export interface MoveBlockOptions {
   blockId: string;
@@ -35,63 +36,31 @@ export class MoveBlockCommand implements Command {
   }
 
   apply(): void {
-    this.blockToMove = this.page.blocks[this.blockId];
+    const target = this.validateAndResolveTarget();
 
-    if (!this.blockToMove) {
-      throw new Error(`Block not found: ${this.blockId}`);
-    }
-
-    if (this.targetParentId && !this.page.blocks[this.targetParentId]) {
-      throw new Error(`Target parent not found: ${this.targetParentId}`);
-    }
-
-    this.originalParentId = this.blockToMove.parentId;
-
-    // First we remove the block from the current position
     if (this.originalParentId) {
-      const parent = this.page.blocks[this.originalParentId];
-      if (parent) {
-        this.originalIndex = parent.children.indexOf(this.blockId);
-        if (this.originalIndex !== -1) {
-          parent.children.splice(this.originalIndex, 1);
-        }
+      const sourceParent = this.page.blocks[this.originalParentId];
+      if (sourceParent && this.originalIndex !== -1) {
+        sourceParent.children.splice(this.originalIndex, 1);
       }
-    } else {
-      // it is a region level block
-      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
-      if (region) {
-        this.originalIndex = region.blocks.indexOf(this.blockId);
-        this.originalRegionId = getRegionId(region);
-        region.blocks.splice(this.originalIndex, 1);
+    } else if (this.originalRegionId) {
+      const sourceRegion = this.page.regions.find((r) => getRegionId(r) === this.originalRegionId);
+      if (sourceRegion && this.originalIndex !== -1) {
+        sourceRegion.blocks.splice(this.originalIndex, 1);
       }
     }
 
-    // the we insert the block at the new position
-    if (this.targetParentId) {
-      const targetParent = this.page.blocks[this.targetParentId];
-      this.blockToMove.parentId = this.targetParentId;
-
-      if (this.targetIndex !== undefined && this.targetIndex >= 0 && this.targetIndex <= targetParent.children.length) {
-        targetParent.children.splice(this.targetIndex, 0, this.blockId);
-      } else {
-        targetParent.children.push(this.blockId);
-      }
+    if (target.kind === 'parent') {
+      this.blockToMove!.parentId = target.parent.id;
+      target.parent.children.splice(target.index, 0, this.blockId);
     } else {
-      this.blockToMove.parentId = undefined;
-
-      const regionId = this.targetRegionId || getRegionId(this.page.regions[0]) || 'main';
-      let targetRegion = this.page.regions.find((r) => getRegionId(r) === regionId);
-
-      if (!targetRegion) {
-        targetRegion = { id: regionId, name: regionId, blocks: [] };
-        this.page.regions.push(targetRegion);
+      this.blockToMove!.parentId = undefined;
+      let region = this.page.regions.find((r) => getRegionId(r) === target.regionId);
+      if (!region) {
+        region = { id: target.regionId, name: target.regionId, blocks: [] };
+        this.page.regions.push(region);
       }
-
-      if (this.targetIndex !== undefined && this.targetIndex >= 0 && this.targetIndex <= targetRegion.blocks.length) {
-        targetRegion.blocks.splice(this.targetIndex, 0, this.blockId);
-      } else {
-        targetRegion.blocks.push(this.blockId);
-      }
+      region.blocks.splice(target.index, 0, this.blockId);
     }
 
     this.emit('block:move', {
@@ -103,6 +72,63 @@ export class MoveBlockCommand implements Command {
       sourceRegionId: this.originalRegionId || null,
       sourceIndex: this.originalIndex,
     });
+  }
+
+  /**
+   * Resolve the target parent/region and the splice index, asserting the
+   * dynamic-child placement rules against the prospective post-move layout.
+   * Captures the source position too so `revert()` can restore it. Pure read —
+   * does not mutate `page`.
+   */
+  private validateAndResolveTarget(): ResolvedTarget {
+    this.blockToMove = this.page.blocks[this.blockId];
+    if (!this.blockToMove) {
+      throw new Error(`Block not found: ${this.blockId}`);
+    }
+
+    this.originalParentId = this.blockToMove.parentId;
+    if (this.originalParentId) {
+      const sourceParent = this.page.blocks[this.originalParentId];
+      this.originalIndex = sourceParent ? sourceParent.children.indexOf(this.blockId) : -1;
+    } else {
+      const sourceRegion = this.page.regions.find((r) => r.blocks.includes(this.blockId));
+      if (sourceRegion) {
+        this.originalRegionId = getRegionId(sourceRegion);
+        this.originalIndex = sourceRegion.blocks.indexOf(this.blockId);
+      } else {
+        this.originalIndex = -1;
+      }
+    }
+
+    if (this.targetParentId) {
+      const parent = this.page.blocks[this.targetParentId];
+      if (!parent) {
+        throw new Error(`Target parent not found: ${this.targetParentId}`);
+      }
+
+      const sourceIsTarget = this.originalParentId === this.targetParentId;
+      const prospective = sourceIsTarget ? parent.children.filter((id) => id !== this.blockId) : parent.children;
+      const index = clampIndex(prospective.length, this.targetIndex);
+
+      if (!canInsertDynamicChildAt(prospective, this.page.blocks, index)) {
+        throw new Error(
+          `Cannot place at index ${index} of ${this.targetParentId}: not a valid slot for a dynamic child`
+        );
+      }
+
+      return { kind: 'parent', parent, index };
+    }
+
+    const regionId = resolveRegionId(this.page, this.targetRegionId);
+    const existing = this.page.regions.find((r) => getRegionId(r) === regionId);
+    const sourceIsTarget = this.originalRegionId === regionId;
+    const prospective = existing
+      ? sourceIsTarget
+        ? existing.blocks.filter((id) => id !== this.blockId)
+        : existing.blocks
+      : [];
+
+    return { kind: 'region', regionId, index: clampIndex(prospective.length, this.targetIndex) };
   }
 
   revert(): void {

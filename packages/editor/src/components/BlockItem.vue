@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
+import { canInsertDynamicChildAt } from '@craftile/core';
 import type { InsertBlockContext } from '../composables/blocks-popover';
 
 const props = defineProps<{
@@ -15,7 +16,8 @@ const {
   children,
   hasChildren,
   canHaveChildren,
-  nextSibling,
+  parent,
+  index: blockIndex,
   toggle,
   moveChild,
   schema,
@@ -24,7 +26,8 @@ const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayers
 const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
 const { open: openBlocksPopover } = useBlocksPopover();
-const { engine, moveBlock, removeBlock, blocks } = useCraftileEngine();
+const { engine, moveBlock, removeBlock, blocks, regions } = useCraftileEngine();
+const { toaster } = useUI();
 
 const isSelected = computed(() => selectedBlockId.value === props.blockId);
 const isExpanded = computed(() => isExpandedFn(props.blockId));
@@ -37,7 +40,15 @@ const blockLabel = getBlockLabelReactive(props.blockId);
 const blockIcon = computed(() => schema.value?.meta?.icon);
 
 const canInsertNextSibling = computed(() => {
-  return !nextSibling.value || nextSibling.value.static !== true;
+  if (blockIndex.value === undefined || blockIndex.value < 0) {
+    return true;
+  }
+  const candidateIndex = blockIndex.value + 1;
+  const siblingsList = parent.value?.children ?? regions.value.find((r) => r.blocks.includes(props.blockId))?.blocks;
+  if (!siblingsList) {
+    return true;
+  }
+  return canInsertDynamicChildAt(siblingsList, blocks.value, candidateIndex);
 });
 
 function handleAddFirstChild(event: Event) {
@@ -100,7 +111,6 @@ function onChildDragEnd(event: SortableEvent) {
     return;
   }
 
-  // Get the moved block ID from the dragged item
   const movedBlockId = event.item?.getAttribute?.('data-block-id');
   if (!movedBlockId) {
     return;
@@ -112,20 +122,25 @@ function onChildDragEnd(event: SortableEvent) {
     return;
   }
 
-  if (isSameContainer) {
-    moveChild(movedBlockId, newIndex);
-    return;
-  }
+  try {
+    if (isSameContainer) {
+      moveChild(movedBlockId, newIndex);
+      return;
+    }
 
-  // For cross-container moves, get the target parent block ID
-  // The 'to' element is the VueDraggable container, so we need to look at its parent
-  const targetParentElement = to?.parentElement?.closest?.('[data-block-id]');
-  const targetParentId = targetParentElement?.getAttribute?.('data-block-id');
+    const targetParentElement = to?.parentElement?.closest?.('[data-block-id]');
+    const targetParentId = targetParentElement?.getAttribute?.('data-block-id');
 
-  if (targetParentId) {
-    moveBlock(movedBlockId, {
-      targetParentId,
-      targetIndex: newIndex,
+    if (targetParentId) {
+      moveBlock(movedBlockId, {
+        targetParentId,
+        targetIndex: newIndex,
+      });
+    }
+  } catch (error) {
+    toaster.create({
+      title: error instanceof Error ? error.message : String(error),
+      type: 'error',
     });
   }
 }

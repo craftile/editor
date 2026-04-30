@@ -12,6 +12,7 @@ const eventBus = useEventBus();
 const { engine, insertBlock, insertBlockFromPreset } = useCraftileEngine();
 const { getAllowedBlockSchemas, expandPresetsToBlockOptions } = useBlocksPopover();
 const { setExpanded } = useLayersPanel();
+const { toaster } = useUI();
 
 const anchorEl = ref<HTMLElement | null>(null);
 const insertionContext = ref<InsertBlockContext | null>(null);
@@ -92,21 +93,29 @@ const handleBlockSelect = (option: BlockSchemaOption) => {
 
   let blockId: string;
 
-  if (option.presetIndex !== undefined) {
-    blockId = insertBlockFromPreset(option.blockType, option.presetIndex, {
-      parentId: insertionContext.value.parentId,
-      regionId: insertionContext.value.regionId,
-      index: insertionContext.value.index,
+  try {
+    if (option.presetIndex !== undefined) {
+      blockId = insertBlockFromPreset(option.blockType, option.presetIndex, {
+        parentId: insertionContext.value.parentId,
+        regionId: insertionContext.value.regionId,
+        index: insertionContext.value.index,
+      });
+    } else {
+      blockId = insertBlock(option.blockType, {
+        parentId: insertionContext.value.parentId,
+        regionId: insertionContext.value.regionId,
+        index: insertionContext.value.index,
+      });
+    }
+  } catch (error) {
+    toaster.create({
+      title: error instanceof Error ? error.message : String(error),
+      type: 'error',
     });
-  } else {
-    blockId = insertBlock(option.blockType, {
-      parentId: insertionContext.value.parentId,
-      regionId: insertionContext.value.regionId,
-      index: insertionContext.value.index,
-    });
+    close();
+    return;
   }
 
-  // Auto-expand blocks that can have children
   const schema = engine.getBlocksManager().get(option.blockType);
 
   if (schema?.accepts && schema.accepts.length > 0) {

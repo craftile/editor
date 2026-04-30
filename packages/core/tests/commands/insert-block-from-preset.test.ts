@@ -284,6 +284,102 @@ describe('InsertBlockFromPresetCommand', () => {
         command.apply();
       }).toThrow('Parent block not found: non-existent-parent');
     });
+
+    it('rejects preset insertion that would split an existing dynamic group', () => {
+      page.blocks['parent-block'].children = ['dynamic-1', 'static-1'];
+      page.blocks['dynamic-1'] = {
+        id: 'dynamic-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+      };
+      page.blocks['static-1'] = {
+        id: 'static-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+        static: true,
+      };
+
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container',
+        presetIndex: 1, // "Heading and Text" — creates 1 root + 2 children
+        parentId: 'parent-block',
+        index: 2, // splits the dynamic group
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      const blocksBefore = Object.keys(page.blocks).length;
+
+      expect(() => command.apply()).toThrow(/not a valid slot/);
+
+      // No leak: neither the root nor the recursive subtree got created
+      expect(Object.keys(page.blocks)).toHaveLength(blocksBefore);
+      expect(emittedEvents).toHaveLength(0);
+    });
+
+    it('rejects preset insertion wedged between two adjacent statics', () => {
+      page.blocks['parent-block'].children = ['static-a', 'static-b'];
+      page.blocks['static-a'] = {
+        id: 'static-a',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+        static: true,
+      };
+      page.blocks['static-b'] = {
+        id: 'static-b',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+        static: true,
+      };
+
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container',
+        presetIndex: 2, // "Nested Layout" — creates a recursive subtree
+        parentId: 'parent-block',
+        index: 1,
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      const blocksBefore = Object.keys(page.blocks).length;
+
+      expect(() => command.apply()).toThrow(/not a valid slot/);
+
+      expect(Object.keys(page.blocks)).toHaveLength(blocksBefore);
+      expect(emittedEvents).toHaveLength(0);
+    });
+
+    it('allows preset insertion at a valid slot', () => {
+      page.blocks['parent-block'].children = ['static-1'];
+      page.blocks['static-1'] = {
+        id: 'static-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+        static: true,
+      };
+
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container',
+        presetIndex: 1,
+        parentId: 'parent-block',
+        index: 0, // before the static — first dynamic, contiguous
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      expect(() => command.apply()).not.toThrow();
+      expect(page.blocks['parent-block'].children[0]).toBe(command.getBlockId());
+    });
   });
 
   describe('Command Revert', () => {

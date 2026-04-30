@@ -132,6 +132,131 @@ describe('InsertBlockCommand', () => {
         command.apply();
       }).toThrow('Parent block not found: non-existent-parent');
     });
+
+    it('rejects insertion that would split the dynamic-children group', () => {
+      // parent-block: [dynamic-1, static-1] — dynamic group must stay before static-1
+      page.blocks['parent-block'].children = ['dynamic-1', 'static-1'];
+      page.blocks['dynamic-1'] = {
+        id: 'dynamic-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+      };
+      page.blocks['static-1'] = {
+        id: 'static-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+        static: true,
+      };
+
+      const command = new InsertBlockCommand(page, {
+        blockType: 'text',
+        parentId: 'parent-block',
+        index: 2,
+        blockSchema: textSchema,
+        emit: mockEmit,
+      });
+
+      const blocksBefore = Object.keys(page.blocks).length;
+
+      expect(() => command.apply()).toThrow(/not a valid slot/);
+
+      // No leak: the new block is never added to page.blocks on a rejected insertion
+      expect(Object.keys(page.blocks)).toHaveLength(blocksBefore);
+      expect(emittedEvents).toHaveLength(0);
+    });
+
+    it('rejects insertion wedged between two adjacent static children', () => {
+      const setupAllStaticParent = () => {
+        page = structuredClone(testPage);
+        page.blocks['parent-block'].children = ['static-a', 'static-b'];
+        page.blocks['static-a'] = {
+          id: 'static-a',
+          type: 'text',
+          properties: {},
+          parentId: 'parent-block',
+          children: [],
+          static: true,
+        };
+        page.blocks['static-b'] = {
+          id: 'static-b',
+          type: 'text',
+          properties: {},
+          parentId: 'parent-block',
+          children: [],
+          static: true,
+        };
+      };
+
+      // Between the two statics: rejected
+      setupAllStaticParent();
+      const blocksBefore = Object.keys(page.blocks).length;
+      const reject = new InsertBlockCommand(page, {
+        blockType: 'text',
+        parentId: 'parent-block',
+        index: 1,
+        blockSchema: textSchema,
+        emit: mockEmit,
+      });
+      expect(() => reject.apply()).toThrow(/not a valid slot/);
+      expect(Object.keys(page.blocks)).toHaveLength(blocksBefore);
+
+      // Outer-leading edge: allowed
+      setupAllStaticParent();
+      const before = new InsertBlockCommand(page, {
+        blockType: 'text',
+        parentId: 'parent-block',
+        index: 0,
+        blockSchema: textSchema,
+        emit: mockEmit,
+      });
+      expect(() => before.apply()).not.toThrow();
+
+      // Outer-trailing edge: allowed (fresh parent state)
+      setupAllStaticParent();
+      const after = new InsertBlockCommand(page, {
+        blockType: 'text',
+        parentId: 'parent-block',
+        index: 2,
+        blockSchema: textSchema,
+        emit: mockEmit,
+      });
+      expect(() => after.apply()).not.toThrow();
+    });
+
+    it('allows insertion that keeps the dynamic-children group contiguous', () => {
+      // parent-block: [dynamic-1, static-1] — index 0 and 1 both stay in the leading group
+      page.blocks['parent-block'].children = ['dynamic-1', 'static-1'];
+      page.blocks['dynamic-1'] = {
+        id: 'dynamic-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+      };
+      page.blocks['static-1'] = {
+        id: 'static-1',
+        type: 'text',
+        properties: {},
+        parentId: 'parent-block',
+        children: [],
+        static: true,
+      };
+
+      const command = new InsertBlockCommand(page, {
+        blockType: 'text',
+        parentId: 'parent-block',
+        index: 1,
+        blockSchema: textSchema,
+        emit: mockEmit,
+      });
+
+      expect(() => command.apply()).not.toThrow();
+      expect(page.blocks['parent-block'].children[1]).toBe(command.getBlockId());
+    });
   });
 
   describe('Command Revert', () => {

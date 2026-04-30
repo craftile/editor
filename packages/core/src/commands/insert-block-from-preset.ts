@@ -1,7 +1,6 @@
 import type { Block, BlockProperties, BlockSchema, BlockStructure, Page } from '@craftile/types';
-import { getRegionId } from '../utils';
+import { generateId, getRegionId, resolveInsertTarget } from '../utils';
 import type { Command, EngineEmitFn } from '../types';
-import { generateId } from '../utils';
 import type { BlocksManager } from '../blocks-manager';
 
 export interface InsertBlockFromPresetOptions {
@@ -69,10 +68,11 @@ export class InsertBlockFromPresetCommand implements Command {
   }
 
   apply(): void {
+    const target = resolveInsertTarget(this.page, this.parentId, this.regionId, this.index);
+
     const blockSchema = this.blocksManager.get(this.blockType);
 
     if (this.presetData) {
-      // Handle BlockStructure (paste operation)
       this.insertedBlock = {
         type: this.blockType,
         id: this.blockId,
@@ -94,7 +94,6 @@ export class InsertBlockFromPresetCommand implements Command {
         this.insertedBlock.children = this.createChildrenFromPreset(this.presetData.children, this.blockId);
       }
     } else if (this.presetIndex !== undefined) {
-      // Handle BlockPreset from schema (preset insertion)
       const preset = blockSchema?.presets?.[this.presetIndex];
       if (!preset) {
         throw new Error(`Preset at index ${this.presetIndex} not found`);
@@ -121,40 +120,18 @@ export class InsertBlockFromPresetCommand implements Command {
       throw new Error('Failed to create block');
     }
 
-    // Insert the root block in the appropriate location
-    if (this.parentId) {
-      const parent = this.page.blocks[this.parentId];
+    this.actualIndex = target.index;
 
-      if (!parent) {
-        throw new Error(`Parent block not found: ${this.parentId}`);
-      }
-
-      this.insertedBlock.parentId = parent.id;
-
-      if (this.index !== undefined && this.index >= 0 && this.index <= parent.children.length) {
-        parent.children.splice(this.index, 0, this.blockId);
-        this.actualIndex = this.index;
-      } else {
-        parent.children.push(this.blockId);
-        this.actualIndex = parent.children.length - 1;
-      }
+    if (target.kind === 'parent') {
+      this.insertedBlock.parentId = target.parent.id;
+      target.parent.children.splice(target.index, 0, this.blockId);
     } else {
-      // Insert as top-level block
-      const targetRegionId = this.regionId || getRegionId(this.page.regions[0]);
-      let targetRegion = this.page.regions.find((r) => getRegionId(r) === targetRegionId);
-
-      if (!targetRegion) {
-        targetRegion = { id: targetRegionId, name: targetRegionId, blocks: [] };
-        this.page.regions.push(targetRegion);
+      let region = this.page.regions.find((r) => getRegionId(r) === target.regionId);
+      if (!region) {
+        region = { id: target.regionId, name: target.regionId, blocks: [] };
+        this.page.regions.push(region);
       }
-
-      if (this.index !== undefined && this.index >= 0 && this.index <= targetRegion.blocks.length) {
-        targetRegion.blocks.splice(this.index, 0, this.blockId);
-        this.actualIndex = this.index;
-      } else {
-        targetRegion.blocks.push(this.blockId);
-        this.actualIndex = targetRegion.blocks.length - 1;
-      }
+      region.blocks.splice(target.index, 0, this.blockId);
     }
 
     this.emit('block:insert', {

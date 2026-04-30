@@ -1,7 +1,6 @@
 import type { Block, BlockSchema, Page } from '@craftile/types';
-import { getRegionId } from '../utils';
+import { generateId, getRegionId, resolveInsertTarget } from '../utils';
 import type { Command, EngineEmitFn } from '../types';
-import { generateId } from '../utils';
 
 export interface InsertBlockOptions {
   blockType: string;
@@ -40,6 +39,8 @@ export class InsertBlockCommand implements Command {
   }
 
   apply(): void {
+    const target = resolveInsertTarget(this.page, this.parentId, this.regionId, this.index);
+
     const blockName = this.blockSchema?.meta?.name || this.blockType;
 
     this.insertedBlock = {
@@ -48,44 +49,22 @@ export class InsertBlockCommand implements Command {
       name: blockName,
       properties: this.properties,
       children: [],
-      parentId: undefined, // Will be set if inserting as child
+      parentId: undefined,
     };
 
     this.page.blocks[this.blockId] = this.insertedBlock;
+    this.actualIndex = target.index;
 
-    if (this.parentId) {
-      const parent = this.page.blocks[this.parentId];
-
-      if (!parent) {
-        throw new Error(`Parent block not found: ${this.parentId}`);
-      }
-
-      this.insertedBlock.parentId = parent.id;
-
-      if (this.index !== undefined && this.index >= 0 && this.index <= parent.children.length) {
-        parent.children.splice(this.index, 0, this.blockId);
-        this.actualIndex = this.index;
-      } else {
-        parent.children.push(this.blockId);
-        this.actualIndex = parent.children.length - 1;
-      }
+    if (target.kind === 'parent') {
+      this.insertedBlock.parentId = target.parent.id;
+      target.parent.children.splice(target.index, 0, this.blockId);
     } else {
-      // Insert as top-level block (to the specified region)
-      const targetRegionId = this.regionId || getRegionId(this.page.regions[0]);
-      let targetRegion = this.page.regions.find((r) => getRegionId(r) === targetRegionId);
-
-      if (!targetRegion) {
-        targetRegion = { id: targetRegionId, name: targetRegionId, blocks: [] };
-        this.page.regions.push(targetRegion);
+      let region = this.page.regions.find((r) => getRegionId(r) === target.regionId);
+      if (!region) {
+        region = { id: target.regionId, name: target.regionId, blocks: [] };
+        this.page.regions.push(region);
       }
-
-      if (this.index !== undefined && this.index >= 0 && this.index <= targetRegion.blocks.length) {
-        targetRegion.blocks.splice(this.index, 0, this.blockId);
-        this.actualIndex = this.index;
-      } else {
-        targetRegion.blocks.push(this.blockId);
-        this.actualIndex = targetRegion.blocks.length - 1;
-      }
+      region.blocks.splice(target.index, 0, this.blockId);
     }
 
     this.emit('block:insert', {
