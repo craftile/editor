@@ -1,8 +1,6 @@
 import { PreviewClient } from '@craftile/preview-client';
-import type { Block, MoveInstruction, Region, UpdatesEvent, WindowMessages } from '@craftile/types';
+import type { Block, BlockPosition, MoveInstruction, UpdatesEvent, WindowMessages } from '@craftile/types';
 import morphdom from 'morphdom';
-
-const getRegionId = (r: Region) => r.id || r.name;
 
 type MorphdomFunction = typeof morphdom;
 export type MorphdomOptions = Parameters<MorphdomFunction>[2];
@@ -15,14 +13,6 @@ interface InsertionPoint {
 interface RegionComments {
   begin: Comment;
   end: Comment;
-}
-
-interface PositionInfo {
-  parentId?: string;
-  regionId?: string;
-  position?: number;
-  afterId?: string;
-  beforeId?: string;
 }
 
 export interface HtmlPreviewClientOptions {
@@ -399,7 +389,8 @@ export default class RawHtmlRenderer {
       }
 
       const block = blocks[blockId];
-      this.moveBlockUsingDOM(block, moveInstruction);
+      const position = changes.positions?.[blockId];
+      this.moveBlockUsingDOM(block, moveInstruction, position);
     }
   }
 
@@ -434,7 +425,7 @@ export default class RawHtmlRenderer {
   }
 
   private handleHtmlEffects(htmlEffects: Record<string, string>, updates: UpdatesEvent) {
-    const { blocks, regions } = updates;
+    const { blocks, changes } = updates;
 
     for (const [blockId, html] of Object.entries(htmlEffects)) {
       if (!html) {
@@ -456,11 +447,13 @@ export default class RawHtmlRenderer {
       const isCurrentlyInDOM = !!blockElement;
 
       if (!isCurrentlyInDOM) {
-        // Block not in DOM - insert it
-        const positionInfo = this.calculatePosition(block, regions, blocks);
-        this.insertBlock(block, html, positionInfo);
+        const position = changes.positions?.[blockId];
+        if (!position) {
+          console.warn(`No position info for block ${blockId}`);
+          continue;
+        }
+        this.insertBlock(block, html, position);
       } else {
-        // Block exists in DOM - update it
         this.updateBlockHtml(block, html);
       }
     }
@@ -493,7 +486,7 @@ export default class RawHtmlRenderer {
     }
   }
 
-  private moveBlockUsingDOM(block: Block, moveInstruction: MoveInstruction) {
+  private moveBlockUsingDOM(block: Block, moveInstruction: MoveInstruction, position?: BlockPosition) {
     const blockElement = this.getElementCached(block.id);
     const { toParent, toRegion, toIndex } = moveInstruction;
 
@@ -512,6 +505,9 @@ export default class RawHtmlRenderer {
       toIndex,
     });
 
+    const afterId = position?.afterId;
+    const beforeId = position?.beforeId;
+
     if (toParent) {
       const parentElement = this.getElementCached(toParent);
 
@@ -520,9 +516,9 @@ export default class RawHtmlRenderer {
         return;
       }
 
-      this.insertElementInContainer(blockElement, parentElement, block.id, toIndex);
+      this.insertElementInParent(blockElement, parentElement, afterId, beforeId);
     } else if (toRegion) {
-      const insertionPoint = this.findRegionInsertionPoint(toRegion, toIndex, undefined, undefined, block.id);
+      const insertionPoint = this.findRegionInsertionPoint(toRegion, afterId, beforeId);
 
       if (!insertionPoint) {
         console.error(`Failed to find insertion point for region: ${toRegion}`);
@@ -543,28 +539,7 @@ export default class RawHtmlRenderer {
     });
   }
 
-  private insertElementInContainer(
-    element: HTMLElement,
-    container: HTMLElement,
-    elementId: string,
-    index?: number
-  ): void {
-    const blockId = container.getAttribute('data-block');
-    const comments = blockId ? this.childrenCommentsCache.get(blockId) : null;
-
-    if (comments) {
-      const insertionPoint = this.findPositionBetweenComments(comments.begin, comments.end, index, elementId);
-      insertionPoint.parent.insertBefore(element, insertionPoint.before);
-    } else {
-      const children = Array.from(container.children);
-      const otherChildren = children.filter((child) => child.getAttribute('data-block') !== elementId);
-      const insertBefore = index !== undefined && index < otherChildren.length ? otherChildren[index] : null;
-
-      container.insertBefore(element, insertBefore);
-    }
-  }
-
-  private insertBlock(block: Block, html: string, positionInfo: PositionInfo): void {
+  private insertBlock(block: Block, html: string, position: BlockPosition): void {
     if (this.getElementCached(block.id)) {
       return;
     }
@@ -574,7 +549,7 @@ export default class RawHtmlRenderer {
       blockType: block.type,
       block,
       html,
-      positionInfo,
+      positionInfo: position,
     });
 
     const newElement = this.parseHtmlElement(html, block.id);
@@ -582,7 +557,7 @@ export default class RawHtmlRenderer {
       return;
     }
 
-    const { parentId, regionId, position, afterId, beforeId } = positionInfo;
+    const { parentId, regionId, afterId, beforeId } = position;
 
     if (parentId) {
       const parentElement = this.getElementCached(parentId);
@@ -592,9 +567,9 @@ export default class RawHtmlRenderer {
         return;
       }
 
-      this.insertElementByPosition(newElement, parentElement, position, afterId, beforeId);
+      this.insertElementInParent(newElement, parentElement, afterId, beforeId);
     } else if (regionId) {
-      const insertionPoint = this.findRegionInsertionPoint(regionId, position, afterId, beforeId);
+      const insertionPoint = this.findRegionInsertionPoint(regionId, afterId, beforeId);
       if (!insertionPoint) {
         console.error(`Failed to find insertion point for region: ${regionId}`);
         return;
@@ -618,7 +593,7 @@ export default class RawHtmlRenderer {
       block,
       element: newElement,
       html,
-      positionInfo,
+      positionInfo: position,
     });
   }
 
@@ -670,10 +645,9 @@ export default class RawHtmlRenderer {
     });
   }
 
-  private insertElementByPosition(
+  private insertElementInParent(
     element: HTMLElement,
     parentElement: HTMLElement,
-    position?: number,
     afterId?: string,
     beforeId?: string
   ): void {
@@ -690,10 +664,6 @@ export default class RawHtmlRenderer {
         if (afterElement && afterElement.nextSibling) {
           insertBefore = afterElement.nextSibling;
         }
-      } else if (typeof position === 'number') {
-        const insertionPoint = this.findPositionBetweenComments(comments.begin, comments.end, position);
-        comments.begin.parentNode!.insertBefore(element, insertionPoint.before);
-        return;
       }
 
       if (!insertBefore) {
@@ -711,22 +681,13 @@ export default class RawHtmlRenderer {
         if (afterElement) {
           insertBefore = afterElement.nextElementSibling;
         }
-      } else if (typeof position === 'number') {
-        const children = Array.from(parentElement.children);
-        insertBefore = children[position] || null;
       }
 
       parentElement.insertBefore(element, insertBefore);
     }
   }
 
-  private findRegionInsertionPoint(
-    regionId: string,
-    position?: number,
-    afterId?: string,
-    beforeId?: string,
-    excludeBlockId?: string
-  ): InsertionPoint | null {
+  private findRegionInsertionPoint(regionId: string, afterId?: string, beforeId?: string): InsertionPoint | null {
     const regionComments = this.regionCommentsCache.get(regionId);
     if (!regionComments) {
       console.error(`Region comments not found for region: ${regionId}`);
@@ -738,23 +699,17 @@ export default class RawHtmlRenderer {
     let insertBefore: Node | null = null;
 
     if (beforeId) {
-      // Insert before specific block
       const beforeElement = this.getElementCached(beforeId);
       if (beforeElement) {
         insertBefore = beforeElement;
       }
     } else if (afterId) {
-      // Insert after specific block
       const afterElement = this.getElementCached(afterId);
       if (afterElement && afterElement.nextSibling) {
         insertBefore = afterElement.nextSibling;
       }
-    } else if (typeof position === 'number') {
-      // Insert at specific position
-      insertBefore = this.findPositionInRegion(beginComment, endComment, position, excludeBlockId);
     }
 
-    // If no specific insertion point found, insert before the end comment
     if (!insertBefore) {
       insertBefore = endComment;
     }
@@ -763,136 +718,6 @@ export default class RawHtmlRenderer {
       parent: beginComment.parentNode!,
       before: insertBefore,
     };
-  }
-
-  private findPositionInRegion(
-    beginComment: Comment,
-    endComment: Comment,
-    position: number,
-    excludeBlockId?: string
-  ): Node | null {
-    const regionBlocks: Element[] = [];
-    let currentNode = beginComment.nextSibling;
-
-    while (currentNode && currentNode !== endComment) {
-      if (currentNode.nodeType === Node.ELEMENT_NODE && (currentNode as Element).hasAttribute('data-block')) {
-        const blockId = (currentNode as Element).getAttribute('data-block');
-        if (!excludeBlockId || blockId !== excludeBlockId) {
-          regionBlocks.push(currentNode as Element);
-        }
-      }
-
-      currentNode = currentNode.nextSibling;
-    }
-
-    return position < regionBlocks.length ? regionBlocks[position] : null;
-  }
-
-  private findPositionBetweenComments(
-    beginComment: Comment,
-    endComment: Comment,
-    index?: number,
-    excludeBlockId?: string
-  ): InsertionPoint {
-    let insertBefore: Node | null = null;
-
-    if (typeof index === 'number') {
-      // Find all blocks between comments
-      const blocks: Element[] = [];
-      let currentNode = beginComment.nextSibling;
-
-      while (currentNode && currentNode !== endComment) {
-        if (currentNode.nodeType === Node.ELEMENT_NODE && (currentNode as Element).hasAttribute('data-block')) {
-          const blockId = (currentNode as Element).getAttribute('data-block');
-          if (!excludeBlockId || blockId !== excludeBlockId) {
-            blocks.push(currentNode as Element);
-          }
-        }
-        currentNode = currentNode.nextSibling;
-      }
-
-      // Insert at the specified index
-      insertBefore = index < blocks.length ? blocks[index] : null;
-    }
-
-    // If no specific position, insert before end comment
-    if (!insertBefore) {
-      insertBefore = endComment;
-    }
-
-    return {
-      parent: beginComment.parentNode!,
-      before: insertBefore,
-    };
-  }
-
-  private calculatePosition(block: Block, regions: Region[], blocks: Record<string, Block>): PositionInfo {
-    if (block.parentId) {
-      const parentBlock = blocks[block.parentId];
-      if (!parentBlock) {
-        console.warn(`Block data not found for block ${block.id}`);
-      }
-
-      const position = parentBlock.children.indexOf(block.id);
-      if (position === -1) {
-        console.warn(`Block ${block.id} not found in parent ${block.parentId} children`);
-        return { parentId: block.parentId };
-      }
-
-      const { afterId, beforeId } = this.findAdjacentSiblings(parentBlock.children, position, blocks);
-
-      return {
-        parentId: block.parentId,
-        position,
-        afterId,
-        beforeId,
-      };
-    } else {
-      // Block is at region level - find position in region
-      for (const region of regions) {
-        const position = region.blocks.indexOf(block.id);
-        if (position !== -1) {
-          const { afterId, beforeId } = this.findAdjacentSiblings(region.blocks, position, blocks);
-          return {
-            regionId: getRegionId(region),
-            position,
-            afterId,
-            beforeId,
-          };
-        }
-      }
-
-      return {};
-    }
-  }
-
-  private findAdjacentSiblings(
-    siblings: string[],
-    currentIndex: number,
-    blocks: Record<string, Block>
-  ): { afterId?: string; beforeId?: string } {
-    let afterId: string | undefined;
-    let beforeId: string | undefined;
-
-    // find the first enabled block before current block
-    for (let i = currentIndex - 1; i >= 0; i--) {
-      const siblingBlock = blocks[siblings[i]];
-      if (siblingBlock && !siblingBlock.disabled) {
-        afterId = siblings[i];
-        break;
-      }
-    }
-
-    // find the first enabled block after current block
-    for (let i = currentIndex + 1; i < siblings.length; i++) {
-      const siblingBlock = blocks[siblings[i]];
-      if (siblingBlock && !siblingBlock.disabled) {
-        beforeId = siblings[i];
-        break;
-      }
-    }
-
-    return { afterId, beforeId };
   }
 
   private parseHtmlElement(html: string, blockId: string): HTMLElement | null {

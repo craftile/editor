@@ -100,6 +100,13 @@ export interface MoveInstruction {
   toIndex: number;
 }
 
+export interface BlockPosition {
+  parentId?: string;
+  regionId?: string;
+  afterId?: string;
+  beforeId?: string;
+}
+
 export interface UpdatesEvent {
   blocks: Record<string, Block>;
   regions: Region[];
@@ -108,6 +115,7 @@ export interface UpdatesEvent {
     updated: string[];
     removed: string[];
     moved: Record<string, MoveInstruction>;
+    positions?: Record<string, BlockPosition>;
   };
 }
 

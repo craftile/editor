@@ -1,5 +1,58 @@
 import type { Engine } from '@craftile/core';
-import type { Block, MoveInstruction, UpdatesEvent } from '@craftile/types';
+import type { Block, BlockPosition, MoveInstruction, Page, UpdatesEvent } from '@craftile/types';
+
+function resolveBlockPosition(blockId: string, page: Page): BlockPosition | undefined {
+  const block = page.blocks[blockId];
+  if (!block) {
+    return;
+  }
+
+  let siblings: string[];
+  let parentId: string | undefined;
+  let regionId: string | undefined;
+
+  if (block.parentId) {
+    const parent = page.blocks[block.parentId];
+    if (!parent) {
+      return;
+    }
+    parentId = block.parentId;
+    siblings = parent.children;
+  } else {
+    const region = page.regions.find((r) => r.blocks.includes(blockId));
+    if (!region) {
+      return;
+    }
+    regionId = region.id || region.name;
+    siblings = region.blocks;
+  }
+
+  const index = siblings.indexOf(blockId);
+  if (index === -1) {
+    return;
+  }
+
+  let afterId: string | undefined;
+  let beforeId: string | undefined;
+
+  for (let i = index - 1; i >= 0; i--) {
+    const sibling = page.blocks[siblings[i]];
+    if (sibling && !sibling.disabled) {
+      afterId = siblings[i];
+      break;
+    }
+  }
+
+  for (let i = index + 1; i < siblings.length; i++) {
+    const sibling = page.blocks[siblings[i]];
+    if (sibling && !sibling.disabled) {
+      beforeId = siblings[i];
+      break;
+    }
+  }
+
+  return { parentId, regionId, afterId, beforeId };
+}
 
 export interface WatchEngineUpdatesOptions {
   debounceMs?: number;
@@ -20,6 +73,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
     updated: new Set<string>(),
     removed: new Set<string>(),
     moved: new Map<string, MoveInstruction>(),
+    positions: new Set<string>(),
     blocksToInclude: new Set<string>(), // All blocks that need to be in the blocks object
   };
 
@@ -62,6 +116,14 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
         }
       });
 
+      const positions: Record<string, BlockPosition> = {};
+      pendingChanges.positions.forEach((id) => {
+        const position = resolveBlockPosition(id, page);
+        if (position) {
+          positions[id] = position;
+        }
+      });
+
       options?.onUpdates({
         blocks: dirtyBlocks,
         regions: structuredClone(page.regions),
@@ -70,6 +132,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
           updated: Array.from(pendingChanges.updated),
           removed: Array.from(pendingChanges.removed),
           moved: Object.fromEntries(pendingChanges.moved),
+          positions,
         },
       });
 
@@ -77,6 +140,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
       pendingChanges.updated.clear();
       pendingChanges.removed.clear();
       pendingChanges.moved.clear();
+      pendingChanges.positions.clear();
       pendingChanges.blocksToInclude.clear();
     }
   };
@@ -105,6 +169,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
   cleanupFunctions.push(
     engine.on('block:insert', ({ blockId, parentId }) => {
       pendingChanges.added.add(blockId);
+      pendingChanges.positions.add(blockId);
 
       // Include block and all its descendants in the update (for presets with nested children)
       addBlockWithDescendants(blockId, pendingChanges.blocksToInclude);
@@ -121,6 +186,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
     engine.on('block:remove', ({ blockId, parentId }) => {
       pendingChanges.added.delete(blockId);
       pendingChanges.updated.delete(blockId);
+      pendingChanges.positions.delete(blockId);
       pendingChanges.removed.add(blockId);
       pendingChanges.blocksToInclude.delete(blockId);
 
@@ -150,6 +216,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
         toParent: targetParentId,
         toIndex: targetIndex ?? 0,
       });
+      pendingChanges.positions.add(blockId);
 
       pendingChanges.blocksToInclude.add(blockId);
 
@@ -194,6 +261,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
         pendingChanges.updated.add(blockId);
       }
 
+      pendingChanges.positions.add(blockId);
       pendingChanges.blocksToInclude.add(blockId);
 
       // Include parent block for positioning context when re-enabling
@@ -210,6 +278,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
   cleanupFunctions.push(
     engine.on('block:duplicate', ({ newBlockId, parentId }) => {
       pendingChanges.added.add(newBlockId);
+      pendingChanges.positions.add(newBlockId);
 
       addBlockWithDescendants(newBlockId, pendingChanges.blocksToInclude);
 
