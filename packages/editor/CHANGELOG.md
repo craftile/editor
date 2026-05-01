@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 1.0.5
+
+### Patch Changes
+
+- [`2936a17`](https://github.com/craftile/editor/commit/2936a1792574e6ada9b067654214d79f28cd1a4c) Thanks [@eldomagan](https://github.com/eldomagan)! - Keep the hover overlay label on a single line. Narrow blocks previously caused the label text to wrap because the absolutely-positioned label had no width or `white-space` constraint and shrank to the block's width. The label is now capped at the block's width and truncates with an ellipsis, while the block icon keeps its size via `shrink-0`.
+
+- Updated dependencies []:
+  - @craftile/core@1.0.5
+  - @craftile/event-bus@1.0.5
+  - @craftile/messenger@1.0.5
+  - @craftile/types@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes
