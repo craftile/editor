@@ -81,13 +81,13 @@ const mainHighlightStyle = computed(() => {
     >
       <!-- Preview label -->
       <div
-        class="bg-blue-500 text-white px-1 py-0.5 rounded-t font-medium text-[0.60rem] flex items-center gap-0.5 pointer-events-none absolute -left-[1px] -top-[19px]"
+        class="bg-blue-500 text-white px-1 py-0.5 rounded-t font-medium text-[0.60rem] flex items-center gap-0.5 pointer-events-none absolute -left-[1px] -top-[19px] max-w-full overflow-hidden"
       >
         <span
-          class="w-3 h-3 flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:fill-current"
+          class="w-3 h-3 shrink-0 flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:fill-current"
           v-html="blockIcon"
         />
-        <span>{{ blockName }}</span>
+        <span class="truncate min-w-0">{{ blockName }}</span>
       </div>
 
       <button
