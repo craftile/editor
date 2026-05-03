@@ -23,6 +23,7 @@ export class InspectorManager {
   private preview: PreviewManager;
   private ui: UIManager;
   private engine: Engine;
+  private previewListenersInitialized = false;
 
   constructor(events: EventBus, preview: PreviewManager, ui: UIManager, engine: Engine) {
     this.events = events;
@@ -42,25 +43,11 @@ export class InspectorManager {
     });
 
     this.preview.onReady(() => {
-      this.preview.onMessage('craftile.preview.block-hover', (data) => {
-        this.setHoveredBlock(data.blockId, data.blockRect, data.parentRect);
-        this.state.parentFlexDirection = data.parentFlexDirection;
-      });
+      this.initializePreviewListeners();
+    });
 
-      this.preview.onMessage('craftile.preview.block-select', (data) => {
-        this.setSelectedBlock(data.blockId, data.blockRect);
-        this.ui.setSelectedBlock(data.blockId);
-      });
-
-      this.preview.onMessage('craftile.preview.update-selected-block', (data) => {
-        if (this.state.selectedBlockId) {
-          this.setSelectedBlock(data.blockId, data.blockRect);
-        }
-      });
-
-      this.preview.onMessage('craftile.preview.block-leave', () => {
-        this.clearHoveredBlock();
-      });
+    this.preview.onDocumentReady(() => {
+      this.syncInspectionModeToPreview();
     });
 
     this.events.on('ui:block:select', (data: { blockId: string }) => {
@@ -124,5 +111,37 @@ export class InspectorManager {
 
   setIframeRect(rect: DOMRect) {
     this.state.iframeRect = rect;
+  }
+
+  private initializePreviewListeners(): void {
+    if (this.previewListenersInitialized) {
+      return;
+    }
+
+    this.preview.onMessage('craftile.preview.block-hover', (data) => {
+      this.setHoveredBlock(data.blockId, data.blockRect, data.parentRect);
+      this.state.parentFlexDirection = data.parentFlexDirection;
+    });
+
+    this.preview.onMessage('craftile.preview.block-select', (data) => {
+      this.setSelectedBlock(data.blockId, data.blockRect);
+      this.ui.setSelectedBlock(data.blockId);
+    });
+
+    this.preview.onMessage('craftile.preview.update-selected-block', (data) => {
+      if (this.state.selectedBlockId) {
+        this.setSelectedBlock(data.blockId, data.blockRect);
+      }
+    });
+
+    this.preview.onMessage('craftile.preview.block-leave', () => {
+      this.clearHoveredBlock();
+    });
+
+    this.previewListenersInitialized = true;
+  }
+
+  private syncInspectionModeToPreview(): void {
+    this.preview.sendMessage(this.state.enabled ? 'craftile.inspector.enable' : 'craftile.inspector.disable');
   }
 }
