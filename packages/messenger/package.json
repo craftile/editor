@@ -1,6 +1,6 @@
 {
   "name": "@craftile/messenger",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A type wrapper of window.postMessage for iframe/parent communication",
   "keywords": [
     "craftile",

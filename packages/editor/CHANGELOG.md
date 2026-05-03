@@ -1,5 +1,19 @@
 # @craftile/editor
 
+## 1.0.5
+
+### Patch Changes
+
+- [`7a26870`](https://github.com/craftile/editor/commit/7a2687051b1f5113fcafd240f06ac1b5424e43b3) Thanks [@eldomagan](https://github.com/eldomagan)! - Keep inspection mode state in sync after preview navigation. Preview readiness now distinguishes one-time setup from each loaded preview document, allowing disabled inspection mode to be replayed when a link navigation creates a fresh preview document.
+
+- [`2936a17`](https://github.com/craftile/editor/commit/2936a1792574e6ada9b067654214d79f28cd1a4c) Thanks [@eldomagan](https://github.com/eldomagan)! - Keep the hover overlay label on a single line. Narrow blocks previously caused the label text to wrap because the absolutely-positioned label had no width or `white-space` constraint and shrank to the block's width. The label is now capped at the block's width and truncates with an ellipsis, while the block icon keeps its size via `shrink-0`.
+
+- Updated dependencies []:
+  - @craftile/core@1.0.5
+  - @craftile/event-bus@1.0.5
+  - @craftile/messenger@1.0.5
+  - @craftile/types@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

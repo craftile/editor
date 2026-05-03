@@ -1,5 +1,15 @@
 # @craftile/plugin-common-properties
 
+## 1.0.5
+
+### Patch Changes
+
+- [`89fa509`](https://github.com/craftile/editor/commit/89fa5099a855b8ce6af784563d353074ece324c2) Thanks [@eldomagan](https://github.com/eldomagan)! - Move the color picker popover into the editor portal and only add recent colors after a completed color selection, instead of while sliders are actively moving.
+
+- [`e149780`](https://github.com/craftile/editor/commit/e1497807c03561bb62732cf4bfb9d4d1da88216d) Thanks [@eldomagan](https://github.com/eldomagan)! - Show an editable alpha value next to the collapsed color hex input. The alpha field keeps a local edit buffer so fractional values stay readable while updating the picker color.
+
+- [`f56735f`](https://github.com/craftile/editor/commit/f56735fd2d3cbe1a546cd2290e3e04e486e2b96f) Thanks [@eldomagan](https://github.com/eldomagan)! - Add compact hover and focus steppers to the range field's number input while keeping the triggers inside the Ark UI number input control.
+
 ## 1.0.4
 
 ### Patch Changes
