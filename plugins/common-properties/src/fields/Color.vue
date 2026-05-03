@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ColorPicker, parseColor, type Color } from '@ark-ui/vue/color-picker';
 import type { PropertyField } from '@craftile/types';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 interface Props {
   field: PropertyField;
@@ -22,6 +22,47 @@ const value = defineModel({
   },
   set: (color: Color) => color.toString('hexa'),
 });
+
+const formatAlpha = (color?: Color) => {
+  const alpha = color?.getChannelValue('alpha') ?? 1;
+  return Number(alpha.toFixed(2)).toString();
+};
+
+const alphaInput = ref(formatAlpha(value.value));
+const alphaInputFocused = ref(false);
+
+watch(value, (color) => {
+  if (!alphaInputFocused.value) {
+    alphaInput.value = formatAlpha(color);
+  }
+});
+
+const updateAlpha = (newValue: string): boolean => {
+  const parsedAlpha = Number.parseFloat(newValue.replace(',', '.'));
+  if (Number.isNaN(parsedAlpha)) {
+    return false;
+  }
+
+  const alpha = Math.min(1, Math.max(0, parsedAlpha));
+  value.value = (value.value ?? parseColor('#000000')).withChannelValue('alpha', alpha) as Color;
+  return true;
+};
+
+const handleAlphaInput = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  alphaInput.value = input.value;
+  updateAlpha(input.value);
+};
+
+const handleAlphaBlur = () => {
+  alphaInputFocused.value = false;
+  if (!updateAlpha(alphaInput.value)) {
+    alphaInput.value = formatAlpha(value.value);
+    return;
+  }
+
+  alphaInput.value = formatAlpha(value.value);
+};
 
 const handleValueChange = (details: { value: Color }) => {
   const existingIndex = recentColors.value.findIndex((color) => color.toHexInt() === details.value.toHexInt());
@@ -51,10 +92,25 @@ const handleValueChange = (details: { value: Color }) => {
         <ColorPicker.ValueSwatch class="h-7 w-7 rounded shadow" />
       </ColorPicker.Trigger>
 
-      <ColorPicker.ChannelInput
-        channel="hex"
-        class="appearance-none rounded bg-none outline-0 relative w-full border px-3 h-10 min-w-10 focus:ring focus:ring-accent"
-      />
+      <div class="flex">
+        <ColorPicker.ChannelInput
+          channel="hex"
+          class="appearance-none rounded-l bg-none outline-0 relative w-full border border-r-0 px-3 h-10 min-w-10 focus:ring focus:ring-accent"
+        />
+
+        <input
+          :value="alphaInput"
+          type="number"
+          inputmode="decimal"
+          step="0.01"
+          min="0"
+          max="1"
+          class="appearance-none rounded-r bg-none outline-0 flex-none w-14 border border-gray-300 px-2 h-10 text-xs font-medium text-gray-600 text-center focus:ring focus:ring-accent"
+          @focus="alphaInputFocused = true"
+          @input="handleAlphaInput"
+          @blur="handleAlphaBlur"
+        />
+      </div>
     </ColorPicker.Control>
 
     <ColorPicker.Positioner class="w-60 !z-20 pl-1">
