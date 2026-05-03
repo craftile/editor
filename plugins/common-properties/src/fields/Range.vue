@@ -61,13 +61,24 @@ const stringValue = computed({
         />
       </Slider.Control>
 
-      <NumberInput.Root v-model="stringValue" :min="min" :max="max" :step="step" class="flex-none w-16">
+      <NumberInput.Root v-model="stringValue" :min="min" :max="max" :step="step" class="flex-none w-16 relative group">
         <NumberInput.Control
-          class="flex items-center h-8 border border-gray-300 rounded overflow-hidden focus-within:outline-none focus-within:ring-2 focus-within:ring-accent focus-within:border-transparent"
+          class="relative flex items-center h-8 border border-gray-300 rounded overflow-hidden focus-within:outline-none focus-within:ring-2 focus-within:ring-accent focus-within:border-transparent"
         >
           <NumberInput.Input class="w-full px-2 text-sm focus:outline-none appearance-none" />
           <div v-if="field.unit" class="px-1 text-sm text-gray-500 border-gray-300">
             {{ field.unit }}
+          </div>
+
+          <div
+            class="absolute top-px bottom-px right-1 flex-col hidden group-hover:flex group-focus-within:flex bg-white"
+          >
+            <NumberInput.IncrementTrigger class="flex-1 flex items-center">
+              <icon-chevron-up class="w-3 h-3 text-gray-600" />
+            </NumberInput.IncrementTrigger>
+            <NumberInput.DecrementTrigger class="flex-1 flex items-center">
+              <icon-chevron-down class="w-3 h-3 text-gray-600" />
+            </NumberInput.DecrementTrigger>
           </div>
         </NumberInput.Control>
       </NumberInput.Root>
