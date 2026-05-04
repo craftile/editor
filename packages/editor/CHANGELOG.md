@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 1.0.6
+
+### Patch Changes
+
+- [`ea2fa9e`](https://github.com/craftile/editor/commit/ea2fa9e5dd0261d22cd2dfc4e51d403cb6a5f614) Thanks [@eldomagan](https://github.com/eldomagan)! - Keep the first visible blocks popover group open after search and filter changes while preserving still-visible open groups.
+
+- Updated dependencies []:
+  - @craftile/core@1.0.6
+  - @craftile/event-bus@1.0.6
+  - @craftile/messenger@1.0.6
+  - @craftile/types@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes
