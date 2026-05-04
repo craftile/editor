@@ -18,7 +18,29 @@ const sortedCategories = computed(() => {
   return Object.keys(props.blocksByCategory).sort((a, b) => a.localeCompare(b));
 });
 
+const openCategories = ref<string[]>([]);
 const hoveredOption = ref<BlockSchemaOption | null>(null);
+
+watch(
+  sortedCategories,
+  (categories) => {
+    if (categories.length === 0) {
+      openCategories.value = [];
+      return;
+    }
+
+    const visibleCategories = new Set(categories);
+    const nextOpenCategories = openCategories.value.filter((category) => visibleCategories.has(category));
+    const firstCategory = categories[0];
+
+    if (firstCategory && !nextOpenCategories.includes(firstCategory)) {
+      nextOpenCategories.unshift(firstCategory);
+    }
+
+    openCategories.value = nextOpenCategories;
+  },
+  { immediate: true }
+);
 
 const handleHover = (option: BlockSchemaOption) => {
   hoveredOption.value = option;
@@ -36,7 +58,7 @@ const clearHover = () => {
   </div>
   <div v-else class="h-full flex">
     <div class="w-60 border-r overflow-y-auto">
-      <Accordion.Root class="w-full" :defaultValue="sortedCategories" multiple>
+      <Accordion.Root v-model="openCategories" class="w-full" multiple>
         <Accordion.Item
           v-for="category in sortedCategories"
           :key="category"
