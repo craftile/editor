@@ -18,6 +18,14 @@ const sortedCategories = computed(() => {
   return Object.keys(props.blocksByCategory).sort((a, b) => a.localeCompare(b));
 });
 
+const sortedBlocksByCategory = computed(() => {
+  const result: Record<string, BlockSchemaOption[]> = {};
+  for (const category of sortedCategories.value) {
+    result[category] = [...props.blocksByCategory[category]].sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return result;
+});
+
 const openCategories = ref<string[]>([]);
 const hoveredOption = ref<BlockSchemaOption | null>(null);
 
@@ -76,7 +84,7 @@ const clearHover = () => {
           <Accordion.ItemContent class="overflow-hidden">
             <div class="pb-1">
               <button
-                v-for="option in blocksByCategory[category]"
+                v-for="option in sortedBlocksByCategory[category]"
                 :key="option.blockType + '-' + (option.presetIndex ?? 'default')"
                 @click="emit('blockSelect', option)"
                 @mouseenter="handleHover(option)"
