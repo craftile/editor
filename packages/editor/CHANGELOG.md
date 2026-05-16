@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 1.0.7
+
+### Patch Changes
+
+- [`3747cf5`](https://github.com/craftile/editor/commit/3747cf578f776337d68c60b2867b3cb4a60f8005) Thanks [@eldomagan](https://github.com/eldomagan)! - Sort blocks alphabetically within each category in the blocks popover.
+
+- Updated dependencies []:
+  - @craftile/core@1.0.7
+  - @craftile/event-bus@1.0.7
+  - @craftile/messenger@1.0.7
+  - @craftile/types@1.0.7
+
 ## 1.0.6
 
 ### Patch Changes
