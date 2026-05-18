@@ -3,7 +3,21 @@ import { createParentMessenger, WindowMessenger } from '@craftile/messenger';
 import { EventBus } from '@craftile/event-bus';
 import { Inspector } from './inspector';
 
-export class PreviewClient extends EventBus {
+export interface PreviewClientEvents extends WindowMessages {
+  [event: string]: any;
+
+  'block.select': {
+    blockId: string;
+    element: HTMLElement;
+  };
+
+  'block.deselect': {
+    blockId: string;
+    element: HTMLElement;
+  };
+}
+
+export class PreviewClient extends EventBus<PreviewClientEvents> {
   private messenger: WindowMessenger<WindowMessages>;
   public inspector: Inspector;
 
@@ -11,7 +25,7 @@ export class PreviewClient extends EventBus {
     super();
 
     this.messenger = createParentMessenger(window.origin);
-    this.inspector = new Inspector(this.messenger);
+    this.inspector = new Inspector(this.messenger, this);
 
     this.initialize();
   }

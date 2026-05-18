@@ -1,9 +1,18 @@
 import type { WindowMessenger } from '@craftile/messenger';
 import type { WindowMessages } from '@craftile/types';
+import type { PreviewClientEvents } from './client';
+
+interface PreviewClientEventsEmitter {
+  emit<K extends keyof PreviewClientEvents>(
+    event: K,
+    ...args: PreviewClientEvents[K] extends void ? [] : [PreviewClientEvents[K]]
+  ): void;
+}
 
 export class Inspector {
   private active = true;
   private messenger: WindowMessenger<WindowMessages>;
+  private events: PreviewClientEventsEmitter;
   private currentHoveredBlock: HTMLElement | null = null;
   private currentSelectedBlock: HTMLElement | null = null;
   private overlayButtonHovered = false;
@@ -11,8 +20,9 @@ export class Inspector {
   private resizeObserver: ResizeObserver | null = null;
   private mutationObserver: MutationObserver | null = null;
 
-  constructor(messenger: WindowMessenger<WindowMessages>) {
+  constructor(messenger: WindowMessenger<WindowMessages>, events: PreviewClientEventsEmitter = { emit: () => {} }) {
     this.messenger = messenger;
+    this.events = events;
 
     this.messenger.listen('craftile.inspector.enable', () => this.enable());
     this.messenger.listen('craftile.inspector.disable', () => this.disable());
@@ -89,7 +99,7 @@ export class Inspector {
     const element = document.querySelector(`[data-block="${data.blockId}"]`) as HTMLElement;
 
     if (element) {
-      this.currentSelectedBlock = element;
+      this.setSelectedBlock(element);
       this.sendSelectedBlockPosition();
       this.trackSelectedBlock();
       element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
@@ -97,6 +107,7 @@ export class Inspector {
   }
 
   private handleEditorDeselectBlock() {
+    const selectedBlock = this.currentSelectedBlock;
     this.currentSelectedBlock = null;
 
     if (this.resizeObserver) {
@@ -107,6 +118,13 @@ export class Inspector {
     if (this.mutationObserver) {
       this.mutationObserver.disconnect();
       this.mutationObserver = null;
+    }
+
+    if (selectedBlock?.dataset.block) {
+      this.events.emit('block.deselect', {
+        blockId: selectedBlock.dataset.block,
+        element: selectedBlock,
+      });
     }
   }
 
@@ -186,9 +204,33 @@ export class Inspector {
       e.preventDefault();
       e.stopImmediatePropagation();
 
-      this.currentSelectedBlock = blockElement;
+      this.setSelectedBlock(blockElement);
       this.sendSelectedBlockPosition();
       this.trackSelectedBlock();
+    }
+  }
+
+  private setSelectedBlock(element: HTMLElement): void {
+    const previousBlock = this.currentSelectedBlock;
+
+    if (previousBlock === element) {
+      return;
+    }
+
+    if (previousBlock?.dataset.block) {
+      this.events.emit('block.deselect', {
+        blockId: previousBlock.dataset.block,
+        element: previousBlock,
+      });
+    }
+
+    this.currentSelectedBlock = element;
+
+    if (element.dataset.block) {
+      this.events.emit('block.select', {
+        blockId: element.dataset.block,
+        element,
+      });
     }
   }
 
