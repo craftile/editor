@@ -1,5 +1,13 @@
 # @craftile/preview-client
 
+## 1.0.8
+
+### Patch Changes
+
+- [`8aca6d7`](https://github.com/craftile/editor/commit/8aca6d7077c3b6b45fbf14249eb51dd8b0eda82a) Thanks [@eldomagan](https://github.com/eldomagan)! - Include block data in preview lifecycle events. Preview clients now cache editor block updates for selection events, remove lifecycle events include block payloads when available, and editor update payloads preserve removed block snapshots for preview consumers.
+
+- [`bbe673b`](https://github.com/craftile/editor/commit/bbe673b4077b0b1a0ed6b5037d50e846f06fad40) Thanks [@eldomagan](https://github.com/eldomagan)! - Expose block selection lifecycle events from the preview client event bus. Consumers can now listen for `block.select` and `block.deselect` on `PreviewClient`, receiving the selected or deselected block ID and DOM element.
+
 ## 1.0.7
 
 ## 1.0.6

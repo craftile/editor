@@ -1,6 +1,6 @@
 {
   "name": "@craftile/plugin-common-properties",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Common block properties fields for craftile editor",
   "keywords": [
     "craftile",
