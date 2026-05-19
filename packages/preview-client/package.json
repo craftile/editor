@@ -1,6 +1,6 @@
 {
   "name": "@craftile/preview-client",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Browser client for Craftile editor preview iframe functionality",
   "keywords": [
     "craftile",
