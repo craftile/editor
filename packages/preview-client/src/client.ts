@@ -45,6 +45,7 @@ export class PreviewClient extends EventBus<PreviewClientEvents> {
 
     this.messenger.listen('craftile.editor.updates', (payload) => {
       this.updateBlocks(payload);
+      this.emit('craftile.editor.updates', payload);
     });
 
     this.messenger.registerFallbackHandler((data: any) => {

@@ -89,6 +89,15 @@ describe('PreviewClient block cache', () => {
 
     const { PreviewClient } = await importPreviewClient();
     const client = new PreviewClient();
+    let emittedUpdates: WindowMessages['craftile.editor.updates'] | undefined;
+    let blockDuringEmit: Block | undefined;
+    let removedDuringEmit: Block | undefined;
+
+    client.on('craftile.editor.updates', (payload) => {
+      emittedUpdates = payload;
+      blockDuringEmit = client.getBlock('initial');
+      removedDuringEmit = client.getBlock('removed');
+    });
 
     (client as any).sendPageData();
 
@@ -103,11 +112,15 @@ describe('PreviewClient block cache', () => {
 
     expect(client.getBlock('from-effects')).toBeUndefined();
 
+    const updates = makeUpdates({ initial: updatedBlock, removed: makeBlock('removed') }, { removed: ['removed'] });
     const updatesHandler = messenger.listen.mock.calls.find(([type]) => type === 'craftile.editor.updates')![1];
-    updatesHandler(makeUpdates({ initial: updatedBlock, removed: makeBlock('removed') }, { removed: ['removed'] }));
+    updatesHandler(updates);
 
     expect(client.getBlock('initial')).toEqual(updatedBlock);
     expect(client.getBlock('removed')).toBeUndefined();
+    expect(emittedUpdates).toBe(updates);
+    expect(blockDuringEmit).toEqual(updatedBlock);
+    expect(removedDuringEmit).toBeUndefined();
   });
 });
 
