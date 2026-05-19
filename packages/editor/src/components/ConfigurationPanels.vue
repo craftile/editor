@@ -4,14 +4,6 @@ import { isComponentString, isHtmlRenderFunction, isVueComponent } from '../util
 import type { CraftileEditor } from '../editor';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 
-interface Props {
-  isOverlay?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-  isOverlay: false,
-});
-
 const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
 const { t } = useI18n();
 const { configurationPanels } = useUI();
@@ -31,7 +23,7 @@ const activePanel = computed(() => {
 
 <template>
   <div class="h-full w-full flex flex-col bg-white relative">
-    <ConfigurationHeader :is-overlay="isOverlay" class="flex-none" />
+    <ConfigurationHeader class="flex-none" />
     <template v-if="hasSelection">
       <Tabs.Root v-if="showTabs" v-model="activePanelId" class="flex-1 flex flex-col overflow-y-hidden">
         <Tabs.List class="flex border-b flex-none">

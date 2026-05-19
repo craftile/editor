@@ -116,7 +116,7 @@ function addBlockToRegion(event: Event, regionId: string) {
     </div>
 
     <div v-if="hasSelection && !isExtraExtraLarge" class="absolute inset-0 z-10">
-      <ConfigurationPanels is-overlay />
+      <ConfigurationPanels />
     </div>
   </div>
 </template>

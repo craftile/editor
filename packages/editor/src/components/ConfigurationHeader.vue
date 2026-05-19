@@ -2,14 +2,6 @@
 import { getRegionId } from '@craftile/core';
 import { Menu } from '@ark-ui/vue';
 
-interface Props {
-  isOverlay?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isOverlay: false,
-});
-
 const { t } = useI18n();
 const { engine, moveBlock, duplicateBlock, toggleBlock, removeBlock, setBlockName } = useCraftileEngine();
 const { selectedBlock, clearSelection } = useSelectedBlock();
@@ -191,7 +183,6 @@ function handleRemoveBlock() {
     <div class="flex items-center gap-2">
       <!-- Back Button (not visible on 2xl screens) -->
       <button
-        v-if="props.isOverlay"
         @click="clearSelection"
         class="flex-none flex items-center justify-center w-8 h-8 rounded-md hover:bg-gray-100 transition-colors"
         :aria-label="t('common.close')"
