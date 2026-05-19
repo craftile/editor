@@ -95,6 +95,8 @@ export default class RawHtmlRenderer {
   }
 
   private cacheChildrenComments(): void {
+    this.childrenCommentsCache.clear();
+
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT, null);
     let node: Comment | null;
     const pendingChildren = new Map<string, Comment>();
@@ -118,38 +120,6 @@ export default class RawHtmlRenderer {
           });
           pendingChildren.delete(blockId);
         }
-      }
-    }
-  }
-
-  private cacheChildrenCommentsForBlock(blockId: string): void {
-    const blockElement = this.getElementCached(blockId);
-    if (!blockElement) {
-      return;
-    }
-
-    // Clear existing cache for this block
-    this.childrenCommentsCache.delete(blockId);
-
-    // Walk the block's subtree to find children comments
-    const walker = document.createTreeWalker(blockElement, NodeFilter.SHOW_COMMENT, null);
-    let node: Comment | null;
-    let beginComment: Comment | null = null;
-
-    while ((node = walker.nextNode() as Comment)) {
-      const text = node.textContent?.trim();
-      if (!text) {
-        continue;
-      }
-
-      if (text === `BEGIN children: ${blockId}`) {
-        beginComment = node;
-      } else if (text === `END children: ${blockId}` && beginComment) {
-        this.childrenCommentsCache.set(blockId, {
-          begin: beginComment,
-          end: node,
-        });
-        break;
       }
     }
   }
@@ -426,6 +396,7 @@ export default class RawHtmlRenderer {
 
   private handleHtmlEffects(htmlEffects: Record<string, string>, updates: UpdatesEvent) {
     const { blocks, changes } = updates;
+    const htmlEffectBlockIds = new Set(Object.keys(htmlEffects));
 
     for (const [blockId, html] of Object.entries(htmlEffects)) {
       if (!html) {
@@ -435,6 +406,10 @@ export default class RawHtmlRenderer {
       const block = blocks[blockId];
       if (!block) {
         console.warn(`Block data not found for ${blockId}`);
+        continue;
+      }
+
+      if (block.parentId && htmlEffectBlockIds.has(block.parentId)) {
         continue;
       }
 
@@ -457,6 +432,8 @@ export default class RawHtmlRenderer {
         this.updateBlockHtml(block, html);
       }
     }
+
+    this.cacheChildrenComments();
   }
 
   private isValidMoveInstruction(instruction: MoveInstruction): boolean {
@@ -583,7 +560,6 @@ export default class RawHtmlRenderer {
     }
 
     this.elementCache.set(block.id, newElement);
-    this.cacheChildrenCommentsForBlock(block.id);
 
     newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
 
@@ -632,9 +608,6 @@ export default class RawHtmlRenderer {
     if (updatedElement !== blockElement) {
       this.previewClient.inspector.updateTrackedElement(block.id, updatedElement);
     }
-
-    // Re-cache children comments after HTML update
-    this.cacheChildrenCommentsForBlock(block.id);
 
     this.previewClient.emit('block.update.after', {
       blockId: block.id,
