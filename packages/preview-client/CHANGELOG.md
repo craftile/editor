@@ -1,5 +1,11 @@
 # @craftile/preview-client
 
+## 1.0.9
+
+### Patch Changes
+
+- [`3fdd48f`](https://github.com/craftile/editor/commit/3fdd48f2496f4c1e3ba0bee92533f413496e1214) Thanks [@eldomagan](https://github.com/eldomagan)! - Re-emit direct editor update messages after updating the preview block cache so preview renderers receive remove, move, and disable operations.
+
 ## 1.0.8
 
 ### Patch Changes

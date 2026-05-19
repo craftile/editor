@@ -1,5 +1,15 @@
 # @craftile/editor
 
+## 1.0.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @craftile/core@1.0.9
+  - @craftile/event-bus@1.0.9
+  - @craftile/messenger@1.0.9
+  - @craftile/types@1.0.9
+
 ## 1.0.8
 
 ### Patch Changes
