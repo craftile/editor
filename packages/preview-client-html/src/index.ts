@@ -379,7 +379,7 @@ export default class RawHtmlRenderer {
 
       if (block.disabled && isCurrentlyInDOM) {
         // Block was disabled - remove from DOM immediately
-        this.removeBlock(block.id);
+        this.removeBlock(block.id, block);
       } else if (!block.disabled && !isCurrentlyInDOM) {
         // Block was enabled but not in DOM - will be handled by html effect
       }
@@ -387,10 +387,10 @@ export default class RawHtmlRenderer {
   }
 
   private handleRemoves(updates: UpdatesEvent): void {
-    const { changes } = updates;
+    const { blocks, changes } = updates;
 
     for (const blockId of changes.removed) {
-      this.removeBlock(blockId);
+      this.removeBlock(blockId, blocks[blockId]);
     }
   }
 
@@ -442,21 +442,30 @@ export default class RawHtmlRenderer {
     return hasTarget && hasValidIndex;
   }
 
-  private removeBlock(blockId: string): void {
+  private removeBlock(blockId: string, block?: Block): void {
     const blockElement = this.getElementCached(blockId);
 
     if (blockElement) {
-      this.previewClient.emit('block.remove.before', {
+      const payload = {
         blockId,
+        ...(block
+          ? {
+              blockType: block.type,
+              block,
+            }
+          : {}),
         element: blockElement,
+      };
+
+      this.previewClient.emit('block.remove.before', {
+        ...payload,
       });
 
       blockElement.remove();
       this.elementCache.delete(blockId);
 
       this.previewClient.emit('block.remove.after', {
-        blockId,
-        element: blockElement,
+        ...payload,
       });
     } else {
       console.warn(`Block ${blockId} not found for removal`);

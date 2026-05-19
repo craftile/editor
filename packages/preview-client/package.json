@@ -34,15 +34,18 @@
   "scripts": {
     "dev": "vite build --watch",
     "build": "rm -rf dist && tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "devDependencies": {
     "@craftile/event-bus": "workspace:*",
     "@craftile/messenger": "workspace:*",
     "@craftile/types": "workspace:*",
+    "jsdom": "^25.0.1",
     "typescript": "^5.8.4",
     "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.3.0"
+    "vite-plugin-dts": "^4.3.0",
+    "vitest": "^3.2.4"
   },
   "repository": {
     "type": "git",

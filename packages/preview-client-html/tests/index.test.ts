@@ -52,6 +52,23 @@ function makeUpdates(
   };
 }
 
+function makeDirectUpdates(
+  blocks: Record<string, Block>,
+  changes: Partial<UpdatesEvent['changes']>
+): WindowMessages['craftile.editor.updates'] {
+  return {
+    blocks,
+    regions: [{ id: 'main', name: 'main', blocks: [] }],
+    changes: {
+      added: [],
+      updated: [],
+      removed: [],
+      moved: {},
+      ...changes,
+    },
+  };
+}
+
 function findComment(root: Node, text: string): Comment | undefined {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_COMMENT);
   let node: Comment | null;
@@ -284,5 +301,80 @@ describe('RawHtmlRenderer child comment cache', () => {
 
     expect(document.querySelector('[data-block="child"]')?.textContent).toBe('from child');
     expect(document.querySelectorAll('[data-block="child"]')).toHaveLength(1);
+  });
+});
+
+describe('RawHtmlRenderer block removal events', () => {
+  let previewClient: FakePreviewClient;
+  let renderer: RawHtmlRenderer;
+
+  beforeEach(() => {
+    previewClient = new FakePreviewClient();
+    installDom('<!--BEGIN region: main--><div data-block="removed">Removed</div><!--END region: main-->');
+    renderer = new RawHtmlRenderer(previewClient as any);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('includes block data on remove lifecycle events', () => {
+    const block = makeBlock('removed');
+    const element = document.querySelector('[data-block="removed"]')!;
+
+    (renderer as any).handleDirectUpdates(
+      makeDirectUpdates(
+        {
+          removed: block,
+        },
+        {
+          removed: ['removed'],
+        }
+      )
+    );
+
+    expect(previewClient.emit).toHaveBeenCalledWith('block.remove.before', {
+      blockId: 'removed',
+      blockType: 'test',
+      block,
+      element,
+    });
+    expect(previewClient.emit).toHaveBeenCalledWith('block.remove.after', {
+      blockId: 'removed',
+      blockType: 'test',
+      block,
+      element,
+    });
+    expect(document.querySelector('[data-block="removed"]')).toBeNull();
+  });
+
+  it('includes block data when a disabled block is removed from the DOM', () => {
+    const block = { ...makeBlock('removed'), disabled: true };
+    const element = document.querySelector('[data-block="removed"]')!;
+
+    (renderer as any).handleDirectUpdates(
+      makeDirectUpdates(
+        {
+          removed: block,
+        },
+        {
+          updated: ['removed'],
+        }
+      )
+    );
+
+    expect(previewClient.emit).toHaveBeenCalledWith('block.remove.before', {
+      blockId: 'removed',
+      blockType: 'test',
+      block,
+      element,
+    });
+    expect(previewClient.emit).toHaveBeenCalledWith('block.remove.after', {
+      blockId: 'removed',
+      blockType: 'test',
+      block,
+      element,
+    });
+    expect(document.querySelector('[data-block="removed"]')).toBeNull();
   });
 });

@@ -1,5 +1,5 @@
 import type { WindowMessenger } from '@craftile/messenger';
-import type { WindowMessages } from '@craftile/types';
+import type { Block, WindowMessages } from '@craftile/types';
 import type { PreviewClientEvents } from './client';
 
 interface PreviewClientEventsEmitter {
@@ -7,6 +7,7 @@ interface PreviewClientEventsEmitter {
     event: K,
     ...args: PreviewClientEvents[K] extends void ? [] : [PreviewClientEvents[K]]
   ): void;
+  getBlock(blockId: string): Block | undefined;
 }
 
 export class Inspector {
@@ -19,8 +20,12 @@ export class Inspector {
 
   private resizeObserver: ResizeObserver | null = null;
   private mutationObserver: MutationObserver | null = null;
+  private transitionCleanupFunctions: (() => void)[] = [];
 
-  constructor(messenger: WindowMessenger<WindowMessages>, events: PreviewClientEventsEmitter = { emit: () => {} }) {
+  constructor(
+    messenger: WindowMessenger<WindowMessages>,
+    events: PreviewClientEventsEmitter = { emit: () => {}, getBlock: () => undefined }
+  ) {
     this.messenger = messenger;
     this.events = events;
 
@@ -81,6 +86,8 @@ export class Inspector {
       this.mutationObserver.disconnect();
       this.mutationObserver = null;
     }
+
+    this.clearTransitionListeners();
   }
 
   private handleOverlayButtonEnter() {
@@ -120,11 +127,10 @@ export class Inspector {
       this.mutationObserver = null;
     }
 
+    this.clearTransitionListeners();
+
     if (selectedBlock?.dataset.block) {
-      this.events.emit('block.deselect', {
-        blockId: selectedBlock.dataset.block,
-        element: selectedBlock,
-      });
+      this.emitBlockDeselect(selectedBlock.dataset.block, selectedBlock);
     }
   }
 
@@ -218,20 +224,37 @@ export class Inspector {
     }
 
     if (previousBlock?.dataset.block) {
-      this.events.emit('block.deselect', {
-        blockId: previousBlock.dataset.block,
-        element: previousBlock,
-      });
+      this.emitBlockDeselect(previousBlock.dataset.block, previousBlock);
     }
 
     this.currentSelectedBlock = element;
 
     if (element.dataset.block) {
-      this.events.emit('block.select', {
-        blockId: element.dataset.block,
-        element,
-      });
+      this.emitBlockSelect(element.dataset.block, element);
     }
+  }
+
+  private createBlockEventPayload(blockId: string, element: HTMLElement) {
+    const block = this.events.getBlock(blockId);
+
+    return {
+      blockId,
+      ...(block
+        ? {
+            block,
+            blockType: block.type,
+          }
+        : {}),
+      element,
+    };
+  }
+
+  private emitBlockSelect(blockId: string, element: HTMLElement): void {
+    this.events.emit('block.select', this.createBlockEventPayload(blockId, element));
+  }
+
+  private emitBlockDeselect(blockId: string, element: HTMLElement): void {
+    this.events.emit('block.deselect', this.createBlockEventPayload(blockId, element));
   }
 
   private sendHoveredBlockPosition() {
@@ -276,6 +299,8 @@ export class Inspector {
       this.mutationObserver = null;
     }
 
+    this.clearTransitionListeners();
+
     this.resizeObserver = new ResizeObserver(() => {
       if (this.active && this.currentSelectedBlock) {
         this.sendSelectedBlockPosition(true);
@@ -307,6 +332,57 @@ export class Inspector {
       }
 
       parent = parent.parentElement;
+    }
+
+    this.trackSelectedBlockTransitions();
+  }
+
+  private clearTransitionListeners(): void {
+    this.transitionCleanupFunctions.forEach((cleanup) => cleanup());
+    this.transitionCleanupFunctions = [];
+  }
+
+  private trackSelectedBlockTransitions(): void {
+    if (!this.currentSelectedBlock) {
+      return;
+    }
+
+    const updatePosition = () => {
+      if (!this.active || !this.currentSelectedBlock?.isConnected) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        if (this.active && this.currentSelectedBlock?.isConnected) {
+          this.sendSelectedBlockPosition(true);
+        }
+      });
+    };
+
+    let element: HTMLElement | null = this.currentSelectedBlock;
+    while (element) {
+      const trackedElement: HTMLElement = element;
+      const handleTransitionComplete = (event: Event) => {
+        if (event.target !== trackedElement) {
+          return;
+        }
+
+        updatePosition();
+      };
+
+      trackedElement.addEventListener('transitionend', handleTransitionComplete);
+      trackedElement.addEventListener('transitioncancel', handleTransitionComplete);
+
+      this.transitionCleanupFunctions.push(() => {
+        trackedElement.removeEventListener('transitionend', handleTransitionComplete);
+        trackedElement.removeEventListener('transitioncancel', handleTransitionComplete);
+      });
+
+      if (trackedElement === document.body) {
+        break;
+      }
+
+      element = trackedElement.parentElement;
     }
   }
 

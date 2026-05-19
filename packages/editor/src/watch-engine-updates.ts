@@ -75,6 +75,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
     moved: new Map<string, MoveInstruction>(),
     positions: new Set<string>(),
     blocksToInclude: new Set<string>(), // All blocks that need to be in the blocks object
+    removedBlocks: new Map<string, Block>(),
   };
 
   let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -110,6 +111,10 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
 
       const dirtyBlocks: Record<string, Block> = {};
 
+      pendingChanges.removedBlocks.forEach((block, id) => {
+        dirtyBlocks[id] = structuredClone(block);
+      });
+
       pendingChanges.blocksToInclude.forEach((id) => {
         if (page.blocks[id]) {
           dirtyBlocks[id] = structuredClone(page.blocks[id]);
@@ -142,6 +147,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
       pendingChanges.moved.clear();
       pendingChanges.positions.clear();
       pendingChanges.blocksToInclude.clear();
+      pendingChanges.removedBlocks.clear();
     }
   };
 
@@ -183,12 +189,13 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
   );
 
   cleanupFunctions.push(
-    engine.on('block:remove', ({ blockId, parentId }) => {
+    engine.on('block:remove', ({ blockId, block, parentId }) => {
       pendingChanges.added.delete(blockId);
       pendingChanges.updated.delete(blockId);
       pendingChanges.positions.delete(blockId);
       pendingChanges.removed.add(blockId);
       pendingChanges.blocksToInclude.delete(blockId);
+      pendingChanges.removedBlocks.set(blockId, block);
 
       if (parentId) {
         pendingChanges.blocksToInclude.add(parentId);
