@@ -1,5 +1,19 @@
 # @craftile/editor
 
+## 1.0.8
+
+### Patch Changes
+
+- [`8aca6d7`](https://github.com/craftile/editor/commit/8aca6d7077c3b6b45fbf14249eb51dd8b0eda82a) Thanks [@eldomagan](https://github.com/eldomagan)! - Include block data in preview lifecycle events. Preview clients now cache editor block updates for selection events, remove lifecycle events include block payloads when available, and editor update payloads preserve removed block snapshots for preview consumers.
+
+- [`051b5ff`](https://github.com/craftile/editor/commit/051b5ffe807bdc8cf788ae4d39ba2faaf443cabe) Thanks [@eldomagan](https://github.com/eldomagan)! - Show the configuration header close button in all panel layouts and remove the overlay-only prop.
+
+- Updated dependencies []:
+  - @craftile/core@1.0.8
+  - @craftile/event-bus@1.0.8
+  - @craftile/messenger@1.0.8
+  - @craftile/types@1.0.8
+
 ## 1.0.7
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @craftile/preview-client-html
 
+## 1.0.8
+
+### Patch Changes
+
+- [`8aca6d7`](https://github.com/craftile/editor/commit/8aca6d7077c3b6b45fbf14249eb51dd8b0eda82a) Thanks [@eldomagan](https://github.com/eldomagan)! - Include block data in preview lifecycle events. Preview clients now cache editor block updates for selection events, remove lifecycle events include block payloads when available, and editor update payloads preserve removed block snapshots for preview consumers.
+
+- [`e6f1685`](https://github.com/craftile/editor/commit/e6f16859d57c0276c721f043d90c01c81796fcd9) Thanks [@eldomagan](https://github.com/eldomagan)! - Rebuild child insertion comment caches after HTML effect batches and skip redundant child HTML effects when the parent effect already contains the child subtree.
+
 ## 1.0.7
 
 ## 1.0.6
