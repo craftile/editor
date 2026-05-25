@@ -378,3 +378,150 @@ describe('RawHtmlRenderer block removal events', () => {
     expect(document.querySelector('[data-block="removed"]')).toBeNull();
   });
 });
+
+describe('RawHtmlRenderer JS effects', () => {
+  let previewClient: FakePreviewClient;
+  let renderer: RawHtmlRenderer;
+  let createdScripts: WeakSet<HTMLScriptElement>;
+
+  function installExecutableScriptHarness() {
+    createdScripts = new WeakSet();
+    const createElement = document.createElement.bind(document);
+    const appendChild = document.head.appendChild.bind(document.head);
+    const replaceChild = document.head.replaceChild.bind(document.head);
+    const executeIfFreshScript = (node: Node) => {
+      if (node instanceof HTMLScriptElement && !node.src && createdScripts.has(node)) {
+        new Function('window', node.textContent || '')(window);
+      }
+    };
+
+    vi.spyOn(document, 'createElement').mockImplementation(((tagName: string, options?: ElementCreationOptions) => {
+      const element = createElement(tagName, options);
+
+      if (tagName.toLowerCase() === 'script') {
+        createdScripts.add(element as HTMLScriptElement);
+      }
+
+      return element;
+    }) as typeof document.createElement);
+
+    vi.spyOn(document.head, 'appendChild').mockImplementation(((node: Node) => {
+      const appended = appendChild(node);
+      executeIfFreshScript(node);
+
+      return appended;
+    }) as typeof document.head.appendChild);
+
+    vi.spyOn(document.head, 'replaceChild').mockImplementation(((newChild: Node, oldChild: Node) => {
+      const replaced = replaceChild(newChild, oldChild);
+      executeIfFreshScript(newChild);
+
+      return replaced;
+    }) as typeof document.head.replaceChild);
+  }
+
+  beforeEach(() => {
+    previewClient = new FakePreviewClient();
+    installDom('');
+    document.head.innerHTML = '';
+    delete (window as any).__craftileEffectCount;
+    installExecutableScriptHarness();
+    renderer = new RawHtmlRenderer(previewClient as any);
+  });
+
+  afterEach(() => {
+    delete (window as any).__craftileEffectCount;
+    vi.restoreAllMocks();
+  });
+
+  it('executes inline JS effects from a fresh script element', () => {
+    (renderer as any).handleJsEffects([
+      '<script>window.__craftileEffectCount = (window.__craftileEffectCount || 0) + 1;</script>',
+    ]);
+
+    expect((window as any).__craftileEffectCount).toBe(1);
+    expect(previewClient.emit).toHaveBeenCalledWith('scripts.execution.complete', {
+      total: 1,
+      completed: 1,
+      failed: 0,
+      success: true,
+    });
+  });
+
+  it('appends external JS effects as fresh scripts with their attributes', () => {
+    (renderer as any).handleJsEffects([
+      '<script src="https://example.test/effect.js" defer data-effect="hero"></script>',
+    ]);
+
+    const script = document.head.querySelector('script[src="https://example.test/effect.js"]') as HTMLScriptElement;
+
+    expect(script).toBeInstanceOf(HTMLScriptElement);
+    expect(createdScripts.has(script)).toBe(true);
+    expect(script.src).toBe('https://example.test/effect.js');
+    expect(script.defer).toBe(true);
+    expect(script.getAttribute('data-effect')).toBe('hero');
+
+    script.dispatchEvent(new Event('load'));
+
+    expect(previewClient.emit).toHaveBeenCalledWith('scripts.execution.complete', {
+      total: 1,
+      completed: 1,
+      failed: 0,
+      success: true,
+    });
+  });
+
+  it('does not execute duplicate inline JS effects twice', () => {
+    const scriptHtml = '<script>window.__craftileEffectCount = (window.__craftileEffectCount || 0) + 1;</script>';
+
+    (renderer as any).handleJsEffects([scriptHtml]);
+    (renderer as any).handleJsEffects([scriptHtml]);
+
+    expect((window as any).__craftileEffectCount).toBe(1);
+    expect(document.head.querySelectorAll('script:not([src]):not([id])')).toHaveLength(1);
+    expect(previewClient.emit).toHaveBeenLastCalledWith('scripts.execution.complete', {
+      total: 1,
+      completed: 1,
+      failed: 0,
+      success: true,
+    });
+  });
+
+  it('does not append duplicate external JS effects twice', () => {
+    const scriptHtml = '<script src="https://example.test/effect.js"></script>';
+
+    (renderer as any).handleJsEffects([scriptHtml]);
+    document.head.querySelector('script[src="https://example.test/effect.js"]')!.dispatchEvent(new Event('load'));
+
+    (renderer as any).handleJsEffects([scriptHtml]);
+
+    expect(document.head.querySelectorAll('script[src="https://example.test/effect.js"]')).toHaveLength(1);
+    expect(previewClient.emit).toHaveBeenLastCalledWith('scripts.execution.complete', {
+      total: 1,
+      completed: 1,
+      failed: 0,
+      success: true,
+    });
+  });
+
+  it('replaces same-id scripts and executes the replacement as a fresh script', () => {
+    (renderer as any).handleJsEffects(['<script id="craftile-effect">window.__craftileEffectCount = 1;</script>']);
+
+    const firstScript = document.getElementById('craftile-effect');
+
+    (renderer as any).handleJsEffects(['<script id="craftile-effect">window.__craftileEffectCount = 2;</script>']);
+
+    const replacementScript = document.getElementById('craftile-effect');
+
+    expect((window as any).__craftileEffectCount).toBe(2);
+    expect(replacementScript).toBeInstanceOf(HTMLScriptElement);
+    expect(replacementScript).not.toBe(firstScript);
+    expect(document.head.querySelectorAll('script#craftile-effect')).toHaveLength(1);
+    expect(previewClient.emit).toHaveBeenLastCalledWith('scripts.execution.complete', {
+      total: 1,
+      completed: 1,
+      failed: 0,
+      success: true,
+    });
+  });
+});

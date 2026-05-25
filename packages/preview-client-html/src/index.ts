@@ -239,14 +239,15 @@ export default class RawHtmlRenderer {
     }
 
     const id = scriptElement.id;
+    const executableScript = this.cloneExecutableScript(scriptElement);
 
     // If script has ID and already exists, replace it
     if (id) {
       const existing = document.getElementById(id) as HTMLScriptElement;
       if (existing && existing.tagName === 'SCRIPT') {
         this.pendingScripts.delete(existing);
-        existing.parentNode?.replaceChild(scriptElement, existing);
-        this.trackScriptExecution(scriptElement);
+        existing.parentNode?.replaceChild(executableScript, existing);
+        this.trackScriptExecution(executableScript);
         return;
       }
     }
@@ -277,8 +278,22 @@ export default class RawHtmlRenderer {
       }
     }
 
-    document.head.appendChild(scriptElement);
-    this.trackScriptExecution(scriptElement);
+    document.head.appendChild(executableScript);
+    this.trackScriptExecution(executableScript);
+  }
+
+  private cloneExecutableScript(parsedScript: HTMLScriptElement): HTMLScriptElement {
+    const script = document.createElement('script');
+
+    for (const attr of parsedScript.attributes) {
+      script.setAttribute(attr.name, attr.value);
+    }
+
+    if (!parsedScript.src) {
+      script.textContent = parsedScript.textContent;
+    }
+
+    return script;
   }
 
   private trackScriptExecution(scriptElement: HTMLScriptElement): void {
