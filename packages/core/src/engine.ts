@@ -1,5 +1,5 @@
 import { EventBus } from '@craftile/event-bus';
-import type { EngineConfig, EngineEvents } from './types';
+import type { Command, EngineConfig, EngineEvents } from './types';
 import type { Block, BlockSchema, BlockStructure, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
@@ -16,6 +16,7 @@ export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
   protected blocksManager: BlocksManager;
   protected historyManager: HistoryManager;
+  private activeBatch: Command[] | null = null;
 
   constructor(config: EngineConfig = {}) {
     super();
@@ -76,8 +77,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
 
     return command.getBlockId();
   }
@@ -134,8 +134,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
 
     return command.getBlockId();
   }
@@ -153,8 +152,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
   }
 
   /**
@@ -195,8 +193,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
   }
 
   /**
@@ -209,8 +206,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
   }
 
   /**
@@ -230,8 +226,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
   }
 
   /**
@@ -249,8 +244,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
   }
 
   /**
@@ -262,8 +256,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
 
     return command.getDuplicatedBlockId();
   }
@@ -347,8 +340,7 @@ export class Engine extends EventBus<EngineEvents> {
       emit: this.emit.bind(this),
     });
 
-    command.apply();
-    this.historyManager.addCommand(command);
+    this.applyCommand(command);
 
     return command.getBlockId();
   }
@@ -466,6 +458,38 @@ export class Engine extends EventBus<EngineEvents> {
   }
 
   /**
+   * Group multiple operations into a single undo/redo history entry.
+   */
+  batch<T>(callback: () => T): T {
+    const isOuterBatch = this.activeBatch === null;
+
+    if (isOuterBatch) {
+      this.activeBatch = [];
+    }
+
+    const batch = this.activeBatch!;
+    const startIndex = batch.length;
+
+    try {
+      const result = callback();
+
+      if (isOuterBatch && batch.length > 0) {
+        this.historyManager.addCommand(new BatchCommand(batch.slice()));
+      }
+
+      return result;
+    } catch (error) {
+      this.rollbackCommands(batch.slice(startIndex));
+      batch.splice(startIndex);
+      throw error;
+    } finally {
+      if (isOuterBatch) {
+        this.activeBatch = null;
+      }
+    }
+  }
+
+  /**
    * Initialize parent-child relationships for blocks that have children but missing parentId
    * Handles deep nesting recursively
    */
@@ -486,5 +510,43 @@ export class Engine extends EventBus<EngineEvents> {
     };
 
     Object.values(this.page.blocks).forEach(processBlock);
+  }
+
+  private applyCommand(command: Command): void {
+    command.apply();
+    this.recordCommand(command);
+  }
+
+  private recordCommand(command: Command): void {
+    if (this.activeBatch) {
+      this.activeBatch.push(command);
+      return;
+    }
+
+    this.historyManager.addCommand(command);
+  }
+
+  private rollbackCommands(commands: Command[]): void {
+    for (let i = commands.length - 1; i >= 0; i--) {
+      commands[i].revert();
+    }
+  }
+}
+
+class BatchCommand implements Command {
+  private commands: Command[];
+
+  constructor(commands: Command[]) {
+    this.commands = commands;
+  }
+
+  apply(): void {
+    this.commands.forEach((command) => command.apply());
+  }
+
+  revert(): void {
+    for (let i = this.commands.length - 1; i >= 0; i--) {
+      this.commands[i].revert();
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { createCraftileEditor, type UiRenderFunctionContext } from '@craftile/editor';
 import CommonPropertiesPlugin from '@craftile/plugin-common-properties';
 import StaticBlocksRenderer from '@craftile/plugin-static-blocks-renderer';
+import type { BlockStructure } from '@craftile/types';
 import CustomPanelPlugin from './custom-panel-plugin';
 import { blockSchemas } from './blockSchemas';
 import { blockRenderers } from './blockRenderers';
@@ -446,6 +447,424 @@ editor.ui.registerHeaderAction({
     },
   },
   order: 100,
+});
+
+const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }> = [
+  {
+    regionId: 'header',
+    structures: [
+      {
+        type: 'container',
+        name: 'Demo Header',
+        properties: {
+          direction: 'horizontal',
+          gap: 24,
+          padding: 20,
+          backgroundColor: '#ffffff',
+        },
+        children: [
+          {
+            type: 'heading',
+            name: 'Brand',
+            properties: {
+              text: 'Craftile Studio',
+              level: 'h2',
+              color: '#111827',
+              align: 'left',
+            },
+            children: [],
+          },
+          {
+            type: 'button',
+            name: 'Docs nav',
+            properties: {
+              text: 'Docs',
+              url: '#docs',
+              style: 'secondary',
+              size: 'small',
+            },
+            children: [],
+          },
+          {
+            type: 'button',
+            name: 'Templates nav',
+            properties: {
+              text: 'Templates',
+              url: '#templates',
+              style: 'secondary',
+              size: 'small',
+            },
+            children: [],
+          },
+          {
+            type: 'button',
+            name: 'Launch nav',
+            properties: {
+              text: 'Launch',
+              url: '#launch',
+              style: 'primary',
+              size: 'small',
+            },
+            children: [],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    regionId: 'main',
+    structures: [
+      {
+        type: 'container',
+        name: 'Complex Demo Page',
+        properties: {
+          direction: 'vertical',
+          gap: 28,
+          padding: 40,
+          backgroundColor: '#f3f4f6',
+        },
+        children: [
+          {
+            type: 'responsive-hero',
+            name: 'Hero',
+            properties: {
+              title: 'Build complete pages from composable blocks',
+              fontSize: {
+                _default: '3xl',
+                tablet: '2xl',
+                mobile: 'xl',
+              },
+              padding: {
+                _default: 56,
+                tablet: 40,
+                mobile: 28,
+              },
+              borderRadius: {
+                _default: 16,
+                tablet: 14,
+                mobile: 12,
+              },
+              textAlign: 'center',
+              backgroundColor: '#2563eb',
+            },
+            children: [],
+          },
+          {
+            type: 'grouped-text',
+            name: 'Intro Copy',
+            properties: {
+              content:
+                'This page was inserted as nested block structures inside one history batch. Undo once to restore the previous playground page.',
+              placeholder: 'Describe the page...',
+              fontSize: {
+                _default: 'lg',
+                tablet: 'md',
+                mobile: 'sm',
+              },
+              color: '#111827',
+              backgroundColor: '#e0f2fe',
+              padding: 24,
+              margin: 0,
+              borderRadius: 12,
+              customClass: 'batch-demo-intro',
+              isHighlighted: true,
+              id: 'batch-demo-intro',
+            },
+            children: [],
+          },
+          {
+            type: 'container',
+            name: 'Feature Cards',
+            properties: {
+              direction: 'horizontal',
+              gap: 20,
+              padding: 0,
+              backgroundColor: 'transparent',
+            },
+            children: [
+              {
+                type: 'link-card',
+                name: 'Preview Feature',
+                properties: {
+                  title: 'Live preview updates',
+                  description: 'Preview changes are emitted from the same command stream used by the editor.',
+                  url: '#preview',
+                  backgroundColor: '#ffffff',
+                },
+                children: [],
+              },
+              {
+                type: 'link-card',
+                name: 'History Feature',
+                properties: {
+                  title: 'Single-step rollback',
+                  description: 'Multiple inserts and removals can be grouped into one undoable history entry.',
+                  url: '#history',
+                  backgroundColor: '#ffffff',
+                },
+                children: [],
+              },
+              {
+                type: 'link-card',
+                name: 'Schema Feature',
+                properties: {
+                  title: 'Schema driven blocks',
+                  description: 'Every block in this demo is created from the playground schema registry.',
+                  url: '#schemas',
+                  backgroundColor: '#ffffff',
+                },
+                children: [],
+              },
+            ],
+          },
+          {
+            type: 'container',
+            name: 'Content Split',
+            properties: {
+              direction: 'horizontal',
+              gap: 24,
+              padding: 24,
+              backgroundColor: '#ffffff',
+            },
+            children: [
+              {
+                type: 'container',
+                name: 'Content Column',
+                properties: {
+                  direction: 'vertical',
+                  gap: 12,
+                  padding: 0,
+                  backgroundColor: 'transparent',
+                },
+                children: [
+                  {
+                    type: 'heading',
+                    name: 'Workflow Heading',
+                    properties: {
+                      text: 'A richer content workflow',
+                      level: 'h3',
+                      color: '#111827',
+                      align: 'left',
+                    },
+                    children: [],
+                  },
+                  {
+                    type: 'text',
+                    name: 'Workflow Body',
+                    properties: {
+                      content:
+                        'Use this example to verify that replacing a whole page through batched operations still behaves like one editor action.',
+                      fontSize: 'md',
+                      color: '#4b5563',
+                      booleanField: true,
+                      rangeField: 64,
+                    },
+                    children: [],
+                  },
+                  {
+                    type: 'button',
+                    name: 'Primary CTA',
+                    properties: {
+                      text: 'Explore the batch',
+                      url: '#batch',
+                      style: 'primary',
+                      size: 'large',
+                    },
+                    children: [],
+                  },
+                ],
+              },
+              {
+                type: 'image',
+                name: 'Preview Image',
+                properties: {
+                  src: 'https://placehold.co/420x260/2563eb/ffffff?text=Complex+Demo',
+                  alt: 'Complex page preview',
+                  width: 420,
+                  height: 260,
+                },
+                children: [],
+              },
+            ],
+          },
+          {
+            type: 'accordion',
+            name: 'Demo FAQ',
+            properties: {
+              backgroundColor: '#ffffff',
+              borderColor: '#d1d5db',
+              allowMultiple: false,
+            },
+            children: [
+              {
+                type: 'accordion-row',
+                name: 'Undo Row',
+                properties: {
+                  title: 'How do I test the batch?',
+                  isOpen: true,
+                },
+                children: [
+                  {
+                    type: 'text',
+                    name: 'Undo Answer',
+                    properties: {
+                      content: 'Click Undo once after loading this page. The previous root blocks should return.',
+                      fontSize: 'md',
+                      color: '#4b5563',
+                    },
+                    children: [],
+                  },
+                ],
+              },
+              {
+                type: 'accordion-row',
+                name: 'Redo Row',
+                properties: {
+                  title: 'What should Redo do?',
+                  isOpen: false,
+                },
+                children: [
+                  {
+                    type: 'text',
+                    name: 'Redo Answer',
+                    properties: {
+                      content: 'Redo should reapply this full complex page as a single history entry.',
+                      fontSize: 'md',
+                      color: '#4b5563',
+                    },
+                    children: [],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: 'collection-list',
+            name: 'Collection Demo',
+            properties: {
+              gap: 16,
+            },
+            children: [
+              {
+                type: 'collection-item',
+                name: 'Starter Item',
+                properties: {
+                  title: 'Starter',
+                  description: 'Ghost data item for the collection demo',
+                  price: '$29',
+                  image: 'https://placehold.co/300x200',
+                },
+                children: [],
+              },
+              {
+                type: 'collection-item',
+                name: 'Growth Item',
+                properties: {
+                  title: 'Growth',
+                  description: 'Another ghost data item for repeated rendering',
+                  price: '$79',
+                  image: 'https://placehold.co/300x200',
+                },
+                children: [],
+              },
+              {
+                type: 'collection-card',
+                name: 'Collection Card',
+                properties: {},
+                children: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    regionId: 'footer',
+    structures: [
+      {
+        type: 'container',
+        name: 'Demo Footer',
+        properties: {
+          direction: 'horizontal',
+          gap: 20,
+          padding: 24,
+          backgroundColor: '#111827',
+        },
+        children: [
+          {
+            type: 'text',
+            name: 'Footer Copyright',
+            properties: {
+              content: 'Craftile Studio demo page',
+              fontSize: 'sm',
+              color: '#d1d5db',
+            },
+            children: [],
+          },
+          {
+            type: 'button',
+            name: 'Status Link',
+            properties: {
+              text: 'Status',
+              url: '#status',
+              style: 'secondary',
+              size: 'small',
+            },
+            children: [],
+          },
+          {
+            type: 'button',
+            name: 'Contact Link',
+            properties: {
+              text: 'Contact',
+              url: '#contact',
+              style: 'secondary',
+              size: 'small',
+            },
+            children: [],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+function replaceCurrentPageRootsWithDemo(): void {
+  const currentPage = editor.engine.getPage();
+  const rootBlockIds = currentPage.regions.flatMap((region) => [...region.blocks]);
+
+  editor.engine.batch(() => {
+    rootBlockIds.forEach((blockId) => {
+      if (editor.engine.getBlockById(blockId)) {
+        editor.engine.removeBlock(blockId);
+      }
+    });
+
+    complexDemoPage.forEach(({ regionId, structures }) => {
+      structures.forEach((structure) => {
+        editor.engine.pasteBlock(structure, { regionId });
+      });
+    });
+  });
+}
+
+editor.ui.registerHeaderAction({
+  id: 'batch-history-demo',
+  slot: 'right',
+  button: {
+    text: 'Load demo page',
+    variant: 'secondary',
+    onClick: (_event, { editor }) => {
+      replaceCurrentPageRootsWithDemo();
+
+      editor.ui.toast({
+        description: 'Loaded complex demo page. Press Undo once to restore the previous page.',
+        type: 'success',
+      });
+    },
+  },
+  order: 90,
 });
 
 editor.engine.on('block:property:set', console.log);

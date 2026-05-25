@@ -366,12 +366,12 @@ export const blockRenderers: Record<string, BlockRenderer> = {
       <!--END children: ${editorAttributes}-->
     </div>`;
   },
-  'collection-item': ({ props, editorAttributes }) => {
+  'collection-item': ({ editorAttributes }) => {
     // Ghost blocks should not render - but this is a fallback
     // The renderer plugin already handles ghost blocks by returning empty string
     return `<div ${editorAttributes} style="display: none;" data-ghost="true"></div>`;
   },
-  'collection-card': ({ block, editorAttributes }) => {
+  'collection-card': ({ editorAttributes }) => {
     // In a real implementation, this would read data from ghost collection-item siblings
     // For demo purposes, we'll show a placeholder card
     const style = `

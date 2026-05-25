@@ -12,7 +12,8 @@
     "@craftile/editor": "workspace:*",
     "@craftile/plugin-common-properties": "workspace:*",
     "@craftile/plugin-static-blocks-renderer": "workspace:*",
-    "@craftile/types": "workspace:*"
+    "@craftile/types": "workspace:*",
+    "vue": "^3.5.17"
   },
   "devDependencies": {
     "typescript": "~5.8.3",

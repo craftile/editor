@@ -89,6 +89,10 @@ export class CraftileEditor {
     return this.engine.setBlockProperty(blockId, propertyKey, propertyValue);
   }
 
+  batch<T>(callback: () => T): T {
+    return this.engine.batch(callback);
+  }
+
   private setup() {
     registerDefaultHeaderActions(this.ui);
     registerDefaultKeyboardShortcuts(this.ui);

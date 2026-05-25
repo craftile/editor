@@ -190,6 +190,9 @@ importers:
       '@craftile/types':
         specifier: workspace:*
         version: link:../packages/types
+      vue:
+        specifier: ^3.5.17
+        version: 3.5.21(typescript@5.8.3)
     devDependencies:
       typescript:
         specifier: ~5.8.3

@@ -65,6 +65,7 @@ export interface UseBlocksEngineReturn {
 
   undo: () => boolean;
   redo: () => boolean;
+  batch: <T>(callback: () => T) => T;
   canUndo: Ref<boolean>;
   canRedo: Ref<boolean>;
 
@@ -320,6 +321,16 @@ export function useBlocksEngine(
     return result;
   };
 
+  const batch = <T>(callback: () => T): T => {
+    const result = engine.batch(callback);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+
+    return result;
+  };
+
   const refresh = () => {
     syncStateFromEngine();
   };
@@ -362,6 +373,7 @@ export function useBlocksEngine(
     // History methods
     undo,
     redo,
+    batch,
     canUndo,
     canRedo,
 
