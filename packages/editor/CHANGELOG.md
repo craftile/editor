@@ -1,5 +1,23 @@
 # @craftile/editor
 
+## 1.1.0
+
+### Minor Changes
+
+- [`10f1572`](https://github.com/craftile/editor/commit/10f15722d6274bffe3ddd33e8ade9c4f7b935f7a) Thanks [@eldomagan](https://github.com/eldomagan)! - Add a sync `batch` API for grouping multiple editor actions into a single undo/redo history entry.
+
+- [`415b5c9`](https://github.com/craftile/editor/commit/415b5c9f5133498ae01497ee740e34fbf8bce93f) Thanks [@eldomagan](https://github.com/eldomagan)! - Add undoable `replaceRegion(regionId, structures)` support for replacing the root block content of an existing region while preserving region metadata.
+
+- [`8adf6af`](https://github.com/craftile/editor/commit/8adf6af48856698ffb26157fa98b7ca5f5d5ec96) Thanks [@eldomagan](https://github.com/eldomagan)! - Add `replacePage` for replacing the current page as a single undoable operation while keeping `setPage` as the non-undoable initial/reset API.
+
+### Patch Changes
+
+- Updated dependencies [[`10f1572`](https://github.com/craftile/editor/commit/10f15722d6274bffe3ddd33e8ade9c4f7b935f7a), [`415b5c9`](https://github.com/craftile/editor/commit/415b5c9f5133498ae01497ee740e34fbf8bce93f), [`8adf6af`](https://github.com/craftile/editor/commit/8adf6af48856698ffb26157fa98b7ca5f5d5ec96)]:
+  - @craftile/core@1.1.0
+  - @craftile/event-bus@1.1.0
+  - @craftile/messenger@1.1.0
+  - @craftile/types@1.1.0
+
 ## 1.0.9
 
 ### Patch Changes

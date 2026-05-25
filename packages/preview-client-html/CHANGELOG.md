@@ -1,5 +1,11 @@
 # @craftile/preview-client-html
 
+## 1.1.0
+
+### Patch Changes
+
+- [`1b565ad`](https://github.com/craftile/editor/commit/1b565ad03a916a078a48ee1301583209d86b51e1) Thanks [@eldomagan](https://github.com/eldomagan)! - Execute JS effects by cloning parsed script HTML into fresh script elements before injecting them into the preview document.
+
 ## 1.0.9
 
 ## 1.0.8
