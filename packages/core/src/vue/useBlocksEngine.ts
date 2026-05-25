@@ -1,4 +1,4 @@
-import { ref, onUnmounted, computed, toRaw, nextTick, type Ref } from 'vue';
+import { ref, onUnmounted, computed, toRaw, nextTick, getCurrentInstance, type Ref } from 'vue';
 import type { Block, BlockStructure, Page, Region } from '@craftile/types';
 import type { EngineConfig } from '../types';
 import { Engine } from '../engine';
@@ -62,6 +62,7 @@ export interface UseBlocksEngineReturn {
       index?: number;
     }
   ) => string;
+  replacePage: (newPage: Page) => void;
 
   undo: () => boolean;
   redo: () => boolean;
@@ -172,6 +173,7 @@ export function useBlocksEngine(
   if (autoSync) {
     const eventTypes = [
       'page:set',
+      'page:replace',
       'block:insert',
       'block:remove',
       'block:move',
@@ -301,6 +303,14 @@ export function useBlocksEngine(
     return blockId;
   };
 
+  const replacePage = (newPage: Page): void => {
+    engine.replacePage(newPage);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+  };
+
   const undo = (): boolean => {
     const result = engine.undo();
 
@@ -340,9 +350,11 @@ export function useBlocksEngine(
     eventCleanups.length = 0;
   };
 
-  onUnmounted(() => {
-    destroy();
-  });
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      destroy();
+    });
+  }
 
   return {
     // Reactive state
@@ -369,6 +381,7 @@ export function useBlocksEngine(
     toggleBlock,
     duplicateBlock,
     pasteBlock,
+    replacePage,
 
     // History methods
     undo,

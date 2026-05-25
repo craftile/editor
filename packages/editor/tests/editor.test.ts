@@ -23,6 +23,11 @@ const testSchemas: BlockSchema[] = [
     ],
     accepts: [],
   },
+  {
+    type: 'text',
+    properties: [{ type: 'text', label: 'Value', default: 'Text', id: 'value' }],
+    accepts: [],
+  },
 ];
 
 describe('CraftileEditor', () => {
@@ -43,5 +48,23 @@ describe('CraftileEditor', () => {
       variant: 'primary',
     });
     expect(editor.engine.canUndo()).toBe(false);
+  });
+
+  it('should expose undoable page replacement', () => {
+    const editor = new CraftileEditor({
+      initialPage: structuredClone(testPage),
+      blockSchemas: testSchemas,
+    });
+
+    editor.replacePage({
+      blocks: {
+        'new-block': { id: 'new-block', type: 'text', properties: { value: 'New' }, children: [] },
+      },
+      regions: [{ name: 'main', blocks: ['new-block'] }],
+    });
+
+    expect(editor.engine.getPage().blocks['new-block']).toBeDefined();
+    expect(editor.engine.undo()).toBe(true);
+    expect(editor.engine.getPage().blocks['block-1']).toBeDefined();
   });
 });

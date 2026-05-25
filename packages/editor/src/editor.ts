@@ -89,6 +89,10 @@ export class CraftileEditor {
     return this.engine.setBlockProperty(blockId, propertyKey, propertyValue);
   }
 
+  replacePage(newPage: Page): void {
+    return this.engine.replacePage(newPage);
+  }
+
   batch<T>(callback: () => T): T {
     return this.engine.batch(callback);
   }

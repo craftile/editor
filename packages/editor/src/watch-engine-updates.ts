@@ -81,6 +81,16 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
   let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
   const cleanupFunctions: (() => void)[] = [];
 
+  const clearPendingChanges = () => {
+    pendingChanges.added.clear();
+    pendingChanges.updated.clear();
+    pendingChanges.removed.clear();
+    pendingChanges.moved.clear();
+    pendingChanges.positions.clear();
+    pendingChanges.blocksToInclude.clear();
+    pendingChanges.removedBlocks.clear();
+  };
+
   const emitUpdates = () => {
     if (
       pendingChanges.added.size ||
@@ -95,11 +105,10 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
       const blocksToCheck = Array.from(pendingChanges.blocksToInclude);
       blocksToCheck.forEach((blockId) => {
         const block = page.blocks[blockId];
-        // Walk up parent chain to find first repeated block
         let currentBlock: Block | undefined = block;
+
         while (currentBlock) {
           if (currentBlock.repeated && currentBlock.parentId) {
-            // Found a repeated block - include its parent
             pendingChanges.blocksToInclude.add(currentBlock.parentId);
             break;
           }
@@ -141,13 +150,7 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
         },
       });
 
-      pendingChanges.added.clear();
-      pendingChanges.updated.clear();
-      pendingChanges.removed.clear();
-      pendingChanges.moved.clear();
-      pendingChanges.positions.clear();
-      pendingChanges.blocksToInclude.clear();
-      pendingChanges.removedBlocks.clear();
+      clearPendingChanges();
     }
   };
 
@@ -171,6 +174,56 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
       });
     }
   };
+
+  const getRootBlockIds = (page: Page): string[] => {
+    return page.regions.flatMap((region) => region.blocks);
+  };
+
+  const emitPageReplaceUpdate = (previousPage: Page, newPage: Page) => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = null;
+    }
+
+    clearPendingChanges();
+
+    const previousRootIds = getRootBlockIds(previousPage);
+    const newRootIds = getRootBlockIds(newPage);
+    const blocks: Record<string, Block> = structuredClone(newPage.blocks);
+
+    previousRootIds.forEach((blockId) => {
+      const block = previousPage.blocks[blockId];
+      if (block && !blocks[blockId]) {
+        blocks[blockId] = structuredClone(block);
+      }
+    });
+
+    const positions: Record<string, BlockPosition> = {};
+    newRootIds.forEach((blockId) => {
+      const position = resolveBlockPosition(blockId, newPage);
+      if (position) {
+        positions[blockId] = position;
+      }
+    });
+
+    options?.onUpdates({
+      blocks,
+      regions: structuredClone(newPage.regions),
+      changes: {
+        added: newRootIds,
+        updated: [],
+        removed: previousRootIds,
+        moved: {},
+        positions,
+      },
+    });
+  };
+
+  cleanupFunctions.push(
+    engine.on('page:replace', ({ previousPage, newPage }) => {
+      emitPageReplaceUpdate(previousPage, newPage);
+    })
+  );
 
   cleanupFunctions.push(
     engine.on('block:insert', ({ blockId, parentId }) => {

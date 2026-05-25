@@ -96,4 +96,58 @@ describe('watchEngineUpdates', () => {
 
     vi.useRealTimers();
   });
+
+  it('emits aggregate updates for page replacement', () => {
+    const previousPage: Page = {
+      blocks: {
+        'old-root': makeBlock('old-root'),
+        'shared-root': makeBlock('shared-root'),
+      },
+      regions: [{ id: 'main', name: 'main', blocks: ['old-root', 'shared-root'] }],
+    };
+    const newChild = makeBlock('new-child', [], 'new-root');
+    const newRoot = makeBlock('new-root', ['new-child']);
+    const sharedRoot = makeBlock('shared-root');
+    const newPage: Page = {
+      blocks: {
+        'new-root': newRoot,
+        'new-child': newChild,
+        'shared-root': sharedRoot,
+      },
+      regions: [{ id: 'main', name: 'main', blocks: ['new-root', 'shared-root'] }],
+    };
+    const updates = vi.fn();
+    const engine = new FakeEngine(newPage);
+
+    watchEngineUpdates(engine as any, {
+      debounceMs: 0,
+      onUpdates: updates,
+    });
+
+    engine.emit('page:replace', {
+      previousPage,
+      newPage,
+    });
+
+    expect(updates).toHaveBeenCalledTimes(1);
+    expect(updates).toHaveBeenCalledWith({
+      blocks: {
+        'old-root': previousPage.blocks['old-root'],
+        'new-root': newRoot,
+        'new-child': newChild,
+        'shared-root': sharedRoot,
+      },
+      regions: newPage.regions,
+      changes: {
+        added: ['new-root', 'shared-root'],
+        updated: [],
+        removed: ['old-root', 'shared-root'],
+        moved: {},
+        positions: {
+          'new-root': { regionId: 'main', beforeId: 'shared-root' },
+          'shared-root': { regionId: 'main', afterId: 'new-root' },
+        },
+      },
+    });
+  });
 });

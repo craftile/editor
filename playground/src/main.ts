@@ -1,7 +1,7 @@
 import { createCraftileEditor, type UiRenderFunctionContext } from '@craftile/editor';
 import CommonPropertiesPlugin from '@craftile/plugin-common-properties';
 import StaticBlocksRenderer from '@craftile/plugin-static-blocks-renderer';
-import type { BlockStructure } from '@craftile/types';
+import type { Block, BlockStructure, Page } from '@craftile/types';
 import CustomPanelPlugin from './custom-panel-plugin';
 import { blockSchemas } from './blockSchemas';
 import { blockRenderers } from './blockRenderers';
@@ -449,9 +449,10 @@ editor.ui.registerHeaderAction({
   order: 100,
 });
 
-const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }> = [
+const complexDemoPageRegions: Array<{ regionId: string; regionName: string; structures: BlockStructure[] }> = [
   {
     regionId: 'header',
+    regionName: 'Header Section',
     structures: [
       {
         type: 'container',
@@ -513,6 +514,7 @@ const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }>
   },
   {
     regionId: 'main',
+    regionName: 'Main Content',
     structures: [
       {
         type: 'container',
@@ -554,7 +556,7 @@ const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }>
             name: 'Intro Copy',
             properties: {
               content:
-                'This page was inserted as nested block structures inside one history batch. Undo once to restore the previous playground page.',
+                'This page was inserted with replacePage as one undoable page replacement. Undo once to restore the previous playground page.',
               placeholder: 'Describe the page...',
               fontSize: {
                 _default: 'lg',
@@ -653,7 +655,7 @@ const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }>
                     name: 'Workflow Body',
                     properties: {
                       content:
-                        'Use this example to verify that replacing a whole page through batched operations still behaves like one editor action.',
+                        'Use this example to verify that replacing a whole page with replacePage still behaves like one editor action.',
                       fontSize: 'md',
                       color: '#4b5563',
                       booleanField: true,
@@ -781,6 +783,7 @@ const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }>
   },
   {
     regionId: 'footer',
+    regionName: 'Footer Section',
     structures: [
       {
         type: 'container',
@@ -830,23 +833,61 @@ const complexDemoPage: Array<{ regionId: string; structures: BlockStructure[] }>
   },
 ];
 
-function replaceCurrentPageRootsWithDemo(): void {
-  const currentPage = editor.engine.getPage();
-  const rootBlockIds = currentPage.regions.flatMap((region) => [...region.blocks]);
+function createBlockFromStructure(
+  structure: BlockStructure,
+  id: string,
+  parentId: string | undefined,
+  blocks: Record<string, Block>
+): Block {
+  const block: Block = {
+    type: structure.type,
+    id,
+    name: structure.name,
+    semanticId: structure.semanticId,
+    properties: structuredClone(structure.properties),
+    disabled: structure.disabled,
+    static: structure.static,
+    repeated: structure.repeated,
+    ghost: structure.ghost,
+    parentId,
+    children: [],
+  };
 
-  editor.engine.batch(() => {
-    rootBlockIds.forEach((blockId) => {
-      if (editor.engine.getBlockById(blockId)) {
-        editor.engine.removeBlock(blockId);
-      }
-    });
+  blocks[id] = block;
 
-    complexDemoPage.forEach(({ regionId, structures }) => {
-      structures.forEach((structure) => {
-        editor.engine.pasteBlock(structure, { regionId });
-      });
-    });
+  return block;
+}
+
+function addStructureToPage(
+  structure: BlockStructure,
+  path: string,
+  parentId: string | undefined,
+  blocks: Record<string, Block>
+): string {
+  const blockId = structure.id ?? `demo-${path}-${structure.type}`;
+  const block = createBlockFromStructure(structure, blockId, parentId, blocks);
+
+  block.children = (structure.children ?? []).map((child, index) => {
+    return addStructureToPage(child, `${path}-${index}`, blockId, blocks);
   });
+
+  return blockId;
+}
+
+function createComplexDemoPage(): Page {
+  const blocks: Record<string, Block> = {};
+
+  const regions = complexDemoPageRegions.map(({ regionId, regionName, structures }) => {
+    return {
+      id: regionId,
+      name: regionName,
+      blocks: structures.map((structure, index) => {
+        return addStructureToPage(structure, `${regionId}-${index}`, undefined, blocks);
+      }),
+    };
+  });
+
+  return { blocks, regions };
 }
 
 editor.ui.registerHeaderAction({
@@ -856,7 +897,7 @@ editor.ui.registerHeaderAction({
     text: 'Load demo page',
     variant: 'secondary',
     onClick: (_event, { editor }) => {
-      replaceCurrentPageRootsWithDemo();
+      editor.engine.replacePage(createComplexDemoPage());
 
       editor.ui.toast({
         description: 'Loaded complex demo page. Press Undo once to restore the previous page.',

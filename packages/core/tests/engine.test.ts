@@ -167,6 +167,118 @@ describe('Engine', () => {
       expect(engine.getPage().blocks['block-1'].properties.text).toBe('Changed');
     });
 
+    it('should keep setPage non-undoable', () => {
+      engine.setBlockProperty('block-1', 'text', 'Changed');
+      expect(engine.canUndo()).toBe(true);
+
+      engine.setPage({
+        blocks: {
+          'new-block': { id: 'new-block', type: 'text', properties: { value: 'New' }, children: [] },
+        },
+        regions: [{ name: 'main', blocks: ['new-block'] }],
+      });
+
+      expect(engine.canUndo()).toBe(false);
+      expect(engine.undo()).toBe(false);
+      expect(engine.getPage().blocks['new-block']).toBeDefined();
+    });
+
+    it('should replace the page as an undoable history entry', () => {
+      const replacementPage: Page = {
+        blocks: {
+          'new-block': { id: 'new-block', type: 'text', properties: { value: 'New' }, children: [] },
+        },
+        regions: [{ name: 'main', blocks: ['new-block'] }],
+      };
+
+      engine.replacePage(replacementPage);
+      expect(engine.getPage().blocks['new-block']).toBeDefined();
+      expect(engine.getPage().blocks['block-1']).toBeUndefined();
+
+      expect(engine.undo()).toBe(true);
+      expect(engine.getPage().blocks['block-1']).toBeDefined();
+      expect(engine.getPage().blocks['new-block']).toBeUndefined();
+
+      expect(engine.redo()).toBe(true);
+      expect(engine.getPage().blocks['new-block']).toBeDefined();
+      expect(engine.getPage().blocks['block-1']).toBeUndefined();
+    });
+
+    it('should emit page:replace when replacing, undoing, and redoing a page replacement', () => {
+      const events: Array<{ previousPage: Page; newPage: Page }> = [];
+      engine.on('page:replace', (event) => {
+        events.push(event);
+      });
+
+      const replacementPage: Page = {
+        blocks: {
+          'new-block': { id: 'new-block', type: 'text', properties: { value: 'New' }, children: [] },
+        },
+        regions: [{ name: 'main', blocks: ['new-block'] }],
+      };
+
+      engine.replacePage(replacementPage);
+      engine.undo();
+      engine.redo();
+
+      expect(events).toHaveLength(3);
+      expect(events[0].previousPage.blocks['block-1']).toBeDefined();
+      expect(events[0].newPage.blocks['new-block']).toBeDefined();
+      expect(events[1].previousPage.blocks['new-block']).toBeDefined();
+      expect(events[1].newPage.blocks['block-1']).toBeDefined();
+      expect(events[2].previousPage.blocks['block-1']).toBeDefined();
+      expect(events[2].newPage.blocks['new-block']).toBeDefined();
+    });
+
+    it('should preserve previous command history after undoing a page replacement', () => {
+      engine.setBlockProperty('block-1', 'text', 'Changed');
+
+      engine.replacePage({
+        blocks: {
+          'new-block': { id: 'new-block', type: 'text', properties: { value: 'New' }, children: [] },
+        },
+        regions: [{ name: 'main', blocks: ['new-block'] }],
+      });
+
+      expect(engine.undo()).toBe(true);
+      expect(engine.getPage().blocks['block-1'].properties.text).toBe('Changed');
+      expect(engine.canUndo()).toBe(true);
+
+      expect(engine.undo()).toBe(true);
+      expect(engine.getPage().blocks['block-1'].properties.text).toBe('Click me');
+    });
+
+    it('should reject replacePage inside a batch and rollback prior batched commands', () => {
+      expect(() => {
+        engine.batch(() => {
+          engine.setBlockProperty('block-1', 'text', 'Changed');
+          engine.replacePage({
+            blocks: {
+              'new-block': { id: 'new-block', type: 'text', properties: { value: 'New' }, children: [] },
+            },
+            regions: [{ name: 'main', blocks: ['new-block'] }],
+          });
+        });
+      }).toThrow('replacePage cannot be called inside batch');
+
+      expect(engine.getPage().blocks['block-1'].properties.text).toBe('Click me');
+      expect(engine.canUndo()).toBe(false);
+    });
+
+    it('should normalize replaced pages like setPage', () => {
+      engine.replacePage({
+        blocks: {
+          parent: { id: 'parent', type: 'box', properties: {}, children: ['child'] },
+          child: { id: 'child', type: 'text', properties: {}, children: [] },
+        },
+        regions: [],
+      });
+
+      const page = engine.getPage();
+      expect(page.regions).toEqual([{ id: 'main', name: 'main', blocks: ['parent', 'child'] }]);
+      expect(page.blocks.child.parentId).toBe('parent');
+    });
+
     it('should undo and redo batched operations as a single history entry', () => {
       engine.batch(() => {
         engine.setBlockProperty('block-1', 'text', 'Changed');

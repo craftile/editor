@@ -1,5 +1,5 @@
 import { EventBus } from '@craftile/event-bus';
-import type { Command, EngineConfig, EngineEvents } from './types';
+import type { Command, EngineConfig, EngineEmitFn, EngineEvents } from './types';
 import type { Block, BlockSchema, BlockStructure, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
@@ -362,26 +362,7 @@ export class Engine extends EventBus<EngineEvents> {
   setPage(newPage: Page): void {
     const beforePage = structuredClone(this.page);
 
-    this.page = structuredClone(newPage);
-
-    if (this.page.regions.length === 0) {
-      this.page.regions = [{ id: 'main', name: 'main', blocks: Object.keys(this.page.blocks) }];
-    }
-
-    // Initialize regions if not present
-    if (this.page.regions.length === 0) {
-      this.page.regions = [
-        {
-          id: 'main',
-          name: 'main',
-          blocks: Object.values(this.page.blocks)
-            .filter((block) => !block.parentId)
-            .map((block) => block.id),
-        },
-      ];
-    }
-
-    this.initializeParentChildRelationships();
+    this.page = this.normalizePage(newPage);
 
     // Clear history since we're switching to a completely new page
     // maybe we should keep a separate history per page
@@ -391,6 +372,24 @@ export class Engine extends EventBus<EngineEvents> {
       previousPage: beforePage,
       newPage: structuredClone(this.page),
     });
+  }
+
+  /**
+   * Replace the current page as a single undoable operation.
+   */
+  replacePage(newPage: Page): void {
+    if (this.activeBatch) {
+      throw new Error('replacePage cannot be called inside batch');
+    }
+
+    const command = new ReplacePageCommand(
+      this.page,
+      this.normalizePage(newPage),
+      this.replacePageState.bind(this),
+      this.emit.bind(this)
+    );
+
+    this.applyCommand(command);
   }
 
   /**
@@ -489,15 +488,23 @@ export class Engine extends EventBus<EngineEvents> {
     }
   }
 
-  /**
-   * Initialize parent-child relationships for blocks that have children but missing parentId
-   * Handles deep nesting recursively
-   */
-  private initializeParentChildRelationships(): void {
+  private normalizePage(page: Page): Page {
+    const normalizedPage = structuredClone(page);
+
+    if (normalizedPage.regions.length === 0) {
+      normalizedPage.regions = [{ id: 'main', name: 'main', blocks: Object.keys(normalizedPage.blocks) }];
+    }
+
+    this.initializeParentChildRelationshipsForPage(normalizedPage);
+
+    return normalizedPage;
+  }
+
+  private initializeParentChildRelationshipsForPage(page: Page): void {
     const processBlock = (block: Block): void => {
       if (block.children && block.children.length > 0) {
         block.children.forEach((childId: string) => {
-          const childBlock = this.page.blocks[childId];
+          const childBlock = page.blocks[childId];
           if (childBlock) {
             if (!childBlock.parentId) {
               childBlock.parentId = block.id;
@@ -509,7 +516,11 @@ export class Engine extends EventBus<EngineEvents> {
       }
     };
 
-    Object.values(this.page.blocks).forEach(processBlock);
+    Object.values(page.blocks).forEach(processBlock);
+  }
+
+  private replacePageState(page: Page): void {
+    this.page = page;
   }
 
   private applyCommand(command: Command): void {
@@ -548,5 +559,37 @@ class BatchCommand implements Command {
     for (let i = this.commands.length - 1; i >= 0; i--) {
       this.commands[i].revert();
     }
+  }
+}
+
+class ReplacePageCommand implements Command {
+  private previousPage: Page;
+  private newPage: Page;
+  private setPageState: (page: Page) => void;
+  private emit: EngineEmitFn;
+
+  constructor(previousPage: Page, newPage: Page, setPageState: (page: Page) => void, emit: EngineEmitFn) {
+    this.previousPage = previousPage;
+    this.newPage = newPage;
+    this.setPageState = setPageState;
+    this.emit = emit;
+  }
+
+  apply(): void {
+    this.setPageState(this.newPage);
+
+    this.emit('page:replace', {
+      previousPage: structuredClone(this.previousPage),
+      newPage: structuredClone(this.newPage),
+    });
+  }
+
+  revert(): void {
+    this.setPageState(this.previousPage);
+
+    this.emit('page:replace', {
+      previousPage: structuredClone(this.newPage),
+      newPage: structuredClone(this.previousPage),
+    });
   }
 }
