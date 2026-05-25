@@ -1,8 +1,9 @@
 import { EventBus } from '@craftile/event-bus';
-import type { Command, EngineConfig, EngineEmitFn, EngineEvents } from './types';
+import type { Command, EngineConfig, EngineEvents } from './types';
 import type { Block, BlockSchema, BlockStructure, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
+import { BatchCommand } from './commands/batch';
 import { InsertBlockCommand } from './commands/insert-block';
 import { InsertBlockFromPresetCommand } from './commands/insert-block-from-preset';
 import { RemoveBlockCommand } from './commands/remove-block';
@@ -11,6 +12,8 @@ import { ToggleBlockCommand } from './commands/toggle-block';
 import { SetBlockPropertyCommand } from './commands/set-block-property';
 import { DuplicateBlockCommand } from './commands/duplicate-block';
 import { SetBlockNameCommand } from './commands/set-block-name';
+import { ReplacePageCommand } from './commands/replace-page';
+import { ReplaceRegionCommand } from './commands/replace-region';
 
 export class Engine extends EventBus<EngineEvents> {
   protected page!: Page;
@@ -393,6 +396,24 @@ export class Engine extends EventBus<EngineEvents> {
   }
 
   /**
+   * Replace an existing region's root blocks as a single undoable operation.
+   */
+  replaceRegion(regionId: string, structures: BlockStructure[]): void {
+    if (this.activeBatch) {
+      throw new Error('replaceRegion cannot be called inside batch');
+    }
+
+    const command = new ReplaceRegionCommand(this.page, {
+      regionId,
+      structures,
+      blocksManager: this.blocksManager,
+      emit: this.emit.bind(this),
+    });
+
+    this.applyCommand(command);
+  }
+
+  /**
    * Get the blocks manager for this engine instance
    */
   getBlocksManager(): BlocksManager {
@@ -541,55 +562,5 @@ export class Engine extends EventBus<EngineEvents> {
     for (let i = commands.length - 1; i >= 0; i--) {
       commands[i].revert();
     }
-  }
-}
-
-class BatchCommand implements Command {
-  private commands: Command[];
-
-  constructor(commands: Command[]) {
-    this.commands = commands;
-  }
-
-  apply(): void {
-    this.commands.forEach((command) => command.apply());
-  }
-
-  revert(): void {
-    for (let i = this.commands.length - 1; i >= 0; i--) {
-      this.commands[i].revert();
-    }
-  }
-}
-
-class ReplacePageCommand implements Command {
-  private previousPage: Page;
-  private newPage: Page;
-  private setPageState: (page: Page) => void;
-  private emit: EngineEmitFn;
-
-  constructor(previousPage: Page, newPage: Page, setPageState: (page: Page) => void, emit: EngineEmitFn) {
-    this.previousPage = previousPage;
-    this.newPage = newPage;
-    this.setPageState = setPageState;
-    this.emit = emit;
-  }
-
-  apply(): void {
-    this.setPageState(this.newPage);
-
-    this.emit('page:replace', {
-      previousPage: structuredClone(this.previousPage),
-      newPage: structuredClone(this.newPage),
-    });
-  }
-
-  revert(): void {
-    this.setPageState(this.previousPage);
-
-    this.emit('page:replace', {
-      previousPage: structuredClone(this.newPage),
-      newPage: structuredClone(this.previousPage),
-    });
   }
 }

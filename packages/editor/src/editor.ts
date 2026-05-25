@@ -1,7 +1,7 @@
 import { createApp, h, provide, type App } from 'vue';
 import { Engine } from '@craftile/core';
 import { EventBus } from '@craftile/event-bus';
-import type { Block, BlockSchema, Page } from '@craftile/types';
+import type { Block, BlockSchema, BlockStructure, Page } from '@craftile/types';
 
 import Editor from './components/Editor.vue';
 import { CRAFTILE_EDITOR_SYMBOL } from './constants';
@@ -91,6 +91,10 @@ export class CraftileEditor {
 
   replacePage(newPage: Page): void {
     return this.engine.replacePage(newPage);
+  }
+
+  replaceRegion(regionId: string, structures: BlockStructure[]): void {
+    return this.engine.replaceRegion(regionId, structures);
   }
 
   batch<T>(callback: () => T): T {

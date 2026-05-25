@@ -219,9 +219,59 @@ export function watchEngineUpdates(engine: Engine, options?: WatchEngineUpdatesO
     });
   };
 
+  const emitRegionReplaceUpdate = (
+    previousRegion: Page['regions'][number],
+    newRegion: Page['regions'][number],
+    removedBlocks: Record<string, Block>,
+    newBlocks: Record<string, Block>
+  ) => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = null;
+    }
+
+    clearPendingChanges();
+
+    const page = engine.getPage();
+    const blocks: Record<string, Block> = structuredClone(newBlocks);
+
+    previousRegion.blocks.forEach((blockId) => {
+      const block = removedBlocks[blockId];
+      if (block && !blocks[blockId]) {
+        blocks[blockId] = structuredClone(block);
+      }
+    });
+
+    const positions: Record<string, BlockPosition> = {};
+    newRegion.blocks.forEach((blockId) => {
+      const position = resolveBlockPosition(blockId, page);
+      if (position) {
+        positions[blockId] = position;
+      }
+    });
+
+    options?.onUpdates({
+      blocks,
+      regions: structuredClone(page.regions),
+      changes: {
+        added: newRegion.blocks,
+        updated: [],
+        removed: previousRegion.blocks,
+        moved: {},
+        positions,
+      },
+    });
+  };
+
   cleanupFunctions.push(
     engine.on('page:replace', ({ previousPage, newPage }) => {
       emitPageReplaceUpdate(previousPage, newPage);
+    })
+  );
+
+  cleanupFunctions.push(
+    engine.on('region:replace', ({ previousRegion, newRegion, removedBlocks, newBlocks }) => {
+      emitRegionReplaceUpdate(previousRegion, newRegion, removedBlocks, newBlocks);
     })
   );
 

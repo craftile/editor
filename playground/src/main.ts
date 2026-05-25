@@ -890,6 +890,238 @@ function createComplexDemoPage(): Page {
   return { blocks, regions };
 }
 
+function createMainRegionDemoStructures(): BlockStructure[] {
+  return [
+    {
+      type: 'container',
+      name: 'Region Replacement Demo',
+      properties: {
+        direction: 'vertical',
+        gap: 28,
+        padding: 40,
+        backgroundColor: '#eef2ff',
+      },
+      children: [
+        {
+          type: 'responsive-hero',
+          name: 'Region Hero',
+          properties: {
+            title: 'Replace one region without touching the rest',
+            fontSize: {
+              _default: '3xl',
+              tablet: '2xl',
+              mobile: 'xl',
+            },
+            padding: {
+              _default: 52,
+              tablet: 36,
+              mobile: 24,
+            },
+            borderRadius: {
+              _default: 16,
+              tablet: 14,
+              mobile: 12,
+            },
+            textAlign: 'center',
+            backgroundColor: '#4f46e5',
+          },
+          children: [],
+        },
+        {
+          type: 'grouped-text',
+          name: 'Region Intro',
+          properties: {
+            content:
+              'This content was loaded with replaceRegion("main", structures). Header and footer stay in place, while Undo restores only the previous main region content.',
+            placeholder: 'Describe the region...',
+            fontSize: {
+              _default: 'lg',
+              tablet: 'md',
+              mobile: 'sm',
+            },
+            color: '#111827',
+            backgroundColor: '#ffffff',
+            padding: 24,
+            margin: 0,
+            borderRadius: 12,
+            customClass: 'replace-region-demo-intro',
+            isHighlighted: true,
+            id: 'replace-region-demo-intro',
+          },
+          children: [],
+        },
+        {
+          type: 'container',
+          name: 'Region Feature Row',
+          properties: {
+            direction: 'horizontal',
+            gap: 20,
+            padding: 0,
+            backgroundColor: 'transparent',
+          },
+          children: [
+            {
+              type: 'link-card',
+              name: 'Scoped Replacement',
+              properties: {
+                title: 'Scoped replacement',
+                description: 'Only the selected region root blocks are removed and replaced.',
+                url: '#region-scope',
+                backgroundColor: '#ffffff',
+              },
+              children: [],
+            },
+            {
+              type: 'link-card',
+              name: 'Undoable Region',
+              properties: {
+                title: 'One undo step',
+                description: 'The full region swap is stored as one history entry.',
+                url: '#region-history',
+                backgroundColor: '#ffffff',
+              },
+              children: [],
+            },
+            {
+              type: 'link-card',
+              name: 'Preview Sync',
+              properties: {
+                title: 'Immediate preview',
+                description: 'The watcher emits root add and remove updates for the region.',
+                url: '#region-preview',
+                backgroundColor: '#ffffff',
+              },
+              children: [],
+            },
+          ],
+        },
+        {
+          type: 'container',
+          name: 'Region Content Split',
+          properties: {
+            direction: 'horizontal',
+            gap: 24,
+            padding: 24,
+            backgroundColor: '#ffffff',
+          },
+          children: [
+            {
+              type: 'container',
+              name: 'Region Content Column',
+              properties: {
+                direction: 'vertical',
+                gap: 12,
+                padding: 0,
+                backgroundColor: 'transparent',
+              },
+              children: [
+                {
+                  type: 'heading',
+                  name: 'Region Workflow Heading',
+                  properties: {
+                    text: 'A focused region workflow',
+                    level: 'h3',
+                    color: '#111827',
+                    align: 'left',
+                  },
+                  children: [],
+                },
+                {
+                  type: 'text',
+                  name: 'Region Workflow Body',
+                  properties: {
+                    content:
+                      'Use this example to verify that replaceRegion can load a complete main-region layout without resetting the page or changing other regions.',
+                    fontSize: 'md',
+                    color: '#4b5563',
+                    booleanField: true,
+                    rangeField: 64,
+                  },
+                  children: [],
+                },
+                {
+                  type: 'button',
+                  name: 'Region CTA',
+                  properties: {
+                    text: 'Inspect history',
+                    url: '#region-history',
+                    style: 'primary',
+                    size: 'large',
+                  },
+                  children: [],
+                },
+              ],
+            },
+            {
+              type: 'image',
+              name: 'Region Preview Image',
+              properties: {
+                src: 'https://placehold.co/420x260/4f46e5/ffffff?text=Region+Demo',
+                alt: 'Region replacement preview',
+                width: 420,
+                height: 260,
+              },
+              children: [],
+            },
+          ],
+        },
+        {
+          type: 'accordion',
+          name: 'Region Demo FAQ',
+          properties: {
+            backgroundColor: '#ffffff',
+            borderColor: '#c7d2fe',
+            allowMultiple: false,
+          },
+          children: [
+            {
+              type: 'accordion-row',
+              name: 'Region Undo Row',
+              properties: {
+                title: 'What should Undo restore?',
+                isOpen: true,
+              },
+              children: [
+                {
+                  type: 'text',
+                  name: 'Region Undo Answer',
+                  properties: {
+                    content: 'Undo once should restore the main region content that existed before loading this demo.',
+                    fontSize: 'md',
+                    color: '#4b5563',
+                  },
+                  children: [],
+                },
+              ],
+            },
+            {
+              type: 'accordion-row',
+              name: 'Region Redo Row',
+              properties: {
+                title: 'What should Redo reapply?',
+                isOpen: false,
+              },
+              children: [
+                {
+                  type: 'text',
+                  name: 'Region Redo Answer',
+                  properties: {
+                    content:
+                      'Redo once should reapply this complete main region replacement while keeping header and footer unchanged.',
+                    fontSize: 'md',
+                    color: '#4b5563',
+                  },
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
+}
+
 editor.ui.registerHeaderAction({
   id: 'batch-history-demo',
   slot: 'right',
@@ -906,6 +1138,24 @@ editor.ui.registerHeaderAction({
     },
   },
   order: 90,
+});
+
+editor.ui.registerHeaderAction({
+  id: 'replace-region-demo',
+  slot: 'right',
+  button: {
+    text: 'Load main demo',
+    variant: 'secondary',
+    onClick: (_event, { editor }) => {
+      editor.engine.replaceRegion('main', createMainRegionDemoStructures());
+
+      editor.ui.toast({
+        description: 'Loaded main region demo. Press Undo once to restore the previous main content.',
+        type: 'success',
+      });
+    },
+  },
+  order: 91,
 });
 
 editor.engine.on('block:property:set', console.log);

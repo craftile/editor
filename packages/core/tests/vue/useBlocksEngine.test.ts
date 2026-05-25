@@ -48,4 +48,23 @@ describe('useBlocksEngine', () => {
 
     blocksEngine.destroy();
   });
+
+  it('should expose undoable region replacement', () => {
+    const blocksEngine = useBlocksEngine({
+      page: structuredClone(testPage),
+      blockSchemas: testSchemas,
+      autoSync: false,
+    });
+
+    blocksEngine.replaceRegion('main', [{ type: 'text', properties: { value: 'Region' }, children: [] }]);
+
+    const newRootId = blocksEngine.regions.value[0].blocks[0];
+    expect(blocksEngine.blocks.value['block-1']).toBeUndefined();
+    expect(blocksEngine.blocks.value[newRootId].type).toBe('text');
+
+    expect(blocksEngine.undo()).toBe(true);
+    expect(blocksEngine.blocks.value['block-1']).toBeDefined();
+
+    blocksEngine.destroy();
+  });
 });

@@ -67,4 +67,21 @@ describe('CraftileEditor', () => {
     expect(editor.engine.undo()).toBe(true);
     expect(editor.engine.getPage().blocks['block-1']).toBeDefined();
   });
+
+  it('should expose undoable region replacement', () => {
+    const editor = new CraftileEditor({
+      initialPage: structuredClone(testPage),
+      blockSchemas: testSchemas,
+    });
+
+    editor.replaceRegion('main', [{ type: 'text', properties: { value: 'Region' }, children: [] }]);
+
+    const page = editor.engine.getPage();
+    const newRootId = page.regions[0].blocks[0];
+    expect(page.blocks['block-1']).toBeUndefined();
+    expect(page.blocks[newRootId].type).toBe('text');
+
+    expect(editor.engine.undo()).toBe(true);
+    expect(editor.engine.getPage().blocks['block-1']).toBeDefined();
+  });
 });

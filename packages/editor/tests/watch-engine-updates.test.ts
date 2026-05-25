@@ -150,4 +150,63 @@ describe('watchEngineUpdates', () => {
       },
     });
   });
+
+  it('emits aggregate updates for region replacement', () => {
+    const oldRoot = makeBlock('old-root', ['old-child']);
+    const oldChild = makeBlock('old-child', [], 'old-root');
+    const newChild = makeBlock('new-child', [], 'new-root');
+    const newRoot = makeBlock('new-root', ['new-child']);
+    const footerRoot = makeBlock('footer-root');
+    const pageAfterReplacement: Page = {
+      blocks: {
+        'new-root': newRoot,
+        'new-child': newChild,
+        'footer-root': footerRoot,
+      },
+      regions: [
+        { id: 'main', name: 'main', blocks: ['new-root'] },
+        { id: 'footer', name: 'footer', blocks: ['footer-root'] },
+      ],
+    };
+    const updates = vi.fn();
+    const engine = new FakeEngine(pageAfterReplacement);
+
+    watchEngineUpdates(engine as any, {
+      debounceMs: 0,
+      onUpdates: updates,
+    });
+
+    engine.emit('region:replace', {
+      regionId: 'main',
+      previousRegion: { id: 'main', name: 'main', blocks: ['old-root'] },
+      newRegion: { id: 'main', name: 'main', blocks: ['new-root'] },
+      removedBlocks: {
+        'old-root': oldRoot,
+        'old-child': oldChild,
+      },
+      newBlocks: {
+        'new-root': newRoot,
+        'new-child': newChild,
+      },
+    });
+
+    expect(updates).toHaveBeenCalledTimes(1);
+    expect(updates).toHaveBeenCalledWith({
+      blocks: {
+        'new-root': newRoot,
+        'new-child': newChild,
+        'old-root': oldRoot,
+      },
+      regions: pageAfterReplacement.regions,
+      changes: {
+        added: ['new-root'],
+        updated: [],
+        removed: ['old-root'],
+        moved: {},
+        positions: {
+          'new-root': { regionId: 'main' },
+        },
+      },
+    });
+  });
 });

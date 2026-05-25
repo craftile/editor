@@ -1,4 +1,4 @@
-import type { Block, BlockSchema, Page } from '@craftile/types';
+import type { Block, BlockSchema, Page, Region } from '@craftile/types';
 import type { BlocksManager } from './blocks-manager';
 
 export interface EngineConfig {
@@ -16,6 +16,13 @@ export interface Command {
 export interface EngineEvents {
   'page:set': { previousPage?: Page; newPage: Page };
   'page:replace': { previousPage: Page; newPage: Page };
+  'region:replace': {
+    regionId: string;
+    previousRegion: Region;
+    newRegion: Region;
+    removedBlocks: Record<string, Block>;
+    newBlocks: Record<string, Block>;
+  };
   'block:insert': { blockId: string; block: Block; parentId?: string; index?: number; regionId?: string };
   'block:remove': { blockId: string; block: Block; parentId?: string; regionId?: string };
   'block:toggle': { blockId: string; disabled: boolean; oldValue?: boolean };

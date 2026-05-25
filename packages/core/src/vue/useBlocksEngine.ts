@@ -63,6 +63,7 @@ export interface UseBlocksEngineReturn {
     }
   ) => string;
   replacePage: (newPage: Page) => void;
+  replaceRegion: (regionId: string, structures: BlockStructure[]) => void;
 
   undo: () => boolean;
   redo: () => boolean;
@@ -174,6 +175,7 @@ export function useBlocksEngine(
     const eventTypes = [
       'page:set',
       'page:replace',
+      'region:replace',
       'block:insert',
       'block:remove',
       'block:move',
@@ -311,6 +313,14 @@ export function useBlocksEngine(
     }
   };
 
+  const replaceRegion = (regionId: string, structures: BlockStructure[]): void => {
+    engine.replaceRegion(regionId, structures);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+  };
+
   const undo = (): boolean => {
     const result = engine.undo();
 
@@ -382,6 +392,7 @@ export function useBlocksEngine(
     duplicateBlock,
     pasteBlock,
     replacePage,
+    replaceRegion,
 
     // History methods
     undo,
