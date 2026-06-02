@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 1.1.1
+
+### Patch Changes
+
+- [`b08e509`](https://github.com/craftile/editor/commit/b08e509496c75166a7356e2d5fc652575185bd7e) Thanks [@eldomagan](https://github.com/eldomagan)! - Show the right configuration panel only when needed on wide screens, animate it when it appears or hides, and keep it persistent on ultra-wide viewports.
+
+- Updated dependencies []:
+  - @craftile/core@1.1.1
+  - @craftile/event-bus@1.1.1
+  - @craftile/messenger@1.1.1
+  - @craftile/types@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
