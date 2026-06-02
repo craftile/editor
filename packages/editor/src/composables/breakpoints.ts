@@ -6,6 +6,7 @@ const DEFAULT_BREAKPOINTS = {
   large: 1024,
   extraLarge: 1280,
   extraExtraLarge: 1536,
+  ultraWide: 1920,
 } as const;
 
 interface UseBreakpointsReturn {
@@ -16,6 +17,7 @@ interface UseBreakpointsReturn {
   isLarge: ComputedRef<boolean>;
   isExtraLarge: ComputedRef<boolean>;
   isExtraExtraLarge: ComputedRef<boolean>;
+  isUltraWide: ComputedRef<boolean>;
 }
 
 export function useBreakpoints(): UseBreakpointsReturn {
@@ -45,6 +47,10 @@ export function useBreakpoints(): UseBreakpointsReturn {
     return windowWidth.value >= DEFAULT_BREAKPOINTS.extraExtraLarge;
   });
 
+  const isUltraWide = computed((): boolean => {
+    return windowWidth.value >= DEFAULT_BREAKPOINTS.ultraWide;
+  });
+
   onMounted((): void => {
     updateWidth();
     window.addEventListener('resize', updateWidth);
@@ -62,5 +68,6 @@ export function useBreakpoints(): UseBreakpointsReturn {
     isLarge,
     isExtraLarge,
     isExtraExtraLarge,
+    isUltraWide,
   };
 }

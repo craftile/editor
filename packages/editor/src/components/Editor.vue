@@ -4,8 +4,9 @@ import type { CraftileEditor } from '../editor';
 import { CRAFTILE_EDITOR_SYMBOL } from '../constants';
 import '../index.css';
 
-const { isExtraExtraLarge } = useBreakpoints();
+const { isExtraExtraLarge, isUltraWide } = useBreakpoints();
 const { keyboardShortcuts } = useUI();
+const { hasSelection } = useSelectedBlock();
 const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL)!;
 
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -40,9 +41,14 @@ const handleKeyDown = (event: KeyboardEvent) => {
           <PreviewCanvas />
         </div>
 
-        <aside v-if="isExtraExtraLarge" class="h-full flex-none overflow-y-hidden w-75 border-l">
-          <ConfigurationPanels />
-        </aside>
+        <Transition name="configuration-panel">
+          <aside
+            v-if="isExtraExtraLarge && (hasSelection || isUltraWide)"
+            class="configuration-panel-aside h-full flex-none overflow-y-hidden border-l"
+          >
+            <ConfigurationPanels />
+          </aside>
+        </Transition>
       </main>
     </div>
 

@@ -65,6 +65,30 @@
     @apply opacity-30 bg-accent/20 border-2 border-dashed border-accent/80 rounded-md;
   }
 
+  .configuration-panel-aside {
+    width: 18.75rem;
+  }
+
+  .configuration-panel-enter-active,
+  .configuration-panel-leave-active {
+    transition:
+      width 0.2s ease-out,
+      opacity 0.2s ease-out;
+    overflow: hidden;
+  }
+
+  .configuration-panel-enter-from,
+  .configuration-panel-leave-to {
+    width: 0;
+    opacity: 0;
+  }
+
+  .configuration-panel-enter-to,
+  .configuration-panel-leave-from {
+    width: 18.75rem;
+    opacity: 1;
+  }
+
   .property-field-enter-active,
   .property-field-leave-active {
     transition: all 0.2s ease;
