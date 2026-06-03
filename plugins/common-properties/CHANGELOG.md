@@ -1,5 +1,7 @@
 # @craftile/plugin-common-properties
 
+## 1.1.1
+
 ## 1.1.0
 
 ## 1.0.9
