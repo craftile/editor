@@ -3,7 +3,7 @@ import { Accordion } from '@ark-ui/vue';
 import { evaluateVisibilityRule } from '../utils';
 
 const { t } = useI18n();
-const { selectedBlock } = useSelectedBlock();
+const { selectedBlock, selectedBlockId } = useSelectedBlock();
 const { engine, setBlockProperty } = useCraftileEngine();
 const { currentDevice } = useDeviceMode();
 
@@ -64,6 +64,25 @@ const defaultOpenGroups = computed(() => {
   return [propertyGroups.value[0].id];
 });
 
+const openGroupsByBlockId = reactive<Record<string, string[]>>({});
+
+const selectedBlockOpenGroups = computed<string[]>({
+  get() {
+    if (!selectedBlockId.value) {
+      return [];
+    }
+
+    return openGroupsByBlockId[selectedBlockId.value] ?? defaultOpenGroups.value;
+  },
+  set(value) {
+    if (!selectedBlockId.value) {
+      return;
+    }
+
+    openGroupsByBlockId[selectedBlockId.value] = value;
+  },
+});
+
 const getPropertyValue = (propertyId: string) => {
   return selectedBlock.value?.properties?.[propertyId];
 };
@@ -95,7 +114,7 @@ function updateProperty(propertyId: string, value: any) {
   <div v-if="selectedBlock">
     <template v-if="propertyFields.length > 0">
       <template v-if="hasGroupedProperties">
-        <Accordion.Root class="w-full" :default-value="defaultOpenGroups" multiple>
+        <Accordion.Root v-model="selectedBlockOpenGroups" class="w-full" multiple>
           <Accordion.Item
             v-for="group in propertyGroups"
             :key="group.id"
