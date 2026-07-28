@@ -1,5 +1,21 @@
 # @craftile/core
 
+## 1.1.2
+
+### Patch Changes
+
+- [`6e64dce`](https://github.com/craftile/editor/commit/6e64dce29ca5aea3a319b87494bb89aa98841ae1) Thanks [@eldomagan](https://github.com/eldomagan)! - Emit the resolved target region ID for block moves that rely on the default region.
+
+- [`67f0bde`](https://github.com/craftile/editor/commit/67f0bde2d9c85b07452c08374134526f2977154d) Thanks [@eldomagan](https://github.com/eldomagan)! - Keep duplicated root blocks in their source region when a region ID differs from its display name.
+
+- [`8522d79`](https://github.com/craftile/editor/commit/8522d79fbb9a04254a8a7fe090b98f8e9cc081d9) Thanks [@eldomagan](https://github.com/eldomagan)! - Include the source region ID in root block removal events, including removals emitted when undoing insertions.
+
+- [`eaa3bbc`](https://github.com/craftile/editor/commit/eaa3bbcfd84b21c1b2600485ef65edd48d7e315d) Thanks [@eldomagan](https://github.com/eldomagan)! - Reject insert, preset, paste, and move operations that target regions which do not exist.
+
+- Updated dependencies []:
+  - @craftile/event-bus@1.1.2
+  - @craftile/types@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes
