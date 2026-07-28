@@ -67,7 +67,7 @@ export class MoveBlockCommand implements Command {
       blockId: this.blockId,
       targetParentId: this.targetParentId,
       targetIndex: this.targetIndex,
-      targetRegionId: this.targetRegionId,
+      targetRegionId: target.kind === 'region' ? target.regionId : undefined,
       sourceParentId: this.originalParentId || null,
       sourceRegionId: this.originalRegionId || null,
       sourceIndex: this.originalIndex,

@@ -73,6 +73,26 @@ describe('MoveBlockCommand', () => {
       expect(emittedEvents[0].data.blockId).toBe('block-1');
     });
 
+    it('should emit the resolved region id when moving to the default region', () => {
+      page.regions[0] = {
+        id: 'main',
+        name: 'Main Content',
+        blocks: ['block-1', 'block-2', 'block-3'],
+      };
+
+      const command = new MoveBlockCommand(page, {
+        blockId: 'block-1',
+        targetIndex: 2,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      expect(emittedEvents).toHaveLength(1);
+      expect(emittedEvents[0].event).toBe('block:move');
+      expect(emittedEvents[0].data.targetRegionId).toBe('main');
+    });
+
     it('should move block to different region', () => {
       const command = new MoveBlockCommand(page, {
         blockId: 'block-1',
