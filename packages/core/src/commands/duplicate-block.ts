@@ -108,9 +108,6 @@ export class DuplicateBlockCommand implements Command {
 
   private determineInsertLocation(): void {
     const originalBlock = this.page.blocks[this.blockId];
-    if (!originalBlock) {
-      throw new Error(`Block not found: ${this.blockId}`);
-    }
 
     this.parentId = originalBlock.parentId || null;
 
@@ -148,7 +145,7 @@ export class DuplicateBlockCommand implements Command {
 
       targetParent.children.splice(this.insertIndex, 0, this.duplicatedBlockId);
     } else {
-      let targetRegion = this.page.regions.find((r) => r.name === this.regionId);
+      let targetRegion = this.page.regions.find((r) => getRegionId(r) === this.regionId);
 
       if (!targetRegion) {
         targetRegion = { name: this.regionId || 'main', blocks: [] };
@@ -178,7 +175,7 @@ export class DuplicateBlockCommand implements Command {
     } else {
       // Remove from region
       if (this.page.regions) {
-        const targetRegion = this.page.regions.find((r) => r.name === this.regionId);
+        const targetRegion = this.page.regions.find((r) => getRegionId(r) === this.regionId);
         if (targetRegion) {
           const index = targetRegion.blocks.indexOf(this.duplicatedBlockId);
           if (index !== -1) {

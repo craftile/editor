@@ -118,4 +118,28 @@ describe('DuplicateBlockCommand', () => {
     expect(page.blocks[duplicatedId]).toBeUndefined();
     expect(page.regions[0].blocks).toEqual(initialRegionBlocks);
   });
+
+  it('should duplicate a root block in a region whose id differs from its name', () => {
+    page.regions[0] = {
+      id: 'main',
+      name: 'Main Content',
+      blocks: ['block-1', 'block-2'],
+    };
+
+    const command = new DuplicateBlockCommand(page, {
+      blockId: 'block-1',
+      emit: mockEmit,
+    });
+
+    command.apply();
+
+    const duplicatedId = command.getDuplicatedBlockId();
+    expect(page.regions).toHaveLength(1);
+    expect(page.regions[0].blocks).toEqual(['block-1', duplicatedId, 'block-2']);
+
+    command.revert();
+
+    expect(page.regions).toHaveLength(1);
+    expect(page.regions[0].blocks).toEqual(['block-1', 'block-2']);
+  });
 });
