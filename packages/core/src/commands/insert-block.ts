@@ -59,11 +59,7 @@ export class InsertBlockCommand implements Command {
       this.insertedBlock.parentId = target.parent.id;
       target.parent.children.splice(target.index, 0, this.blockId);
     } else {
-      let region = this.page.regions.find((r) => getRegionId(r) === target.regionId);
-      if (!region) {
-        region = { id: target.regionId, name: target.regionId, blocks: [] };
-        this.page.regions.push(region);
-      }
+      const region = this.page.regions.find((r) => getRegionId(r) === target.regionId)!;
       region.blocks.splice(target.index, 0, this.blockId);
     }
 

@@ -178,6 +178,23 @@ describe('Copy and Paste', () => {
     }).toThrow();
   });
 
+  it('should reject pasting into a non-existent region without mutating the page or history', () => {
+    const originalId = engine.insertBlock('Button');
+    const structure = engine.exportBlockAsNestedStructure(originalId);
+    const pageBefore = engine.getPage();
+    let insertedEvents = 0;
+    engine.on('block:insert', () => {
+      insertedEvents++;
+    });
+
+    expect(() => engine.pasteBlock(structure, { regionId: 'missing' })).toThrow('Region not found: missing');
+    expect(engine.getPage()).toEqual(pageBefore);
+    expect(insertedEvents).toBe(0);
+
+    expect(engine.undo()).toBe(true);
+    expect(engine.getBlockById(originalId)).toBeUndefined();
+  });
+
   it('should support undo/redo for paste operation', () => {
     const originalId = engine.insertBlock('Button');
     const structure = engine.exportBlockAsNestedStructure(originalId);

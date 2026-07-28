@@ -155,6 +155,20 @@ describe('MoveBlockCommand', () => {
   });
 
   describe('Dynamic-children contiguity', () => {
+    it('rejects a move to a non-existent region without mutating the page', () => {
+      const pageBefore = structuredClone(page);
+      const command = new MoveBlockCommand(page, {
+        blockId: 'block-1',
+        targetRegionId: 'missing',
+        targetIndex: 0,
+        emit: mockEmit,
+      });
+
+      expect(() => command.apply()).toThrow('Region not found: missing');
+      expect(page).toEqual(pageBefore);
+      expect(emittedEvents).toHaveLength(0);
+    });
+
     it('rejects a cross-parent move that would split the target dynamic group and restores the source', () => {
       // parent-a starts: [dynamic-a, static-a] — group sits before static-a
       page.blocks['dynamic-a'] = {

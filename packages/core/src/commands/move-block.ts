@@ -55,11 +55,7 @@ export class MoveBlockCommand implements Command {
       target.parent.children.splice(target.index, 0, this.blockId);
     } else {
       this.blockToMove!.parentId = undefined;
-      let region = this.page.regions.find((r) => getRegionId(r) === target.regionId);
-      if (!region) {
-        region = { id: target.regionId, name: target.regionId, blocks: [] };
-        this.page.regions.push(region);
-      }
+      const region = this.page.regions.find((r) => getRegionId(r) === target.regionId)!;
       region.blocks.splice(target.index, 0, this.blockId);
     }
 
@@ -121,12 +117,12 @@ export class MoveBlockCommand implements Command {
 
     const regionId = resolveRegionId(this.page, this.targetRegionId);
     const existing = this.page.regions.find((r) => getRegionId(r) === regionId);
+    if (!existing) {
+      throw new Error(`Region not found: ${regionId}`);
+    }
+
     const sourceIsTarget = this.originalRegionId === regionId;
-    const prospective = existing
-      ? sourceIsTarget
-        ? existing.blocks.filter((id) => id !== this.blockId)
-        : existing.blocks
-      : [];
+    const prospective = sourceIsTarget ? existing.blocks.filter((id) => id !== this.blockId) : existing.blocks;
 
     return { kind: 'region', regionId, index: clampIndex(prospective.length, this.targetIndex) };
   }

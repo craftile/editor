@@ -249,6 +249,21 @@ describe('InsertBlockFromPresetCommand', () => {
   });
 
   describe('Validation', () => {
+    it('should reject insertion into a non-existent region without mutating the page', () => {
+      const pageBefore = structuredClone(page);
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container',
+        presetIndex: 0,
+        regionId: 'missing',
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      expect(() => command.apply()).toThrow('Region not found: missing');
+      expect(page).toEqual(pageBefore);
+      expect(emittedEvents).toHaveLength(0);
+    });
+
     it('should throw error for invalid block type', () => {
       expect(() => {
         new InsertBlockFromPresetCommand(page, {

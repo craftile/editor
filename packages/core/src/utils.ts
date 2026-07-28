@@ -60,10 +60,14 @@ export const resolveInsertTarget = (
 
   const targetRegionId = resolveRegionId(page, regionId);
   const existing = page.regions.find((r) => getRegionId(r) === targetRegionId);
+  if (!existing) {
+    throw new Error(`Region not found: ${targetRegionId}`);
+  }
+
   return {
     kind: 'region',
     regionId: targetRegionId,
-    index: clampIndex(existing?.blocks.length ?? 0, index),
+    index: clampIndex(existing.blocks.length, index),
   };
 };
 
