@@ -1,5 +1,15 @@
 # @craftile/editor
 
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`6e64dce`](https://github.com/craftile/editor/commit/6e64dce29ca5aea3a319b87494bb89aa98841ae1), [`67f0bde`](https://github.com/craftile/editor/commit/67f0bde2d9c85b07452c08374134526f2977154d), [`8522d79`](https://github.com/craftile/editor/commit/8522d79fbb9a04254a8a7fe090b98f8e9cc081d9), [`eaa3bbc`](https://github.com/craftile/editor/commit/eaa3bbcfd84b21c1b2600485ef65edd48d7e315d)]:
+  - @craftile/core@1.1.2
+  - @craftile/event-bus@1.1.2
+  - @craftile/messenger@1.1.2
+  - @craftile/types@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes
