@@ -275,6 +275,12 @@ describe('InsertBlockCommand', () => {
 
   describe('Command Revert', () => {
     it('should revert block insertion', () => {
+      page.regions[0] = {
+        id: 'main',
+        name: 'Main Content',
+        blocks: ['existing-block', 'parent-block'],
+      };
+
       const command = new InsertBlockCommand(page, {
         blockType: 'text',
         blockSchema: textSchema,
@@ -298,6 +304,8 @@ describe('InsertBlockCommand', () => {
       expect(emittedEvents).toHaveLength(2);
       expect(emittedEvents[1].event).toBe('block:remove');
       expect(emittedEvents[1].data.blockId).toBe(insertedId);
+      expect(emittedEvents[1].data.parentId).toBeUndefined();
+      expect(emittedEvents[1].data.regionId).toBe('main');
     });
   });
 

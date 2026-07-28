@@ -54,6 +54,7 @@ export class RemoveBlockCommand implements Command {
       blockId: this.blockId,
       block: this.removedBlock,
       parentId: this.originalParentId,
+      regionId: this.regionId,
     });
   }
 

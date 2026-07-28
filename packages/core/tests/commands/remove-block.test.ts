@@ -41,6 +41,12 @@ describe('RemoveBlockCommand', () => {
 
   describe('Basic Removal', () => {
     it('should remove top-level block from region', () => {
+      page.regions[0] = {
+        id: 'main',
+        name: 'Main Content',
+        blocks: ['block-1', 'block-2'],
+      };
+
       const command = new RemoveBlockCommand(page, {
         blockId: 'block-1',
         emit: mockEmit,
@@ -58,6 +64,8 @@ describe('RemoveBlockCommand', () => {
       expect(emittedEvents).toHaveLength(1);
       expect(emittedEvents[0].event).toBe('block:remove');
       expect(emittedEvents[0].data.blockId).toBe('block-1');
+      expect(emittedEvents[0].data.parentId).toBeUndefined();
+      expect(emittedEvents[0].data.regionId).toBe('main');
     });
 
     it('should remove child block from parent', () => {
@@ -74,6 +82,8 @@ describe('RemoveBlockCommand', () => {
       expect(parentBlock.children).toHaveLength(initialChildCount - 1);
       expect(parentBlock.children).not.toContain('block-2-1');
       expect(page.blocks['block-2-1']).toBeUndefined();
+      expect(emittedEvents[0].data.parentId).toBe('block-2');
+      expect(emittedEvents[0].data.regionId).toBeUndefined();
     });
   });
 

@@ -23,6 +23,7 @@ export class InsertBlockCommand implements Command {
   private blockSchema?: BlockSchema;
   private insertedBlock?: Block;
   private actualIndex?: number;
+  private resolvedRegionId?: string;
   private emit: EngineEmitFn;
 
   constructor(page: Page, options: InsertBlockOptions) {
@@ -40,6 +41,7 @@ export class InsertBlockCommand implements Command {
 
   apply(): void {
     const target = resolveInsertTarget(this.page, this.parentId, this.regionId, this.index);
+    this.resolvedRegionId = target.kind === 'region' ? target.regionId : undefined;
 
     const blockName = this.blockSchema?.meta?.name || this.blockType;
 
@@ -84,9 +86,8 @@ export class InsertBlockCommand implements Command {
       if (parent && this.actualIndex !== undefined) {
         parent.children.splice(this.actualIndex, 1);
       }
-    } else {
-      const targetRegionId = this.regionId || getRegionId(this.page.regions[0]);
-      const targetRegion = this.page.regions.find((r) => getRegionId(r) === targetRegionId);
+    } else if (this.resolvedRegionId) {
+      const targetRegion = this.page.regions.find((r) => getRegionId(r) === this.resolvedRegionId);
 
       if (targetRegion && this.actualIndex !== undefined) {
         targetRegion.blocks.splice(this.actualIndex, 1);
@@ -97,6 +98,7 @@ export class InsertBlockCommand implements Command {
       blockId: this.blockId,
       block: this.insertedBlock,
       parentId: this.parentId,
+      regionId: this.resolvedRegionId,
     });
   }
 

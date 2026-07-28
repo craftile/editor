@@ -399,6 +399,12 @@ describe('InsertBlockFromPresetCommand', () => {
 
   describe('Command Revert', () => {
     it('should revert preset insertion with children', () => {
+      page.regions[0] = {
+        id: 'main',
+        name: 'Main Content',
+        blocks: ['existing-block', 'parent-block'],
+      };
+
       const command = new InsertBlockFromPresetCommand(page, {
         blockType: 'container',
         presetIndex: 1, // Has 2 children
@@ -424,6 +430,8 @@ describe('InsertBlockFromPresetCommand', () => {
 
       expect(emittedEvents).toHaveLength(2);
       expect(emittedEvents[1].event).toBe('block:remove');
+      expect(emittedEvents[1].data.parentId).toBeUndefined();
+      expect(emittedEvents[1].data.regionId).toBe('main');
     });
 
     it('should revert nested preset insertion', () => {
