@@ -78,6 +78,7 @@ export interface BlockSchema {
   type: string;
   properties: PropertyField[];
   accepts?: string[];
+  rejects?: string[]; // Patterns removed from what accepts allows. Has no effect without accepts. Applies to private blocks too.
   presets?: BlockPreset[];
   private?: boolean; // Private blocks can only be children if explicitly listed in parent's accepts array
   meta?: Record<string, any>; // UI-specific metadata for editors

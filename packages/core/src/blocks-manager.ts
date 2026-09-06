@@ -76,11 +76,16 @@ export class BlocksManager {
   /**
    * Validate if a block type can be a child of another type
    * Private blocks can only be children if explicitly listed in parent's accepts array (no pattern matching)
+   * Patterns in the parent's rejects array remove matches from accepts, including private blocks
    */
   canBeChild(childType: string, parentType: string): boolean {
     const parentSchema = this.get(parentType);
 
     if (!parentSchema || !parentSchema.accepts) {
+      return false;
+    }
+
+    if (parentSchema.rejects?.some((pattern) => this.matchesPattern(childType, pattern))) {
       return false;
     }
 
@@ -104,7 +109,7 @@ export class BlocksManager {
   }
 
   /**
-   * Check if a child type matches a pattern from the accepts list
+   * Check if a child type matches a pattern from the accepts or rejects list
    * Supports glob-style wildcards: '*', '@theme/*', '*-button', '*type*', etc.
    */
   private matchesPattern(childType: string, pattern: string): boolean {

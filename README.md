@@ -99,6 +99,8 @@ const editor = createCraftileEditor({
 });
 ```
 
+A block schema's `accepts` lists the child types it allows, using exact names or glob patterns such as `*`, `@theme/*` or `visual-*`. The optional `rejects` list uses the same patterns and removes matches from `accepts`. For example, `accepts: ['*'], rejects: ['button']` allows every block except buttons. A schema without `accepts` allows no children, whatever `rejects` contains.
+
 ### With Plugins
 
 ```typescript

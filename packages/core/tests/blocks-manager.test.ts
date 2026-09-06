@@ -53,6 +53,23 @@ const testSchemas: Record<string, BlockSchema> = {
     accepts: [],
     private: true, // Private: only exact matches allowed
   },
+  'open-container': {
+    type: 'open-container',
+    properties: [],
+    accepts: ['*'],
+    rejects: ['button', 'visual-*'],
+  },
+  'strict-accordion': {
+    type: 'strict-accordion',
+    properties: [],
+    accepts: ['accordion-row', 'text'],
+    rejects: ['accordion-*'],
+  },
+  'rejects-only': {
+    type: 'rejects-only',
+    properties: [],
+    rejects: ['button'],
+  },
 };
 
 const ALL_TYPES = Object.keys(testSchemas);
@@ -215,6 +232,33 @@ describe('BlocksManager', () => {
         // Non-private blocks still work with exact matches
         expect(manager.canBeChild('button', 'section')).toBe(true);
         expect(manager.canBeChild('text', 'section')).toBe(true);
+      });
+    });
+
+    describe('Rejects', () => {
+      it('should reject exact type matches listed in rejects', () => {
+        expect(manager.canBeChild('button', 'open-container')).toBe(false);
+      });
+
+      it('should reject types matching a rejects pattern', () => {
+        expect(manager.canBeChild('visual-card', 'open-container')).toBe(false);
+        expect(manager.canBeChild('visual-button', 'open-container')).toBe(false);
+      });
+
+      it('should still accept types not matching any rejects pattern', () => {
+        expect(manager.canBeChild('text', 'open-container')).toBe(true);
+        expect(manager.canBeChild('box', 'open-container')).toBe(true);
+        expect(manager.canBeChild('card-visual', 'open-container')).toBe(true);
+      });
+
+      it('should reject private blocks by pattern even when explicitly accepted', () => {
+        expect(manager.canBeChild('accordion-row', 'strict-accordion')).toBe(false);
+        expect(manager.canBeChild('text', 'strict-accordion')).toBe(true);
+      });
+
+      it('should accept nothing when rejects is set without accepts', () => {
+        expect(manager.canBeChild('button', 'rejects-only')).toBe(false);
+        expect(manager.canBeChild('text', 'rejects-only')).toBe(false);
       });
     });
   });
