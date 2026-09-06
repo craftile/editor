@@ -237,4 +237,70 @@ describe('PreviewClient inspector block events', () => {
       scrollLeft: 0,
     });
   });
+
+  it('re-sends the selected block position when the viewport resizes', async () => {
+    const { PreviewClient } = await importPreviewClient();
+    new PreviewClient();
+
+    const selectHandler = messenger.listen.mock.calls.find(([type]) => type === 'craftile.editor.select-block')![1];
+
+    selectHandler({ blockId: 'known' });
+    messenger.send.mockClear();
+
+    window.dispatchEvent(new Event('resize'));
+
+    expect(messenger.send).toHaveBeenCalledWith('craftile.preview.block-select', {
+      blockId: 'known',
+      blockRect: expect.objectContaining({
+        top: expect.any(Number),
+        left: expect.any(Number),
+        width: expect.any(Number),
+        height: expect.any(Number),
+      }),
+      scrollTop: 0,
+      scrollLeft: 0,
+    });
+  });
+
+  it('coalesces a burst of resize events into a single frame', async () => {
+    const frameCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn((callback: FrameRequestCallback) => {
+        frameCallbacks.push(callback);
+        return frameCallbacks.length;
+      })
+    );
+
+    const { PreviewClient } = await importPreviewClient();
+    new PreviewClient();
+
+    const selectHandler = messenger.listen.mock.calls.find(([type]) => type === 'craftile.editor.select-block')![1];
+
+    selectHandler({ blockId: 'known' });
+    messenger.send.mockClear();
+
+    // Inspectors from earlier tests keep their window listeners, so measure the
+    // number of frames one resize schedules instead of assuming a single instance.
+    window.dispatchEvent(new Event('resize'));
+    const framesPerResize = frameCallbacks.length;
+    expect(framesPerResize).toBeGreaterThan(0);
+
+    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event('resize'));
+
+    expect(frameCallbacks).toHaveLength(framesPerResize);
+    expect(messenger.send).not.toHaveBeenCalled();
+
+    frameCallbacks.forEach((callback) => callback(0));
+
+    expect(messenger.send).toHaveBeenCalledWith(
+      'craftile.preview.block-select',
+      expect.objectContaining({ blockId: 'known' })
+    );
+
+    // A later resize schedules a fresh frame once the previous one has run
+    window.dispatchEvent(new Event('resize'));
+    expect(frameCallbacks).toHaveLength(framesPerResize * 2);
+  });
 });

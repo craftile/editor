@@ -21,6 +21,7 @@ export class Inspector {
   private resizeObserver: ResizeObserver | null = null;
   private mutationObserver: MutationObserver | null = null;
   private transitionCleanupFunctions: (() => void)[] = [];
+  private pendingViewportResizeFrame: number | null = null;
 
   constructor(
     messenger: WindowMessenger<WindowMessages>,
@@ -37,6 +38,7 @@ export class Inspector {
     this.messenger.listen('craftile.editor.deselect-block', this.handleEditorDeselectBlock.bind(this));
 
     window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
+    window.addEventListener('resize', this.handleViewportResize.bind(this), { passive: true });
     this.setupGlobalEventListeners();
   }
 
@@ -135,6 +137,28 @@ export class Inspector {
   }
 
   private handleScroll() {
+    this.refreshTrackedBlockPositions();
+  }
+
+  /**
+   * The iframe viewport resizes whenever the editor layout changes around it
+   * (e.g. the configuration panel opening). A block can move without its own
+   * box changing size, which the ResizeObserver would not catch, so re-measure
+   * on the next frame. Resize events arrive once per frame during layout
+   * transitions, so coalesce them into a single pending frame.
+   */
+  private handleViewportResize() {
+    if (!this.active || this.pendingViewportResizeFrame !== null) {
+      return;
+    }
+
+    this.pendingViewportResizeFrame = requestAnimationFrame(() => {
+      this.pendingViewportResizeFrame = null;
+      this.refreshTrackedBlockPositions();
+    });
+  }
+
+  private refreshTrackedBlockPositions() {
     if (!this.active) {
       return;
     }
