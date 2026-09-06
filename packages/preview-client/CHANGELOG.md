@@ -1,5 +1,11 @@
 # @craftile/preview-client
 
+## 1.2.0
+
+### Patch Changes
+
+- [`3d3e447`](https://github.com/craftile/editor/commit/3d3e4478778eefe456ef02e4db4704ef9700e70e) Thanks [@eldomagan](https://github.com/eldomagan)! - Re-measure the selected and hovered block positions when the preview viewport resizes so the selection overlay follows blocks that move without changing size (for example when the configuration panel opens).
+
 ## 1.1.2
 
 ## 1.1.1

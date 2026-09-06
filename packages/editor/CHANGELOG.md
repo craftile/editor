@@ -1,5 +1,21 @@
 # @craftile/editor
 
+## 1.2.0
+
+### Patch Changes
+
+- [`e3795d2`](https://github.com/craftile/editor/commit/e3795d296f23a71549979e4d8a2ac5719f6bd2cf) Thanks [@eldomagan](https://github.com/eldomagan)! - Always show an "Add block" row at the end of every region and every expanded block that accepts children in the layers panel, instead of only when the list is empty. The row appends to the end of the list and is hidden where a dynamic block cannot legally be placed.
+
+- [`b8d41d8`](https://github.com/craftile/editor/commit/b8d41d89cf43392d486a81664870f568ce0aa7d6) Thanks [@eldomagan](https://github.com/eldomagan)! - Expand every block group that contains a match while searching in the blocks popover, and reset the search when the popover closes.
+
+- [`98c25a1`](https://github.com/craftile/editor/commit/98c25a1b3512f01154a8bef88859bdde2e0fba87) Thanks [@eldomagan](https://github.com/eldomagan)! - Rescale the preview canvas and refresh the iframe position when the preview container resizes (for example when the configuration panel opens or the window is resized) instead of clipping the canvas at its previous scale.
+
+- Updated dependencies [[`746e3fa`](https://github.com/craftile/editor/commit/746e3fad02eb04d5935f0aa3bb2c34b3ecc5012a)]:
+  - @craftile/types@1.2.0
+  - @craftile/core@1.2.0
+  - @craftile/event-bus@1.2.0
+  - @craftile/messenger@1.2.0
+
 ## 1.1.2
 
 ### Patch Changes
