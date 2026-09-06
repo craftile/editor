@@ -26,6 +26,11 @@ const popover = usePopover({
   id: 'blocks-popover',
   portalled: true,
   closeOnInteractOutside: true,
+  onOpenChange: ({ open }) => {
+    if (!open) {
+      close();
+    }
+  },
   positioning: {
     placement: 'left-start',
     strategy: 'fixed',
@@ -137,6 +142,7 @@ const close = () => {
   popover.value.setOpen(false);
   insertionContext.value = null;
   anchorEl.value = null;
+  searchQuery.value = '';
 };
 
 onMounted(() => {

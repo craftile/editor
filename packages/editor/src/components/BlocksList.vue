@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Accordion } from '@ark-ui/vue/accordion';
-import type { BlockSchemaOption } from '../composables/blocks-popover';
+import { resolveOpenCategories, type BlockSchemaOption } from '../composables/blocks-popover';
 
 interface Props {
   blocksByCategory: Record<string, BlockSchemaOption[]>;
@@ -29,23 +29,21 @@ const sortedBlocksByCategory = computed(() => {
 const openCategories = ref<string[]>([]);
 const hoveredOption = ref<BlockSchemaOption | null>(null);
 
+// The popover content stays mounted between opens, so the category list
+// changes on every open/close as well as on every search query change.
 watch(
-  sortedCategories,
-  (categories) => {
-    if (categories.length === 0) {
-      openCategories.value = [];
+  [() => props.searchQuery, sortedCategories],
+  ([searchQuery, categories], previous) => {
+    const previousQuery = previous?.[0];
+    const visibleCategories = new Set(categories);
+    const stillOpen = openCategories.value.filter((category) => visibleCategories.has(category));
+
+    if (searchQuery !== previousQuery || stillOpen.length === 0) {
+      openCategories.value = resolveOpenCategories(searchQuery, categories);
       return;
     }
 
-    const visibleCategories = new Set(categories);
-    const nextOpenCategories = openCategories.value.filter((category) => visibleCategories.has(category));
-    const firstCategory = categories[0];
-
-    if (firstCategory && !nextOpenCategories.includes(firstCategory)) {
-      nextOpenCategories.unshift(firstCategory);
-    }
-
-    openCategories.value = nextOpenCategories;
+    openCategories.value = stillOpen;
   },
   { immediate: true }
 );

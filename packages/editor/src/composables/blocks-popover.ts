@@ -19,6 +19,25 @@ export interface BlockSchemaOption {
   previewImageUrl?: string;
 }
 
+/**
+ * Resolve which categories should be open in the blocks list.
+ * While a search query is active every category containing a match is open.
+ * Without a query only the first category is open.
+ */
+export function resolveOpenCategories(searchQuery: string, categories: string[]): string[] {
+  if (searchQuery.trim()) {
+    return [...categories];
+  }
+
+  const firstCategory = categories[0];
+
+  if (!firstCategory) {
+    return [];
+  }
+
+  return [firstCategory];
+}
+
 export function useBlocksPopover() {
   const editor = inject<CraftileEditor>(CRAFTILE_EDITOR_SYMBOL);
 
