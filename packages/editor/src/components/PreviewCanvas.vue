@@ -9,13 +9,12 @@ const canvasContainer = ref<HTMLElement>();
 const previewWrapper = ref<HTMLElement>();
 
 const currentDeviceWidth = computed(() => currentDeviceData.value?.width);
+const containerWidth = ref(0);
 
-const getContainerWidth = () => {
-  return previewWrapper.value?.getBoundingClientRect().width || 0;
-};
+let resizeObserver: ResizeObserver | undefined;
 
 const zoomScale = computed(() => {
-  const availableWidth = getContainerWidth();
+  const availableWidth = containerWidth.value;
 
   if (availableWidth <= 0) {
     return 1;
@@ -92,10 +91,19 @@ const handleInsertAfter = (targetBlockId: string, event: MouseEvent) => {
 
 onMounted(() => {
   window.addEventListener('scroll', updateIframePosition);
+
+  if (previewWrapper.value) {
+    resizeObserver = new ResizeObserver((entries) => {
+      containerWidth.value = entries[0].contentRect.width;
+      updateIframePosition();
+    });
+    resizeObserver.observe(previewWrapper.value);
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', updateIframePosition);
+  resizeObserver?.disconnect();
 });
 </script>
 
