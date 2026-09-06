@@ -304,6 +304,127 @@ describe('RawHtmlRenderer child comment cache', () => {
   });
 });
 
+describe('RawHtmlRenderer static siblings outside children markers', () => {
+  let renderer: RawHtmlRenderer;
+
+  beforeEach(() => {
+    installDom('<!--BEGIN region: main--><!--END region: main-->');
+    renderer = new RawHtmlRenderer(new FakePreviewClient() as any);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function renderParent(html: string, children: string[]) {
+    (renderer as any).handleEffects(
+      makeUpdates(
+        { parent: html },
+        { parent: makeBlock('parent', children) },
+        {
+          added: ['parent'],
+          positions: {
+            parent: { regionId: 'main' },
+          },
+        }
+      )
+    );
+  }
+
+  function insertChild(id: string, position: { afterId?: string; beforeId?: string }) {
+    (renderer as any).handleEffects(
+      makeUpdates(
+        { [id]: `<p data-block="${id}">${id}</p>` },
+        { [id]: makeBlock(id) },
+        {
+          added: [id],
+          positions: {
+            [id]: { parentId: 'parent', ...position },
+          },
+        }
+      )
+    );
+  }
+
+  it('inserts the first dynamic child between the markers when afterId is a static block outside the wrapper', () => {
+    renderParent(
+      `
+        <section data-block="parent">
+          <h2 data-block="title">Title</h2>
+          <div class="items">
+            <!--BEGIN children: parent-->
+            <!--END children: parent-->
+          </div>
+        </section>
+      `,
+      ['title']
+    );
+
+    insertChild('item-1', { afterId: 'title' });
+
+    const parentElement = document.querySelector('[data-block="parent"]')!;
+    const item = document.querySelector('[data-block="item-1"]')!;
+    const beginComment = findComment(parentElement, 'BEGIN children: parent')!;
+    const endComment = findComment(parentElement, 'END children: parent')!;
+
+    expect(item.parentNode).toBe(beginComment.parentNode);
+    expect(beginComment.compareDocumentPosition(item) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(item.nextSibling).toBe(endComment);
+  });
+
+  it('inserts the first dynamic child between the markers when afterId is a static block before BEGIN in the same wrapper', () => {
+    renderParent(
+      `
+        <section data-block="parent">
+          <div class="items">
+            <h2 data-block="title">Title</h2>
+            <!--BEGIN children: parent-->
+            <!--END children: parent-->
+          </div>
+        </section>
+      `,
+      ['title']
+    );
+
+    insertChild('item-1', { afterId: 'title' });
+
+    const parentElement = document.querySelector('[data-block="parent"]')!;
+    const item = document.querySelector('[data-block="item-1"]')!;
+    const beginComment = findComment(parentElement, 'BEGIN children: parent')!;
+    const endComment = findComment(parentElement, 'END children: parent')!;
+
+    expect(item.parentNode).toBe(beginComment.parentNode);
+    expect(beginComment.compareDocumentPosition(item) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(item.nextSibling).toBe(endComment);
+  });
+
+  it('falls back to afterId when beforeId is a static block after END', () => {
+    renderParent(
+      `
+        <section data-block="parent">
+          <div class="items">
+            <!--BEGIN children: parent-->
+            <p data-block="item-1">item-1</p>
+            <!--END children: parent-->
+            <footer data-block="footer">Footer</footer>
+          </div>
+        </section>
+      `,
+      ['item-1', 'footer']
+    );
+
+    insertChild('item-2', { afterId: 'item-1', beforeId: 'footer' });
+
+    const parentElement = document.querySelector('[data-block="parent"]')!;
+    const item1 = document.querySelector('[data-block="item-1"]')!;
+    const item2 = document.querySelector('[data-block="item-2"]')!;
+    const endComment = findComment(parentElement, 'END children: parent')!;
+
+    expect(item1.nextSibling).toBe(item2);
+    expect(item2.compareDocumentPosition(endComment) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});
+
 describe('RawHtmlRenderer block removal events', () => {
   let previewClient: FakePreviewClient;
   let renderer: RawHtmlRenderer;

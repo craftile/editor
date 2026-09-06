@@ -652,13 +652,17 @@ export default class RawHtmlRenderer {
     const comments = blockId ? this.childrenCommentsCache.get(blockId) : null;
 
     if (comments) {
+      // Static siblings may be rendered outside the children markers (in the
+      // outer wrapper, or in the same wrapper but before BEGIN / after END).
+      // Only anchors that sit between the markers can be used.
       let insertBefore: Node | null = null;
 
-      if (beforeId) {
-        insertBefore = this.getElementCached(beforeId);
-      } else if (afterId) {
-        const afterElement = this.getElementCached(afterId);
-        if (afterElement && afterElement.nextSibling) {
+      const beforeElement = beforeId ? this.getElementCached(beforeId) : null;
+      if (beforeElement && this.isBetweenComments(beforeElement, comments)) {
+        insertBefore = beforeElement;
+      } else {
+        const afterElement = afterId ? this.getElementCached(afterId) : null;
+        if (afterElement && this.isBetweenComments(afterElement, comments)) {
           insertBefore = afterElement.nextSibling;
         }
       }
@@ -682,6 +686,12 @@ export default class RawHtmlRenderer {
 
       parentElement.insertBefore(element, insertBefore);
     }
+  }
+
+  private isBetweenComments(node: Node, comments: RegionComments): boolean {
+    const afterBegin = !!(comments.begin.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const beforeEnd = !!(comments.end.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_PRECEDING);
+    return afterBegin && beforeEnd;
   }
 
   private findRegionInsertionPoint(regionId: string, afterId?: string, beforeId?: string): InsertionPoint | null {

@@ -348,7 +348,7 @@ export const blockRenderers: Record<string, BlockRenderer> = {
       </div>
     </div>`;
   },
-  'collection-list': ({ props, children, editorAttributes }) => {
+  'collection-list': ({ props, children, editorAttributes, id }) => {
     const gap = props.gap || 16;
 
     const style = `
@@ -361,9 +361,9 @@ export const blockRenderers: Record<string, BlockRenderer> = {
     `;
 
     return `<div class="block collection-list" ${editorAttributes} style="${style}">
-      <!--BEGIN children: ${editorAttributes}-->
+      <!--BEGIN children: ${id}-->
       ${children}
-      <!--END children: ${editorAttributes}-->
+      <!--END children: ${id}-->
     </div>`;
   },
   'collection-item': ({ editorAttributes }) => {
