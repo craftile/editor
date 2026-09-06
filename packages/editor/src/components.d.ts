@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddBlockBtn: typeof import('./components/AddBlockBtn.vue')['default']
+    AddBlockRow: typeof import('./components/AddBlockRow.vue')['default']
     BlockContextMenu: typeof import('./components/BlockContextMenu.vue')['default']
     BlockItem: typeof import('./components/BlockItem.vue')['default']
     BlocksList: typeof import('./components/BlocksList.vue')['default']

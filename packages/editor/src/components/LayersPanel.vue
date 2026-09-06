@@ -2,12 +2,10 @@
 import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
 import { getRegionId } from '@craftile/core';
 import CollapseAllIcon from './CollapseAllIcon.vue';
-import type { InsertBlockContext } from '../composables/blocks-popover';
 
 const { t } = useI18n();
 const { regions, moveBlock } = useCraftileEngine();
 const { collapseRegion, expandAncestors } = useLayersPanel();
-const { open: openBlocksPopover } = useBlocksPopover();
 const eventBus = useEventBus();
 const { isExtraExtraLarge } = useBreakpoints();
 const { hasSelection } = useSelectedBlock();
@@ -53,20 +51,6 @@ function onRegionBlockMove(event: any) {
     return false;
   }
 }
-
-function addBlockToRegion(event: Event, regionId: string) {
-  const button = event.target as HTMLElement;
-
-  const context: InsertBlockContext = {
-    regionId,
-    index: 0,
-  };
-
-  openBlocksPopover({
-    anchor: button,
-    context,
-  });
-}
 </script>
 
 <template>
@@ -101,15 +85,12 @@ function addBlockToRegion(event: Event, regionId: string) {
             <BlockItem v-for="blockId in region.blocks" :key="blockId" :block-id="blockId" :level="0" />
           </VueDraggable>
 
-          <!-- Show add block button when region is empty -->
-          <div v-if="region.blocks.length === 0" class="flex items-center justify-center py-2">
-            <button
-              @click="addBlockToRegion($event, getRegionId(region))"
-              class="flex w-full items-center gap-2 px-2 py-1 text-sm text-accent/90 hover:text-accent hover:bg-accent-foreground rounded-lg transition-colors cursor-pointer"
-            >
-              <icon-plus class="w-4 h-4" />
-              {{ t('layers.addBlockToRegion') }}
-            </button>
+          <div class="flex items-center justify-center">
+            <AddBlockRow
+              :context="{ regionId: getRegionId(region), index: region.blocks.length }"
+              :label="t('layers.addBlockToRegion')"
+              :variant="region.blocks.length === 0 ? 'accent' : 'muted'"
+            />
           </div>
         </div>
       </div>

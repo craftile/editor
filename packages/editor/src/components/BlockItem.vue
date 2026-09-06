@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable, type SortableEvent } from 'vue-draggable-plus';
 import { canInsertDynamicChildAt } from '@craftile/core';
-import type { InsertBlockContext } from '../composables/blocks-popover';
 
 const props = defineProps<{
   blockId: any;
@@ -14,7 +13,6 @@ const isActive = ref(false);
 const {
   block: blockData,
   children,
-  hasChildren,
   canHaveChildren,
   parent,
   index: blockIndex,
@@ -25,7 +23,6 @@ const {
 const { isExpanded: isExpandedFn, toggleExpanded: toggleExpandedFn } = useLayersPanel();
 const { getBlockLabelReactive, getBlockSchemaNameReactive } = useBlockLabel();
 const { selectedBlockId, selectBlock } = useSelectedBlock();
-const { open: openBlocksPopover } = useBlocksPopover();
 const { engine, moveBlock, removeBlock, blocks, regions } = useCraftileEngine();
 const { toaster } = useUI();
 
@@ -51,19 +48,14 @@ const canInsertNextSibling = computed(() => {
   return canInsertDynamicChildAt(siblingsList, blocks.value, candidateIndex);
 });
 
-function handleAddFirstChild(event: Event) {
-  const button = event.target as HTMLElement;
-
-  const context: InsertBlockContext = {
-    parentId: props.blockId,
-    index: 0,
-  };
-
-  openBlocksPopover({
-    anchor: button,
-    context,
-  });
-}
+// Show the trailing "Add block" row only where a dynamic child can legally be appended
+const canAppendChild = computed(() => {
+  if (!schema.value?.accepts || schema.value.accepts.length === 0) {
+    return false;
+  }
+  const childIds = blockData.value?.children ?? [];
+  return canInsertDynamicChildAt(childIds, blocks.value, childIds.length);
+});
 
 function canAcceptChild(event: any): boolean {
   // Prevent dropping on static blocks
@@ -255,7 +247,7 @@ function remove() {
     </BlockContextMenu>
 
     <!-- Child Blocks - Always show when expanded and can have children to allow drops into empty containers -->
-    <div v-if="canHaveChildren && isExpanded" class="ml-3 space-y-1">
+    <div v-if="canHaveChildren && isExpanded" class="ml-3">
       <VueDraggable
         :model-value="blockData.children"
         :animation="200"
@@ -270,16 +262,13 @@ function remove() {
         <BlockItem v-for="child in children" :key="child.id" :block-id="child.id" :level="level + 1" />
       </VueDraggable>
 
-      <!-- Show add button when empty -->
-      <div v-if="!hasChildren" class="">
-        <button
-          @click="handleAddFirstChild($event)"
-          class="flex items-center gap-1.5 w-full p-1.5 text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors"
-        >
-          <icon-plus class="w-3 h-3" />
-          <span>{{ t('layers.addBlockToBlock') }}</span>
-        </button>
-      </div>
+      <AddBlockRow
+        v-if="canAppendChild"
+        :context="{ parentId: blockData.id, index: blockData.children.length }"
+        :label="t('layers.addBlockToBlock')"
+        variant="muted"
+        class="ml-2"
+      />
     </div>
 
     <AddBlockBtn
