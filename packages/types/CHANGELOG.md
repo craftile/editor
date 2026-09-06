@@ -1,5 +1,11 @@
 # @craftile/types
 
+## 1.2.0
+
+### Minor Changes
+
+- [`746e3fa`](https://github.com/craftile/editor/commit/746e3fad02eb04d5935f0aa3bb2c34b3ecc5012a) Thanks [@eldomagan](https://github.com/eldomagan)! - Add an optional `rejects` list to block schemas. It uses the same glob patterns as `accepts` and removes matching child types from what `accepts` allows, including private blocks. It has no effect when `accepts` is absent. Insert, move, paste, drag-and-drop and the block picker all honor it through `canBeChild`.
+
 ## 1.1.2
 
 ## 1.1.1
