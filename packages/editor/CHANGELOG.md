@@ -1,5 +1,19 @@
 # @craftile/editor
 
+## 1.3.0
+
+### Minor Changes
+
+- [`6b28fae`](https://github.com/craftile/editor/commit/6b28faeba7dfc9d5055c449689655ea8190cec85) Thanks [@eldomagan](https://github.com/eldomagan)! - Add `engine.patchBlocks(blocks)` to merge externally resolved blocks into the live page without touching history, emitting `blocks:patch`. Export `collectVanishedDescendants`. Commands now read the page through an accessor at apply and revert time, so undo and redo keep working after `replacePage()` or an external page swap.
+
+### Patch Changes
+
+- Updated dependencies [[`6b28fae`](https://github.com/craftile/editor/commit/6b28faeba7dfc9d5055c449689655ea8190cec85)]:
+  - @craftile/core@1.3.0
+  - @craftile/event-bus@1.3.0
+  - @craftile/messenger@1.3.0
+  - @craftile/types@1.3.0
+
 ## 1.2.1
 
 ### Patch Changes
