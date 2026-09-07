@@ -1,5 +1,15 @@
 # @craftile/core
 
+## 1.2.1
+
+### Patch Changes
+
+- [`e879086`](https://github.com/craftile/editor/commit/e87908646f1185c7c68ecacc48751989d1aa7fa4) Thanks [@eldomagan](https://github.com/eldomagan)! - Preserve additional host-defined block data (any extra top-level key such as `keep` or `meta`) through copy, paste, structure presets and replaceRegion. `Block` now has an index signature alongside the existing flags.
+
+- Updated dependencies [[`e879086`](https://github.com/craftile/editor/commit/e87908646f1185c7c68ecacc48751989d1aa7fa4)]:
+  - @craftile/types@1.2.1
+  - @craftile/event-bus@1.2.1
+
 ## 1.2.0
 
 ### Minor Changes
