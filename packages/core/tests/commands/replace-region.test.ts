@@ -249,4 +249,27 @@ describe('ReplaceRegionCommand', () => {
     expect(engine.getPage().blocks['block-1'].properties.text).toBe('Click me');
     expect(engine.canUndo()).toBe(false);
   });
+
+  it('should preserve additional data from replacement structures', () => {
+    engine.replaceRegion('main', [
+      {
+        type: 'box',
+        properties: {},
+        keep: true,
+        meta: { source: 'cms' },
+        children: [{ type: 'text', properties: { value: 'Child' }, keep: false, meta: { role: 'body' } }],
+      },
+    ]);
+
+    const page = engine.getPage();
+    const rootId = page.regions[0].blocks[0];
+    const root = page.blocks[rootId];
+    const child = page.blocks[root.children[0]];
+
+    expect(root.keep).toBe(true);
+    expect(root.meta).toEqual({ source: 'cms' });
+    expect(child.keep).toBe(false);
+    expect(child.meta).toEqual({ role: 'body' });
+    expect(child.parentId).toBe(rootId);
+  });
 });

@@ -76,6 +76,7 @@ export class InsertBlockFromPresetCommand implements Command {
 
     if (this.presetData) {
       this.insertedBlock = {
+        ...structuredClone(this.presetData),
         type: this.blockType,
         id: this.blockId,
         name: this.presetData.name || blockSchema?.meta?.name || this.blockType,
@@ -83,10 +84,6 @@ export class InsertBlockFromPresetCommand implements Command {
         properties: this.properties,
         children: [],
         parentId: undefined,
-        static: this.presetData.static,
-        disabled: this.presetData.disabled,
-        repeated: this.presetData.repeated,
-        ghost: this.presetData.ghost,
       };
 
       this.page.blocks[this.blockId] = this.insertedBlock;
@@ -195,6 +192,7 @@ export class InsertBlockFromPresetCommand implements Command {
       const childProperties = this.buildProperties(childSchema, structure.properties);
 
       const childBlock: Block = {
+        ...structuredClone(structure),
         type: structure.type,
         id: childId,
         name: structure.name || childSchema.meta?.name || structure.type,
@@ -202,10 +200,6 @@ export class InsertBlockFromPresetCommand implements Command {
         properties: childProperties,
         children: [],
         parentId,
-        static: structure.static,
-        disabled: structure.disabled,
-        repeated: structure.repeated,
-        ghost: structure.ghost,
       };
 
       this.page.blocks[childId] = childBlock;

@@ -640,4 +640,64 @@ describe('InsertBlockFromPresetCommand', () => {
       expect(secondChild.semanticId).toBe('static-text');
     });
   });
+
+  describe('Additional Block Data', () => {
+    it('should preserve additional data from preset structure and its children', () => {
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container',
+        presetData: {
+          type: 'container',
+          properties: { gap: 8 },
+          keep: true,
+          meta: { source: 'cms' },
+          children: [{ type: 'text', properties: { content: 'Child' }, keep: false, meta: { role: 'body' } }],
+        },
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedBlock = page.blocks[command.getBlockId()];
+      expect(insertedBlock.keep).toBe(true);
+      expect(insertedBlock.meta).toEqual({ source: 'cms' });
+      expect(insertedBlock.properties).toEqual({ direction: 'vertical', gap: 8 });
+
+      const child = page.blocks[insertedBlock.children[0]];
+      expect(child.keep).toBe(false);
+      expect(child.meta).toEqual({ role: 'body' });
+      expect(child.parentId).toBe(insertedBlock.id);
+    });
+
+    it('should preserve additional data on schema preset children', () => {
+      const manager = new BlocksManager();
+      manager.register('container', containerSchema);
+      manager.register('text', textSchema);
+      manager.register('container-extra', {
+        type: 'container-extra',
+        properties: [],
+        accepts: ['*'],
+        presets: [
+          {
+            name: 'With extra child data',
+            children: [{ type: 'text', properties: { content: 'Hi' }, keep: true, meta: { role: 'body' } }],
+          },
+        ],
+      });
+
+      const command = new InsertBlockFromPresetCommand(page, {
+        blockType: 'container-extra',
+        presetIndex: 0,
+        blocksManager: manager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      const insertedBlock = page.blocks[command.getBlockId()];
+      const child = page.blocks[insertedBlock.children[0]];
+      expect(child.keep).toBe(true);
+      expect(child.meta).toEqual({ role: 'body' });
+    });
+  });
 });

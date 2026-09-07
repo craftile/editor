@@ -278,15 +278,9 @@ export class Engine extends EventBus<EngineEvents> {
       throw new Error(`Block not found: ${blockId}`);
     }
 
+    const { parentId: _parentId, children: _children, ...rest } = structuredClone(block);
     const structure: BlockStructure = {
-      type: block.type,
-      id: block.id,
-      semanticId: block.semanticId,
-      properties: structuredClone(block.properties),
-      name: block.name,
-      static: block.static,
-      disabled: block.disabled,
-      repeated: block.repeated,
+      ...rest,
       children: [],
     };
 

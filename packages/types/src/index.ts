@@ -45,6 +45,7 @@ export interface Block {
   ghost?: boolean; // Block exists in data but is not rendered in preview (data holder only)
   parentId?: string; // ID of parent block (undefined for top-level blocks)
   children: string[]; // Ordered array of child block IDs
+  [key: string]: any; // Additional host-defined data, preserved through copy, paste and presets
 }
 
 export interface PropertyField {

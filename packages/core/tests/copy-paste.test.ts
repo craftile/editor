@@ -209,4 +209,62 @@ describe('Copy and Paste', () => {
     engine.redo();
     expect(engine.getBlockById(pastedId)).toBeDefined();
   });
+
+  it('should preserve additional block data through copy and paste', () => {
+    const originalId = engine.pasteBlock({
+      type: 'Container',
+      properties: {},
+      keep: true,
+      ghost: true,
+      meta: { source: 'cms', tags: ['a', 'b'] },
+      children: [{ type: 'Button', properties: { text: 'Child' }, keep: false, meta: { role: 'cta' } }],
+    });
+
+    const structure = engine.exportBlockAsNestedStructure(originalId);
+
+    expect(structure.keep).toBe(true);
+    expect(structure.ghost).toBe(true);
+    expect(structure.meta).toEqual({ source: 'cms', tags: ['a', 'b'] });
+    expect(structure).not.toHaveProperty('parentId');
+    expect(structure.children?.[0].keep).toBe(false);
+    expect(structure.children?.[0].meta).toEqual({ role: 'cta' });
+
+    const pastedId = engine.pasteBlock(structure);
+    const pasted = engine.getBlockById(pastedId)!;
+
+    expect(pasted.keep).toBe(true);
+    expect(pasted.ghost).toBe(true);
+    expect(pasted.meta).toEqual({ source: 'cms', tags: ['a', 'b'] });
+    expect(pasted.meta).not.toBe(structure.meta);
+
+    const pastedChild = engine.getBlockById(pasted.children[0])!;
+    expect(pastedChild.keep).toBe(false);
+    expect(pastedChild.meta).toEqual({ role: 'cta' });
+    expect(pastedChild.parentId).toBe(pastedId);
+  });
+
+  it('should not let structure data override engine-owned fields when pasting', () => {
+    const parentId = engine.insertBlock('Container');
+
+    const pastedId = engine.pasteBlock(
+      {
+        type: 'Button',
+        id: 'stale-id',
+        parentId: 'stale-parent',
+        properties: {},
+        children: [{ type: 'Text', properties: {} }],
+      } as any,
+      { parentId }
+    );
+
+    const pasted = engine.getBlockById(pastedId)!;
+
+    expect(pastedId).not.toBe('stale-id');
+    expect(pasted.id).toBe(pastedId);
+    expect(pasted.parentId).toBe(parentId);
+    expect(pasted.semanticId).toBe('stale-id');
+    expect(pasted.properties).toEqual({ text: 'Click me' });
+    expect(pasted.children).toHaveLength(1);
+    expect(engine.getBlockById(pasted.children[0])?.parentId).toBe(pastedId);
+  });
 });

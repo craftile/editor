@@ -65,6 +65,7 @@ export class ReplaceRegionCommand implements Command {
 
     const blockId = generateId();
     const block: Block = {
+      ...structuredClone(structure),
       type: structure.type,
       id: blockId,
       name: structure.name || blockSchema.meta?.name || structure.type,
@@ -72,10 +73,6 @@ export class ReplaceRegionCommand implements Command {
       properties: this.buildProperties(blockSchema, structure.properties),
       children: [],
       parentId,
-      static: structure.static,
-      disabled: structure.disabled,
-      repeated: structure.repeated,
-      ghost: structure.ghost,
     };
 
     target[blockId] = block;
