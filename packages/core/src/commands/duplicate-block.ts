@@ -9,7 +9,7 @@ export interface DuplicateBlockOptions {
 }
 
 export class DuplicateBlockCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockId: string;
 
   // State for reverting
@@ -20,25 +20,31 @@ export class DuplicateBlockCommand implements Command {
   private regionId?: string | null;
   private emit: EngineEmitFn;
 
-  constructor(page: Page, options: DuplicateBlockOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: DuplicateBlockOptions) {
+    this.getPage = getPage;
     this.blockId = options.blockId;
     this.emit = options.emit;
   }
 
   apply(): void {
-    const originalBlock = this.page.blocks[this.blockId];
+    const page = this.getPage();
+    const originalBlock = page.blocks[this.blockId];
     if (!originalBlock) {
       throw new Error(`Block not found: ${this.blockId}`);
     }
 
     this.duplicatedBlockId = generateId();
 
-    this.duplicatedBlock = this.cloneBlockWithNewIds(originalBlock, this.duplicatedBlockId, originalBlock.parentId);
+    this.duplicatedBlock = this.cloneBlockWithNewIds(
+      page,
+      originalBlock,
+      this.duplicatedBlockId,
+      originalBlock.parentId
+    );
 
-    this.determineInsertLocation();
+    this.determineInsertLocation(page);
 
-    this.insertDuplicatedBlock();
+    this.insertDuplicatedBlock(page);
 
     this.emit('block:duplicate', {
       originalBlockId: this.blockId,
@@ -55,7 +61,7 @@ export class DuplicateBlockCommand implements Command {
       return;
     }
 
-    this.removeDuplicatedBlock();
+    this.removeDuplicatedBlock(this.getPage());
   }
 
   getBlockId(): string {
@@ -82,7 +88,7 @@ export class DuplicateBlockCommand implements Command {
     return this.regionId;
   }
 
-  private cloneBlockWithNewIds(block: Block, newId: string, newParentId?: string): Block {
+  private cloneBlockWithNewIds(page: Page, block: Block, newId: string, newParentId?: string): Block {
     const clonedBlock: Block = {
       ...structuredClone(block),
       id: newId,
@@ -92,27 +98,27 @@ export class DuplicateBlockCommand implements Command {
 
     if (block.children && block.children.length > 0) {
       for (const childId of block.children) {
-        const childBlock = this.page.blocks[childId];
+        const childBlock = page.blocks[childId];
         if (childBlock) {
           const newChildId = generateId();
-          this.cloneBlockWithNewIds(childBlock, newChildId, newId);
+          this.cloneBlockWithNewIds(page, childBlock, newChildId, newId);
           clonedBlock.children.push(newChildId);
         }
       }
     }
 
-    this.page.blocks[newId] = clonedBlock;
+    page.blocks[newId] = clonedBlock;
 
     return clonedBlock;
   }
 
-  private determineInsertLocation(): void {
-    const originalBlock = this.page.blocks[this.blockId];
+  private determineInsertLocation(page: Page): void {
+    const originalBlock = page.blocks[this.blockId];
 
     this.parentId = originalBlock.parentId || null;
 
     if (this.parentId) {
-      const parent = this.page.blocks[this.parentId];
+      const parent = page.blocks[this.parentId];
       if (parent) {
         const index = parent.children.indexOf(this.blockId);
         this.insertIndex = index !== -1 ? index + 1 : parent.children.length;
@@ -120,52 +126,52 @@ export class DuplicateBlockCommand implements Command {
         this.insertIndex = 0;
       }
     } else {
-      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
+      const region = page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         const index = region.blocks.indexOf(this.blockId);
         this.regionId = getRegionId(region);
         this.insertIndex = index + 1;
       } else {
-        this.regionId = getRegionId(this.page.regions[0]) || 'main';
-        this.insertIndex = this.page.regions[0].blocks.length || 0;
+        this.regionId = getRegionId(page.regions[0]) || 'main';
+        this.insertIndex = page.regions[0].blocks.length || 0;
       }
     }
   }
 
-  private insertDuplicatedBlock(): void {
+  private insertDuplicatedBlock(page: Page): void {
     if (!this.duplicatedBlock) {
       return;
     }
 
     if (this.parentId) {
-      const targetParent = this.page.blocks[this.parentId];
+      const targetParent = page.blocks[this.parentId];
       if (!targetParent) {
         throw new Error(`Parent block not found: ${this.parentId}`);
       }
 
       targetParent.children.splice(this.insertIndex, 0, this.duplicatedBlockId);
     } else {
-      let targetRegion = this.page.regions.find((r) => getRegionId(r) === this.regionId);
+      let targetRegion = page.regions.find((r) => getRegionId(r) === this.regionId);
 
       if (!targetRegion) {
         targetRegion = { name: this.regionId || 'main', blocks: [] };
-        this.page.regions.push(targetRegion);
+        page.regions.push(targetRegion);
       }
 
       targetRegion.blocks.splice(this.insertIndex, 0, this.duplicatedBlockId);
     }
   }
 
-  private removeDuplicatedBlock(): void {
+  private removeDuplicatedBlock(page: Page): void {
     if (!this.duplicatedBlockId) {
       return;
     }
 
-    this.removeBlockAndChildren(this.duplicatedBlockId);
+    this.removeBlockAndChildren(page, this.duplicatedBlockId);
 
     if (this.parentId) {
       // Remove from parent's children array
-      const targetParent = this.page.blocks[this.parentId];
+      const targetParent = page.blocks[this.parentId];
       if (targetParent) {
         const index = targetParent.children.indexOf(this.duplicatedBlockId);
         if (index !== -1) {
@@ -174,8 +180,8 @@ export class DuplicateBlockCommand implements Command {
       }
     } else {
       // Remove from region
-      if (this.page.regions) {
-        const targetRegion = this.page.regions.find((r) => getRegionId(r) === this.regionId);
+      if (page.regions) {
+        const targetRegion = page.regions.find((r) => getRegionId(r) === this.regionId);
         if (targetRegion) {
           const index = targetRegion.blocks.indexOf(this.duplicatedBlockId);
           if (index !== -1) {
@@ -186,16 +192,16 @@ export class DuplicateBlockCommand implements Command {
     }
   }
 
-  private removeBlockAndChildren(blockId: string): void {
-    const block = this.page.blocks[blockId];
+  private removeBlockAndChildren(page: Page, blockId: string): void {
+    const block = page.blocks[blockId];
     if (!block) {
       return;
     }
 
     for (const childId of block.children) {
-      this.removeBlockAndChildren(childId);
+      this.removeBlockAndChildren(page, childId);
     }
 
-    delete this.page.blocks[blockId];
+    delete page.blocks[blockId];
   }
 }

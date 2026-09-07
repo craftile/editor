@@ -47,7 +47,7 @@ describe('RemoveBlockCommand', () => {
         blocks: ['block-1', 'block-2'],
       };
 
-      const command = new RemoveBlockCommand(page, {
+      const command = new RemoveBlockCommand(() => page, {
         blockId: 'block-1',
         emit: mockEmit,
       });
@@ -69,7 +69,7 @@ describe('RemoveBlockCommand', () => {
     });
 
     it('should remove child block from parent', () => {
-      const command = new RemoveBlockCommand(page, {
+      const command = new RemoveBlockCommand(() => page, {
         blockId: 'block-2-1',
         emit: mockEmit,
       });
@@ -89,7 +89,7 @@ describe('RemoveBlockCommand', () => {
 
   describe('Validation', () => {
     it('should throw error for non-existent block', () => {
-      const command = new RemoveBlockCommand(page, {
+      const command = new RemoveBlockCommand(() => page, {
         blockId: 'non-existent-block',
         emit: mockEmit,
       });
@@ -102,7 +102,7 @@ describe('RemoveBlockCommand', () => {
 
   describe('Command Revert', () => {
     it('should revert block removal', () => {
-      const command = new RemoveBlockCommand(page, {
+      const command = new RemoveBlockCommand(() => page, {
         blockId: 'block-1',
         emit: mockEmit,
       });

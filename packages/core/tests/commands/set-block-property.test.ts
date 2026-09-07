@@ -40,7 +40,7 @@ describe('SetBlockPropertyCommand', () => {
   });
 
   it('should set property on block', () => {
-    const command = new SetBlockPropertyCommand(page, {
+    const command = new SetBlockPropertyCommand(() => page, {
       blockId: 'block-1',
       propertyKey: 'text',
       propertyValue: 'Updated Button',
@@ -63,7 +63,7 @@ describe('SetBlockPropertyCommand', () => {
   });
 
   it('should revert property change', () => {
-    const command = new SetBlockPropertyCommand(page, {
+    const command = new SetBlockPropertyCommand(() => page, {
       blockId: 'block-1',
       propertyKey: 'text',
       propertyValue: 'Updated Button',

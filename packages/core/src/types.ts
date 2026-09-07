@@ -45,6 +45,7 @@ export interface EngineEvents {
     index?: number;
     regionId?: string;
   };
+  'blocks:patch': { blocks: Record<string, Block>; removed: string[]; previousPage: Page; newPage: Page };
   undo: { command: any };
   redo: { command: any };
 }

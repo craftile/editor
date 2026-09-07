@@ -3,6 +3,7 @@ import type { Command, EngineConfig, EngineEvents } from './types';
 import type { Block, BlockSchema, BlockStructure, Page } from '@craftile/types';
 import { BlocksManager } from './blocks-manager';
 import { HistoryManager } from './history-manager';
+import { collectVanishedDescendants } from './utils';
 import { BatchCommand } from './commands/batch';
 import { InsertBlockCommand } from './commands/insert-block';
 import { InsertBlockFromPresetCommand } from './commands/insert-block-from-preset';
@@ -71,7 +72,7 @@ export class Engine extends EventBus<EngineEvents> {
       }
     }
 
-    const command = new InsertBlockCommand(this.page, {
+    const command = new InsertBlockCommand(this.getLivePage, {
       blockType,
       parentId: options?.parentId,
       regionId: options?.regionId,
@@ -127,7 +128,7 @@ export class Engine extends EventBus<EngineEvents> {
       }
     }
 
-    const command = new InsertBlockFromPresetCommand(this.page, {
+    const command = new InsertBlockFromPresetCommand(this.getLivePage, {
       blockType,
       presetIndex,
       parentId: options?.parentId,
@@ -150,7 +151,7 @@ export class Engine extends EventBus<EngineEvents> {
    * @emits block:remove - When the block is successfully removed
    */
   removeBlock(blockId: string): void {
-    const command = new RemoveBlockCommand(this.page, {
+    const command = new RemoveBlockCommand(this.getLivePage, {
       blockId,
       emit: this.emit.bind(this),
     });
@@ -188,7 +189,7 @@ export class Engine extends EventBus<EngineEvents> {
       }
     }
 
-    const command = new MoveBlockCommand(this.page, {
+    const command = new MoveBlockCommand(this.getLivePage, {
       blockId,
       targetParentId: options?.targetParentId,
       targetIndex: options?.targetIndex,
@@ -203,7 +204,7 @@ export class Engine extends EventBus<EngineEvents> {
    * Toggle a block's disabled state (enable/disable)
    */
   toggleBlock(blockId: string, disabled?: boolean): void {
-    const command = new ToggleBlockCommand(this.page, {
+    const command = new ToggleBlockCommand(this.getLivePage, {
       blockId,
       disabled,
       emit: this.emit.bind(this),
@@ -222,7 +223,7 @@ export class Engine extends EventBus<EngineEvents> {
    * @emits block:property:set - When the property is successfully set
    */
   setBlockProperty(blockId: string, propertyKey: string, propertyValue: any): void {
-    const command = new SetBlockPropertyCommand(this.page, {
+    const command = new SetBlockPropertyCommand(this.getLivePage, {
       blockId,
       propertyKey,
       propertyValue,
@@ -241,7 +242,7 @@ export class Engine extends EventBus<EngineEvents> {
    * @emits block:update - When the name is successfully set
    */
   setBlockName(blockId: string, name: string): void {
-    const command = new SetBlockNameCommand(this.page, {
+    const command = new SetBlockNameCommand(this.getLivePage, {
       blockId,
       name,
       emit: this.emit.bind(this),
@@ -254,7 +255,7 @@ export class Engine extends EventBus<EngineEvents> {
    * Duplicate a block (creates a copy placed right after the original)
    */
   duplicateBlock(blockId: string): string {
-    const command = new DuplicateBlockCommand(this.page, {
+    const command = new DuplicateBlockCommand(this.getLivePage, {
       blockId,
       emit: this.emit.bind(this),
     });
@@ -327,7 +328,7 @@ export class Engine extends EventBus<EngineEvents> {
       }
     }
 
-    const command = new InsertBlockFromPresetCommand(this.page, {
+    const command = new InsertBlockFromPresetCommand(this.getLivePage, {
       blockType: structure.type,
       presetData: structure,
       parentId: options?.parentId,
@@ -397,7 +398,7 @@ export class Engine extends EventBus<EngineEvents> {
       throw new Error('replaceRegion cannot be called inside batch');
     }
 
-    const command = new ReplaceRegionCommand(this.page, {
+    const command = new ReplaceRegionCommand(this.getLivePage, {
       regionId,
       structures,
       blocksManager: this.blocksManager,
@@ -405,6 +406,48 @@ export class Engine extends EventBus<EngineEvents> {
     });
 
     this.applyCommand(command);
+  }
+
+  /**
+   * Merge externally resolved blocks into the live page.
+   *
+   * Each given block replaces the existing one with the same id wholesale (no deep merge).
+   * Blocks are used as given: the caller supplies `parentId` and `children`, no parent
+   * back-fill or validation runs. When a patched block drops ids from its previous `children`,
+   * those blocks vanish with their whole subtree unless they are present in the patch.
+   * Regions are untouched. The page is mutated in place and history is neither cleared nor
+   * extended, so this operation is not undoable.
+   *
+   * @param blocks - Blocks keyed by id
+   * @throws {Error} When called inside a batch
+   * @emits blocks:patch - When at least one block was given
+   */
+  patchBlocks(blocks: Record<string, Block>): void {
+    if (this.activeBatch) {
+      throw new Error('patchBlocks cannot be called inside batch');
+    }
+
+    if (Object.keys(blocks).length === 0) {
+      return;
+    }
+
+    const previousPage = structuredClone(this.page);
+    const removed = [...collectVanishedDescendants(this.page.blocks, blocks)];
+
+    for (const blockId of removed) {
+      delete this.page.blocks[blockId];
+    }
+
+    for (const [blockId, block] of Object.entries(blocks)) {
+      this.page.blocks[blockId] = structuredClone(block);
+    }
+
+    this.emit('blocks:patch', {
+      blocks,
+      removed,
+      previousPage,
+      newPage: structuredClone(this.page),
+    });
   }
 
   /**
@@ -537,6 +580,10 @@ export class Engine extends EventBus<EngineEvents> {
   private replacePageState(page: Page): void {
     this.page = page;
   }
+
+  private getLivePage = (): Page => {
+    return this.page;
+  };
 
   private applyCommand(command: Command): void {
     command.apply();

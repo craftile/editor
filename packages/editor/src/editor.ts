@@ -117,9 +117,17 @@ export class CraftileEditor {
           }
         });
 
+        const stopPatchListener = this.engine.on('blocks:patch', ({ removed }) => {
+          const selectedBlockId = this.ui.state.selectedBlockId;
+          if (selectedBlockId && removed.includes(selectedBlockId)) {
+            this.ui.clearSelectedBlock();
+          }
+        });
+
         onBeforeUnmount(() => {
           stopWatching();
           stopRemoveListener();
+          stopPatchListener();
         });
 
         return () => h(Editor);

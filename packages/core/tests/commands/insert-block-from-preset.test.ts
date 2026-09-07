@@ -96,7 +96,7 @@ describe('InsertBlockFromPresetCommand', () => {
 
   describe('Basic Preset Insertion', () => {
     it('should insert block with preset properties', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 0, // Empty Container preset
         blocksManager,
@@ -123,7 +123,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should insert block with preset children', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 1, // Heading and Text preset
         blocksManager,
@@ -165,7 +165,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should handle nested children', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 2, // Nested Layout preset
         blocksManager,
@@ -213,7 +213,7 @@ describe('InsertBlockFromPresetCommand', () => {
 
   describe('Insertion Location', () => {
     it('should insert in specified region', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 0,
         regionId: 'main',
@@ -228,7 +228,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should insert as child at specific index', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 0,
         parentId: 'parent-block',
@@ -251,7 +251,7 @@ describe('InsertBlockFromPresetCommand', () => {
   describe('Validation', () => {
     it('should reject insertion into a non-existent region without mutating the page', () => {
       const pageBefore = structuredClone(page);
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 0,
         regionId: 'missing',
@@ -266,7 +266,7 @@ describe('InsertBlockFromPresetCommand', () => {
 
     it('should throw error for invalid block type', () => {
       expect(() => {
-        new InsertBlockFromPresetCommand(page, {
+        new InsertBlockFromPresetCommand(() => page, {
           blockType: 'invalid-type',
           presetIndex: 0,
           blocksManager,
@@ -277,7 +277,7 @@ describe('InsertBlockFromPresetCommand', () => {
 
     it('should throw error for invalid preset index', () => {
       expect(() => {
-        new InsertBlockFromPresetCommand(page, {
+        new InsertBlockFromPresetCommand(() => page, {
           blockType: 'container',
           presetIndex: 999,
           blocksManager,
@@ -287,7 +287,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should throw error for non-existent parent', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 0,
         parentId: 'non-existent-parent',
@@ -318,7 +318,7 @@ describe('InsertBlockFromPresetCommand', () => {
         static: true,
       };
 
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 1, // "Heading and Text" — creates 1 root + 2 children
         parentId: 'parent-block',
@@ -355,7 +355,7 @@ describe('InsertBlockFromPresetCommand', () => {
         static: true,
       };
 
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 2, // "Nested Layout" — creates a recursive subtree
         parentId: 'parent-block',
@@ -383,7 +383,7 @@ describe('InsertBlockFromPresetCommand', () => {
         static: true,
       };
 
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 1,
         parentId: 'parent-block',
@@ -405,7 +405,7 @@ describe('InsertBlockFromPresetCommand', () => {
         blocks: ['existing-block', 'parent-block'],
       };
 
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 1, // Has 2 children
         blocksManager,
@@ -435,7 +435,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should revert nested preset insertion', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 2, // Nested layout
         blocksManager,
@@ -454,7 +454,7 @@ describe('InsertBlockFromPresetCommand', () => {
 
   describe('Semantic IDs', () => {
     it('should preserve semantic IDs from preset', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 1,
         blocksManager,
@@ -477,7 +477,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should handle missing semantic IDs', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetIndex: 2, // Has some children without semantic IDs
         blocksManager,
@@ -542,7 +542,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should preserve custom name from preset child', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container-metadata',
         presetIndex: 0,
         blocksManager,
@@ -559,7 +559,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should preserve static flag from preset child', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container-metadata',
         presetIndex: 0,
         blocksManager,
@@ -577,7 +577,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should preserve static flag in nested children', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container-metadata',
         presetIndex: 0,
         blocksManager,
@@ -602,7 +602,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should handle children without custom name or static flag', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container-metadata',
         presetIndex: 0,
         blocksManager,
@@ -622,7 +622,7 @@ describe('InsertBlockFromPresetCommand', () => {
     });
 
     it('should combine custom name and static flag', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container-metadata',
         presetIndex: 0,
         blocksManager,
@@ -643,7 +643,7 @@ describe('InsertBlockFromPresetCommand', () => {
 
   describe('Additional Block Data', () => {
     it('should preserve additional data from preset structure and its children', () => {
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container',
         presetData: {
           type: 'container',
@@ -685,7 +685,7 @@ describe('InsertBlockFromPresetCommand', () => {
         ],
       });
 
-      const command = new InsertBlockFromPresetCommand(page, {
+      const command = new InsertBlockFromPresetCommand(() => page, {
         blockType: 'container-extra',
         presetIndex: 0,
         blocksManager: manager,

@@ -209,4 +209,36 @@ describe('watchEngineUpdates', () => {
       },
     });
   });
+
+  it('ignores blocks:patch', () => {
+    vi.useFakeTimers();
+
+    const page: Page = {
+      blocks: {
+        parent: makeBlock('parent', ['child']),
+        child: makeBlock('child', [], 'parent'),
+      },
+      regions: [{ id: 'main', name: 'main', blocks: ['parent'] }],
+    };
+    const updates = vi.fn();
+    const engine = new FakeEngine(page);
+
+    watchEngineUpdates(engine as any, {
+      debounceMs: 0,
+      onUpdates: updates,
+    });
+
+    engine.emit('blocks:patch', {
+      blocks: { parent: makeBlock('parent', []) },
+      removed: ['child'],
+      previousPage: page,
+      newPage: { ...page, blocks: { parent: makeBlock('parent', []) } },
+    });
+
+    vi.runAllTimers();
+
+    expect(updates).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
 });

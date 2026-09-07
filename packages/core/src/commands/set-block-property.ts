@@ -1,4 +1,4 @@
-import type { Block, Page } from '@craftile/types';
+import type { Page } from '@craftile/types';
 import type { Command, EngineEmitFn } from '../types';
 
 export interface SetBlockPropertyOptions {
@@ -9,16 +9,15 @@ export interface SetBlockPropertyOptions {
 }
 
 export class SetBlockPropertyCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockId: string;
   private propertyKey: string;
   private propertyValue: any;
   private originalValue: any;
-  private block?: Block;
   private emit: EngineEmitFn;
 
-  constructor(page: Page, options: SetBlockPropertyOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: SetBlockPropertyOptions) {
+    this.getPage = getPage;
     this.blockId = options.blockId;
     this.propertyKey = options.propertyKey;
     this.propertyValue = options.propertyValue;
@@ -26,18 +25,18 @@ export class SetBlockPropertyCommand implements Command {
   }
 
   apply(): void {
-    this.block = this.page.blocks[this.blockId];
+    const block = this.getPage().blocks[this.blockId];
 
-    if (!this.block) {
+    if (!block) {
       throw new Error(`Block not found: ${this.blockId}`);
     }
 
-    if (!this.block.properties) {
-      this.block.properties = {};
+    if (!block.properties) {
+      block.properties = {};
     }
 
-    this.originalValue = this.block.properties[this.propertyKey];
-    this.block.properties[this.propertyKey] = this.propertyValue;
+    this.originalValue = block.properties[this.propertyKey];
+    block.properties[this.propertyKey] = this.propertyValue;
 
     this.emit('block:property:set', {
       blockId: this.blockId,
@@ -48,14 +47,16 @@ export class SetBlockPropertyCommand implements Command {
   }
 
   revert(): void {
-    if (!this.block || !this.block.properties) {
+    const block = this.getPage().blocks[this.blockId];
+
+    if (!block || !block.properties) {
       return;
     }
 
     if (this.originalValue !== undefined) {
-      this.block.properties[this.propertyKey] = this.originalValue;
+      block.properties[this.propertyKey] = this.originalValue;
     } else {
-      delete this.block.properties[this.propertyKey];
+      delete block.properties[this.propertyKey];
     }
 
     this.emit('block:property:set', {

@@ -1,4 +1,4 @@
-import type { Block, Page } from '@craftile/types';
+import type { Page } from '@craftile/types';
 import type { Command, EngineEmitFn } from '../types';
 
 export interface SetBlockNameOptions {
@@ -8,37 +8,39 @@ export interface SetBlockNameOptions {
 }
 
 export class SetBlockNameCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockId: string;
   private newName: string;
   private oldName: string | undefined;
-  private block: Block | undefined;
   private emit: EngineEmitFn;
 
-  constructor(page: Page, options: SetBlockNameOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: SetBlockNameOptions) {
+    this.getPage = getPage;
     this.blockId = options.blockId;
     this.newName = options.name;
     this.emit = options.emit;
-    this.block = this.page.blocks[this.blockId];
 
-    if (!this.block) {
+    const block = this.getPage().blocks[this.blockId];
+
+    if (!block) {
       throw new Error(`Block not found: ${this.blockId}`);
     }
 
-    this.oldName = this.block.name;
+    this.oldName = block.name;
   }
 
   apply(): void {
-    if (!this.block) {
+    const block = this.getPage().blocks[this.blockId];
+
+    if (!block) {
       throw new Error(`Block not found: ${this.blockId}`);
     }
 
-    this.block.name = this.newName;
+    block.name = this.newName;
 
     this.emit('block:update', {
       blockId: this.blockId,
-      block: this.block,
+      block,
       property: 'name',
       value: this.newName,
       oldValue: this.oldName,
@@ -46,15 +48,17 @@ export class SetBlockNameCommand implements Command {
   }
 
   revert(): void {
-    if (!this.block) {
+    const block = this.getPage().blocks[this.blockId];
+
+    if (!block) {
       return;
     }
 
-    this.block.name = this.oldName;
+    block.name = this.oldName;
 
     this.emit('block:update', {
       blockId: this.blockId,
-      block: this.block,
+      block,
       property: 'name',
       value: this.oldName,
       oldValue: this.newName,

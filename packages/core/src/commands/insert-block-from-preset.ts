@@ -15,7 +15,7 @@ export interface InsertBlockFromPresetOptions {
 }
 
 export class InsertBlockFromPresetCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockType: string;
   private presetIndex?: number;
   private presetData?: BlockStructure;
@@ -31,8 +31,8 @@ export class InsertBlockFromPresetCommand implements Command {
   private emit: EngineEmitFn;
   private createdBlockIds: string[] = [];
 
-  constructor(page: Page, options: InsertBlockFromPresetOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: InsertBlockFromPresetOptions) {
+    this.getPage = getPage;
     this.blockType = options.blockType;
     this.presetIndex = options.presetIndex;
     this.presetData = options.presetData;
@@ -69,7 +69,8 @@ export class InsertBlockFromPresetCommand implements Command {
   }
 
   apply(): void {
-    const target = resolveInsertTarget(this.page, this.parentId, this.regionId, this.index);
+    const page = this.getPage();
+    const target = resolveInsertTarget(page, this.parentId, this.regionId, this.index);
     this.resolvedRegionId = target.kind === 'region' ? target.regionId : undefined;
 
     const blockSchema = this.blocksManager.get(this.blockType);
@@ -86,11 +87,11 @@ export class InsertBlockFromPresetCommand implements Command {
         parentId: undefined,
       };
 
-      this.page.blocks[this.blockId] = this.insertedBlock;
+      page.blocks[this.blockId] = this.insertedBlock;
       this.createdBlockIds.push(this.blockId);
 
       if (this.presetData.children && this.presetData.children.length > 0) {
-        this.insertedBlock.children = this.createChildrenFromPreset(this.presetData.children, this.blockId);
+        this.insertedBlock.children = this.createChildrenFromPreset(page, this.presetData.children, this.blockId);
       }
     } else if (this.presetIndex !== undefined) {
       const preset = blockSchema?.presets?.[this.presetIndex];
@@ -107,11 +108,11 @@ export class InsertBlockFromPresetCommand implements Command {
         parentId: undefined,
       };
 
-      this.page.blocks[this.blockId] = this.insertedBlock;
+      page.blocks[this.blockId] = this.insertedBlock;
       this.createdBlockIds.push(this.blockId);
 
       if (preset.children && preset.children.length > 0) {
-        this.insertedBlock.children = this.createChildrenFromPreset(preset.children, this.blockId);
+        this.insertedBlock.children = this.createChildrenFromPreset(page, preset.children, this.blockId);
       }
     }
 
@@ -125,7 +126,7 @@ export class InsertBlockFromPresetCommand implements Command {
       this.insertedBlock.parentId = target.parent.id;
       target.parent.children.splice(target.index, 0, this.blockId);
     } else {
-      const region = this.page.regions.find((r) => getRegionId(r) === target.regionId)!;
+      const region = page.regions.find((r) => getRegionId(r) === target.regionId)!;
       region.blocks.splice(target.index, 0, this.blockId);
     }
 
@@ -134,7 +135,7 @@ export class InsertBlockFromPresetCommand implements Command {
       block: this.insertedBlock,
       parentId: this.parentId,
       index: this.actualIndex,
-      regionId: this.regionId || getRegionId(this.page.regions[0]),
+      regionId: this.regionId || getRegionId(page.regions[0]),
     });
   }
 
@@ -143,21 +144,24 @@ export class InsertBlockFromPresetCommand implements Command {
       return;
     }
 
+    const page = this.getPage();
+
     // Remove all created blocks
     for (const blockId of this.createdBlockIds) {
-      delete this.page.blocks[blockId];
+      delete page.blocks[blockId];
     }
 
     if (this.parentId) {
-      const parent = this.page.blocks[this.parentId];
-      if (parent && this.actualIndex !== undefined) {
-        parent.children.splice(this.actualIndex, 1);
+      const parent = page.blocks[this.parentId];
+      const index = parent ? parent.children.indexOf(this.blockId) : -1;
+      if (parent && index !== -1) {
+        parent.children.splice(index, 1);
       }
     } else if (this.resolvedRegionId) {
-      const targetRegion = this.page.regions.find((r) => getRegionId(r) === this.resolvedRegionId);
-
-      if (targetRegion && this.actualIndex !== undefined) {
-        targetRegion.blocks.splice(this.actualIndex, 1);
+      const targetRegion = page.regions.find((r) => getRegionId(r) === this.resolvedRegionId);
+      const index = targetRegion ? targetRegion.blocks.indexOf(this.blockId) : -1;
+      if (targetRegion && index !== -1) {
+        targetRegion.blocks.splice(index, 1);
       }
     }
 
@@ -177,7 +181,7 @@ export class InsertBlockFromPresetCommand implements Command {
     return this.insertedBlock;
   }
 
-  private createChildrenFromPreset(structures: BlockStructure[], parentId: string): string[] {
+  private createChildrenFromPreset(page: Page, structures: BlockStructure[], parentId: string): string[] {
     const childIds: string[] = [];
 
     for (const structure of structures) {
@@ -202,12 +206,12 @@ export class InsertBlockFromPresetCommand implements Command {
         parentId,
       };
 
-      this.page.blocks[childId] = childBlock;
+      page.blocks[childId] = childBlock;
       this.createdBlockIds.push(childId);
 
       // Recursively create nested children
       if (structure.children && structure.children.length > 0) {
-        childBlock.children = this.createChildrenFromPreset(structure.children, childId);
+        childBlock.children = this.createChildrenFromPreset(page, structure.children, childId);
       }
 
       childIds.push(childId);

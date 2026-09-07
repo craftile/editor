@@ -41,7 +41,7 @@ describe('SetBlockNameCommand', () => {
   });
 
   it('should set name on block without existing name', () => {
-    const command = new SetBlockNameCommand(page, {
+    const command = new SetBlockNameCommand(() => page, {
       blockId: 'block-1',
       name: 'Primary Button',
       emit: mockEmit,
@@ -64,7 +64,7 @@ describe('SetBlockNameCommand', () => {
   });
 
   it('should update existing name on block', () => {
-    const command = new SetBlockNameCommand(page, {
+    const command = new SetBlockNameCommand(() => page, {
       blockId: 'block-2',
       name: 'Updated Container',
       emit: mockEmit,
@@ -87,7 +87,7 @@ describe('SetBlockNameCommand', () => {
   });
 
   it('should revert name change to undefined', () => {
-    const command = new SetBlockNameCommand(page, {
+    const command = new SetBlockNameCommand(() => page, {
       blockId: 'block-1',
       name: 'Primary Button',
       emit: mockEmit,
@@ -109,7 +109,7 @@ describe('SetBlockNameCommand', () => {
   });
 
   it('should revert name change to previous value', () => {
-    const command = new SetBlockNameCommand(page, {
+    const command = new SetBlockNameCommand(() => page, {
       blockId: 'block-2',
       name: 'Updated Container',
       emit: mockEmit,

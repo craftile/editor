@@ -40,7 +40,7 @@ describe('DuplicateBlockCommand', () => {
   });
 
   it('should duplicate a block', () => {
-    const command = new DuplicateBlockCommand(page, {
+    const command = new DuplicateBlockCommand(() => page, {
       blockId: 'block-1',
       emit: mockEmit,
     });
@@ -79,7 +79,7 @@ describe('DuplicateBlockCommand', () => {
     };
     childBlock.children = ['grandchild-1'];
 
-    const command = new DuplicateBlockCommand(page, {
+    const command = new DuplicateBlockCommand(() => page, {
       blockId: 'child-1',
       emit: mockEmit,
     });
@@ -101,7 +101,7 @@ describe('DuplicateBlockCommand', () => {
   });
 
   it('should revert a block duplication', () => {
-    const command = new DuplicateBlockCommand(page, {
+    const command = new DuplicateBlockCommand(() => page, {
       blockId: 'block-1',
       emit: mockEmit,
     });
@@ -126,7 +126,7 @@ describe('DuplicateBlockCommand', () => {
       blocks: ['block-1', 'block-2'],
     };
 
-    const command = new DuplicateBlockCommand(page, {
+    const command = new DuplicateBlockCommand(() => page, {
       blockId: 'block-1',
       emit: mockEmit,
     });

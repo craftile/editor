@@ -69,7 +69,7 @@ describe('ReplaceRegionCommand', () => {
 
   it('should replace a region and restore it on revert', () => {
     const events: Array<{ previousRegion: { blocks: string[] }; newRegion: { blocks: string[] } }> = [];
-    const command = new ReplaceRegionCommand(page, {
+    const command = new ReplaceRegionCommand(() => page, {
       regionId: 'main',
       structures: [{ type: 'text', properties: { value: 'Replacement' }, children: [] }],
       blocksManager: createBlocksManager(),

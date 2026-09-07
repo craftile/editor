@@ -49,7 +49,7 @@ describe('InsertBlockCommand', () => {
 
   describe('Basic Insertion', () => {
     it('should insert block in region', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         blockSchema: textSchema,
         emit: mockEmit,
@@ -82,7 +82,7 @@ describe('InsertBlockCommand', () => {
     });
 
     it('should insert block at specific index', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         index: 1,
         blockSchema: textSchema,
@@ -100,7 +100,7 @@ describe('InsertBlockCommand', () => {
     });
 
     it('should insert block as child', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'parent-block',
         blockSchema: textSchema,
@@ -122,7 +122,7 @@ describe('InsertBlockCommand', () => {
   describe('Validation', () => {
     it('should reject insertion into a non-existent region without mutating the page', () => {
       const pageBefore = structuredClone(page);
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         regionId: 'missing',
         blockSchema: textSchema,
@@ -135,7 +135,7 @@ describe('InsertBlockCommand', () => {
     });
 
     it('should throw error for non-existent parent', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'non-existent-parent',
         blockSchema: textSchema,
@@ -166,7 +166,7 @@ describe('InsertBlockCommand', () => {
         static: true,
       };
 
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'parent-block',
         index: 2,
@@ -208,7 +208,7 @@ describe('InsertBlockCommand', () => {
       // Between the two statics: rejected
       setupAllStaticParent();
       const blocksBefore = Object.keys(page.blocks).length;
-      const reject = new InsertBlockCommand(page, {
+      const reject = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'parent-block',
         index: 1,
@@ -220,7 +220,7 @@ describe('InsertBlockCommand', () => {
 
       // Outer-leading edge: allowed
       setupAllStaticParent();
-      const before = new InsertBlockCommand(page, {
+      const before = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'parent-block',
         index: 0,
@@ -231,7 +231,7 @@ describe('InsertBlockCommand', () => {
 
       // Outer-trailing edge: allowed (fresh parent state)
       setupAllStaticParent();
-      const after = new InsertBlockCommand(page, {
+      const after = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'parent-block',
         index: 2,
@@ -260,7 +260,7 @@ describe('InsertBlockCommand', () => {
         static: true,
       };
 
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         parentId: 'parent-block',
         index: 1,
@@ -281,7 +281,7 @@ describe('InsertBlockCommand', () => {
         blocks: ['existing-block', 'parent-block'],
       };
 
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         blockSchema: textSchema,
         emit: mockEmit,
@@ -311,7 +311,7 @@ describe('InsertBlockCommand', () => {
 
   describe('Block Naming', () => {
     it('should set block name from schema meta name', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'button',
         blockSchema: buttonSchema,
         emit: mockEmit,
@@ -326,7 +326,7 @@ describe('InsertBlockCommand', () => {
     });
 
     it('should set block name to block type if no schema meta name', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'text',
         blockSchema: textSchema,
         emit: mockEmit,
@@ -341,7 +341,7 @@ describe('InsertBlockCommand', () => {
     });
 
     it('should set block name to block type if no schema provided', () => {
-      const command = new InsertBlockCommand(page, {
+      const command = new InsertBlockCommand(() => page, {
         blockType: 'custom-block',
         emit: mockEmit,
       });

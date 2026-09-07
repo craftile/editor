@@ -67,4 +67,35 @@ describe('useBlocksEngine', () => {
 
     blocksEngine.destroy();
   });
+
+  it('re-syncs reactive state on blocks:patch', () => {
+    const blocksEngine = useBlocksEngine({
+      page: structuredClone(testPage),
+      blockSchemas: testSchemas,
+    });
+
+    blocksEngine.engine.patchBlocks({
+      'block-1': { id: 'block-1', type: 'button', properties: { text: 'Resolved' }, children: [] },
+    });
+
+    expect(blocksEngine.blocks.value['block-1'].properties.text).toBe('Resolved');
+
+    blocksEngine.destroy();
+  });
+
+  it('exposes patchBlocks and syncs without autoSync', () => {
+    const blocksEngine = useBlocksEngine({
+      page: structuredClone(testPage),
+      blockSchemas: testSchemas,
+      autoSync: false,
+    });
+
+    blocksEngine.patchBlocks({
+      'block-1': { id: 'block-1', type: 'button', properties: { text: 'Resolved' }, children: [] },
+    });
+
+    expect(blocksEngine.blocks.value['block-1'].properties.text).toBe('Resolved');
+
+    blocksEngine.destroy();
+  });
 });

@@ -56,7 +56,7 @@ describe('MoveBlockCommand', () => {
 
   describe('Basic Movement', () => {
     it('should reorder block within same region', () => {
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetIndex: 2,
         emit: mockEmit,
@@ -80,7 +80,7 @@ describe('MoveBlockCommand', () => {
         blocks: ['block-1', 'block-2', 'block-3'],
       };
 
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetIndex: 2,
         emit: mockEmit,
@@ -94,7 +94,7 @@ describe('MoveBlockCommand', () => {
     });
 
     it('should move block to different region', () => {
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetRegionId: 'sidebar',
         targetIndex: 0,
@@ -109,7 +109,7 @@ describe('MoveBlockCommand', () => {
     });
 
     it('should move top-level block to become child', () => {
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetParentId: 'parent-a',
         targetIndex: 0,
@@ -124,7 +124,7 @@ describe('MoveBlockCommand', () => {
     });
 
     it('should move child block to top-level', () => {
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'child-1',
         targetIndex: 1,
         emit: mockEmit,
@@ -139,7 +139,7 @@ describe('MoveBlockCommand', () => {
     });
 
     it('should move child block between different parents', () => {
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'child-1',
         targetParentId: 'parent-a',
         targetIndex: 0,
@@ -157,7 +157,7 @@ describe('MoveBlockCommand', () => {
   describe('Dynamic-children contiguity', () => {
     it('rejects a move to a non-existent region without mutating the page', () => {
       const pageBefore = structuredClone(page);
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetRegionId: 'missing',
         targetIndex: 0,
@@ -188,7 +188,7 @@ describe('MoveBlockCommand', () => {
       };
       page.blocks['parent-a'].children = ['dynamic-a', 'static-a'];
 
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetParentId: 'parent-a',
         targetIndex: 2, // would land after static-a, splitting the dynamic group
@@ -229,7 +229,7 @@ describe('MoveBlockCommand', () => {
       };
       page.blocks['parent-a'].children = ['dynamic-1', 'dynamic-2', 'static-1'];
 
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'dynamic-1',
         targetParentId: 'parent-a',
         targetIndex: 2, // moves dynamic-1 past static-1, splitting dynamic-2 from it
@@ -254,7 +254,7 @@ describe('MoveBlockCommand', () => {
       };
       page.blocks['parent-a'].children = ['static-a'];
 
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetParentId: 'parent-a',
         targetIndex: 0, // before the static — first dynamic, still contiguous
@@ -270,7 +270,7 @@ describe('MoveBlockCommand', () => {
     it('should revert region reordering', () => {
       const originalOrder = [...page.regions[0].blocks];
 
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetIndex: 2,
         emit: mockEmit,
@@ -287,7 +287,7 @@ describe('MoveBlockCommand', () => {
       const originalMainBlocks = [...page.regions[0].blocks];
       const originalSidebarBlocks = [...page.regions[1].blocks];
 
-      const command = new MoveBlockCommand(page, {
+      const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
         targetRegionId: 'sidebar',
         targetIndex: 0,

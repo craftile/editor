@@ -11,7 +11,7 @@ export interface ReplaceRegionOptions {
 }
 
 export class ReplaceRegionCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private regionId: string;
   private regionIndex: number;
   private previousRegion: Page['regions'][number];
@@ -21,19 +21,21 @@ export class ReplaceRegionCommand implements Command {
   private emit: EngineEmitFn;
   private blocksManager: BlocksManager;
 
-  constructor(page: Page, options: ReplaceRegionOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: ReplaceRegionOptions) {
+    this.getPage = getPage;
     this.regionId = options.regionId;
     this.blocksManager = options.blocksManager;
     this.emit = options.emit;
 
-    this.regionIndex = this.page.regions.findIndex((region) => getRegionId(region) === this.regionId);
+    const page = this.getPage();
+
+    this.regionIndex = page.regions.findIndex((region) => getRegionId(region) === this.regionId);
     if (this.regionIndex === -1) {
       throw new Error(`Region not found: ${this.regionId}`);
     }
 
-    this.previousRegion = structuredClone(this.page.regions[this.regionIndex]);
-    this.removedBlocks = this.collectBlocksForRoots(this.previousRegion.blocks);
+    this.previousRegion = structuredClone(page.regions[this.regionIndex]);
+    this.removedBlocks = this.collectBlocksForRoots(page, this.previousRegion.blocks);
 
     this.newBlocks = {};
     const newRootIds = options.structures.map((structure) =>
@@ -97,11 +99,11 @@ export class ReplaceRegionCommand implements Command {
     return builtProperties;
   }
 
-  private collectBlocksForRoots(rootBlockIds: string[]): Record<string, Block> {
+  private collectBlocksForRoots(page: Page, rootBlockIds: string[]): Record<string, Block> {
     const blocks: Record<string, Block> = {};
 
     const collectBlock = (blockId: string) => {
-      const block = this.page.blocks[blockId];
+      const block = page.blocks[blockId];
       if (!block || blocks[blockId]) {
         return;
       }
@@ -121,15 +123,17 @@ export class ReplaceRegionCommand implements Command {
     removedBlocks: Record<string, Block>,
     newBlocks: Record<string, Block>
   ): void {
+    const page = this.getPage();
+
     Object.keys(removedBlocks).forEach((blockId) => {
-      delete this.page.blocks[blockId];
+      delete page.blocks[blockId];
     });
 
     Object.entries(newBlocks).forEach(([blockId, block]) => {
-      this.page.blocks[blockId] = block;
+      page.blocks[blockId] = block;
     });
 
-    this.page.regions[this.regionIndex] = newRegion;
+    page.regions[this.regionIndex] = newRegion;
 
     this.emit('region:replace', {
       regionId: this.regionId,

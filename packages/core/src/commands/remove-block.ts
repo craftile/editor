@@ -8,7 +8,7 @@ export interface RemoveBlockOptions {
 }
 
 export class RemoveBlockCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockId: string;
   private removedBlock?: Block;
   private originalIndex?: number;
@@ -16,14 +16,15 @@ export class RemoveBlockCommand implements Command {
   private regionId?: string;
   private emit: EngineEmitFn;
 
-  constructor(page: Page, options: RemoveBlockOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: RemoveBlockOptions) {
+    this.getPage = getPage;
     this.blockId = options.blockId;
     this.emit = options.emit;
   }
 
   apply(): void {
-    this.removedBlock = this.page.blocks[this.blockId];
+    const page = this.getPage();
+    this.removedBlock = page.blocks[this.blockId];
 
     if (!this.removedBlock) {
       throw new Error(`Block not found: ${this.blockId}`);
@@ -32,7 +33,7 @@ export class RemoveBlockCommand implements Command {
     this.originalParentId = this.removedBlock.parentId;
 
     if (this.originalParentId) {
-      const parent = this.page.blocks[this.originalParentId];
+      const parent = page.blocks[this.originalParentId];
       if (parent) {
         this.originalIndex = parent.children.indexOf(this.blockId);
         if (this.originalIndex !== -1) {
@@ -40,7 +41,7 @@ export class RemoveBlockCommand implements Command {
         }
       }
     } else {
-      const region = this.page.regions.find((r) => r.blocks.includes(this.blockId));
+      const region = page.regions.find((r) => r.blocks.includes(this.blockId));
       if (region) {
         this.originalIndex = region.blocks.indexOf(this.blockId);
         this.regionId = getRegionId(region);
@@ -48,7 +49,7 @@ export class RemoveBlockCommand implements Command {
       }
     }
 
-    delete this.page.blocks[this.blockId];
+    delete page.blocks[this.blockId];
 
     this.emit('block:remove', {
       blockId: this.blockId,
@@ -63,15 +64,17 @@ export class RemoveBlockCommand implements Command {
       return;
     }
 
-    this.page.blocks[this.blockId] = this.removedBlock;
+    const page = this.getPage();
+
+    page.blocks[this.blockId] = this.removedBlock;
 
     if (this.originalParentId) {
-      const parent = this.page.blocks[this.originalParentId];
+      const parent = page.blocks[this.originalParentId];
       if (parent) {
         parent.children.splice(this.originalIndex, 0, this.blockId);
       }
     } else if (this.regionId) {
-      const region = this.page.regions.find((r) => getRegionId(r) === this.regionId);
+      const region = page.regions.find((r) => getRegionId(r) === this.regionId);
       if (region) {
         region.blocks.splice(this.originalIndex, 0, this.blockId);
       }

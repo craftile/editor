@@ -40,7 +40,7 @@ describe('ToggleBlockCommand', () => {
   });
 
   it('should disable block when not disabled', () => {
-    const command = new ToggleBlockCommand(page, {
+    const command = new ToggleBlockCommand(() => page, {
       blockId: 'block-1',
       emit: mockEmit,
     });
@@ -63,7 +63,7 @@ describe('ToggleBlockCommand', () => {
     const block = page.blocks['block-1'];
     block.disabled = true;
 
-    const command = new ToggleBlockCommand(page, {
+    const command = new ToggleBlockCommand(() => page, {
       blockId: 'block-1',
       emit: mockEmit,
     });
@@ -74,7 +74,7 @@ describe('ToggleBlockCommand', () => {
   });
 
   it('should set explicit disabled state', () => {
-    const command = new ToggleBlockCommand(page, {
+    const command = new ToggleBlockCommand(() => page, {
       blockId: 'block-1',
       disabled: true,
       emit: mockEmit,
@@ -87,7 +87,7 @@ describe('ToggleBlockCommand', () => {
   });
 
   it('should revert toggle operation', () => {
-    const command = new ToggleBlockCommand(page, {
+    const command = new ToggleBlockCommand(() => page, {
       blockId: 'block-1',
       emit: mockEmit,
     });

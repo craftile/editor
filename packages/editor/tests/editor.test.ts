@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+// @vitest-environment jsdom
+import { describe, expect, it, vi } from 'vitest';
 import { CraftileEditor } from '../src/editor';
 import type { BlockSchema, Page } from '@craftile/types';
 
@@ -29,6 +30,14 @@ const testSchemas: BlockSchema[] = [
     accepts: [],
   },
 ];
+
+class ResizeObserverStub {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+
+vi.stubGlobal('ResizeObserver', ResizeObserverStub);
 
 describe('CraftileEditor', () => {
   it('should expose batched history operations', () => {
@@ -83,5 +92,41 @@ describe('CraftileEditor', () => {
 
     expect(editor.engine.undo()).toBe(true);
     expect(editor.engine.getPage().blocks['block-1']).toBeDefined();
+  });
+
+  it('clears the selection when the selected block is pruned by patchBlocks', () => {
+    const editor = new CraftileEditor({
+      initialPage: {
+        blocks: {
+          box: { id: 'box', type: 'box', properties: {}, children: ['block-1'] },
+          'block-1': { id: 'block-1', type: 'button', properties: {}, children: [], parentId: 'box' },
+        },
+        regions: [{ name: 'main', blocks: ['box'] }],
+      },
+      blockSchemas: [...testSchemas, { type: 'box', properties: [], accepts: ['*'] }],
+    });
+
+    editor.mount(document.createElement('div'));
+    editor.ui.setSelectedBlock('block-1');
+
+    editor.engine.patchBlocks({ box: { id: 'box', type: 'box', properties: {}, children: [] } });
+
+    expect(editor.ui.state.selectedBlockId).toBeNull();
+  });
+
+  it('keeps the selection when the selected block survives patchBlocks', () => {
+    const editor = new CraftileEditor({
+      initialPage: structuredClone(testPage),
+      blockSchemas: testSchemas,
+    });
+
+    editor.mount(document.createElement('div'));
+    editor.ui.setSelectedBlock('block-1');
+
+    editor.engine.patchBlocks({
+      'block-1': { id: 'block-1', type: 'button', properties: { text: 'Resolved' }, children: [] },
+    });
+
+    expect(editor.ui.state.selectedBlockId).toBe('block-1');
   });
 });

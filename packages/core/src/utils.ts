@@ -105,3 +105,46 @@ export const canInsertDynamicChildAt = (
   }
   return index >= first && index <= last + 1;
 };
+
+/**
+ * Every block in a patch carries an authoritative `children` list. Ids in a patched block's
+ * previous `children` that are missing from its new `children` have vanished, together with
+ * their whole subtree (walked through `previousBlocks`). Blocks present in the patch are never
+ * pruned, even when their previous parent dropped them.
+ */
+export const collectVanishedDescendants = (
+  previousBlocks: Record<string, Block>,
+  patchBlocks: Record<string, Block>
+): Set<string> => {
+  const vanished = new Set<string>();
+
+  const collectSubtree = (blockId: string): void => {
+    if (patchBlocks[blockId] || vanished.has(blockId)) {
+      return;
+    }
+
+    vanished.add(blockId);
+
+    for (const childId of previousBlocks[blockId]?.children ?? []) {
+      collectSubtree(childId);
+    }
+  };
+
+  for (const [blockId, patchBlock] of Object.entries(patchBlocks)) {
+    const previousBlock = previousBlocks[blockId];
+
+    if (!previousBlock) {
+      continue;
+    }
+
+    const keptChildren = new Set(patchBlock.children ?? []);
+
+    for (const childId of previousBlock.children ?? []) {
+      if (!keptChildren.has(childId)) {
+        collectSubtree(childId);
+      }
+    }
+  }
+
+  return vanished;
+};

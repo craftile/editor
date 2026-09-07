@@ -64,6 +64,7 @@ export interface UseBlocksEngineReturn {
   ) => string;
   replacePage: (newPage: Page) => void;
   replaceRegion: (regionId: string, structures: BlockStructure[]) => void;
+  patchBlocks: (blocks: Record<string, Block>) => void;
 
   undo: () => boolean;
   redo: () => boolean;
@@ -183,6 +184,7 @@ export function useBlocksEngine(
       'block:duplicate',
       'block:property:set',
       'block:update',
+      'blocks:patch',
       'undo',
       'redo',
     ] as const;
@@ -321,6 +323,14 @@ export function useBlocksEngine(
     }
   };
 
+  const patchBlocks = (blocks: Record<string, Block>): void => {
+    engine.patchBlocks(blocks);
+
+    if (!autoSync) {
+      syncStateFromEngine();
+    }
+  };
+
   const undo = (): boolean => {
     const result = engine.undo();
 
@@ -393,6 +403,7 @@ export function useBlocksEngine(
     pasteBlock,
     replacePage,
     replaceRegion,
+    patchBlocks,
 
     // History methods
     undo,

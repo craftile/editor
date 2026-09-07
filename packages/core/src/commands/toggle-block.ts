@@ -1,4 +1,4 @@
-import type { Block, Page } from '@craftile/types';
+import type { Page } from '@craftile/types';
 import type { Command, EngineEmitFn } from '../types';
 
 export interface ToggleBlockOptions {
@@ -8,56 +8,60 @@ export interface ToggleBlockOptions {
 }
 
 export class ToggleBlockCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockId: string;
   private targetDisabled?: boolean;
   private originalDisabled?: boolean;
-  private block?: Block;
+  private newDisabled?: boolean;
   private emit: EngineEmitFn;
 
-  constructor(page: Page, options: ToggleBlockOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: ToggleBlockOptions) {
+    this.getPage = getPage;
     this.blockId = options.blockId;
     this.targetDisabled = options.disabled;
     this.emit = options.emit;
   }
 
   apply(): void {
-    this.block = this.page.blocks[this.blockId];
+    const block = this.getPage().blocks[this.blockId];
 
-    if (!this.block) {
+    if (!block) {
       throw new Error(`Block not found: ${this.blockId}`);
     }
 
-    this.originalDisabled = this.block.disabled;
+    this.originalDisabled = block.disabled;
 
     if (this.targetDisabled !== undefined) {
-      this.block.disabled = this.targetDisabled;
+      block.disabled = this.targetDisabled;
     } else {
-      this.block.disabled = !this.block.disabled;
+      block.disabled = !block.disabled;
     }
+
+    this.newDisabled = block.disabled;
 
     this.emit('block:toggle', {
       blockId: this.blockId,
-      disabled: this.block.disabled ?? false,
+      disabled: block.disabled ?? false,
       oldValue: this.originalDisabled,
     });
   }
 
   revert(): void {
-    if (!this.block) {
+    const block = this.getPage().blocks[this.blockId];
+
+    if (!block) {
       return;
     }
 
     if (this.originalDisabled !== undefined) {
-      this.block.disabled = this.originalDisabled;
+      block.disabled = this.originalDisabled;
     } else {
-      this.block.disabled = !this.block.disabled;
+      block.disabled = !block.disabled;
     }
 
     this.emit('block:toggle', {
       blockId: this.blockId,
-      disabled: this.block.disabled ?? false,
+      disabled: block.disabled ?? false,
       oldValue: this.targetDisabled !== undefined ? this.targetDisabled : !this.originalDisabled,
     });
   }
@@ -71,6 +75,6 @@ export class ToggleBlockCommand implements Command {
   }
 
   getNewDisabled(): boolean | undefined {
-    return this.block?.disabled;
+    return this.newDisabled;
   }
 }

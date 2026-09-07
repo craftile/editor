@@ -13,7 +13,7 @@ export interface InsertBlockOptions {
 }
 
 export class InsertBlockCommand implements Command {
-  private page: Page;
+  private getPage: () => Page;
   private blockType: string;
   private parentId?: string;
   private regionId?: string;
@@ -26,8 +26,8 @@ export class InsertBlockCommand implements Command {
   private resolvedRegionId?: string;
   private emit: EngineEmitFn;
 
-  constructor(page: Page, options: InsertBlockOptions) {
-    this.page = page;
+  constructor(getPage: () => Page, options: InsertBlockOptions) {
+    this.getPage = getPage;
     this.blockType = options.blockType;
     this.parentId = options.parentId;
     this.regionId = options.regionId;
@@ -40,7 +40,8 @@ export class InsertBlockCommand implements Command {
   }
 
   apply(): void {
-    const target = resolveInsertTarget(this.page, this.parentId, this.regionId, this.index);
+    const page = this.getPage();
+    const target = resolveInsertTarget(page, this.parentId, this.regionId, this.index);
     this.resolvedRegionId = target.kind === 'region' ? target.regionId : undefined;
 
     const blockName = this.blockSchema?.meta?.name || this.blockType;
@@ -54,14 +55,14 @@ export class InsertBlockCommand implements Command {
       parentId: undefined,
     };
 
-    this.page.blocks[this.blockId] = this.insertedBlock;
+    page.blocks[this.blockId] = this.insertedBlock;
     this.actualIndex = target.index;
 
     if (target.kind === 'parent') {
       this.insertedBlock.parentId = target.parent.id;
       target.parent.children.splice(target.index, 0, this.blockId);
     } else {
-      const region = this.page.regions.find((r) => getRegionId(r) === target.regionId)!;
+      const region = page.regions.find((r) => getRegionId(r) === target.regionId)!;
       region.blocks.splice(target.index, 0, this.blockId);
     }
 
@@ -70,7 +71,7 @@ export class InsertBlockCommand implements Command {
       block: this.insertedBlock,
       parentId: this.parentId,
       index: this.actualIndex,
-      regionId: this.regionId || getRegionId(this.page.regions[0]),
+      regionId: this.regionId || getRegionId(page.regions[0]),
     });
   }
 
@@ -79,18 +80,21 @@ export class InsertBlockCommand implements Command {
       return;
     }
 
-    delete this.page.blocks[this.blockId];
+    const page = this.getPage();
+
+    delete page.blocks[this.blockId];
 
     if (this.parentId) {
-      const parent = this.page.blocks[this.parentId];
-      if (parent && this.actualIndex !== undefined) {
-        parent.children.splice(this.actualIndex, 1);
+      const parent = page.blocks[this.parentId];
+      const index = parent ? parent.children.indexOf(this.blockId) : -1;
+      if (parent && index !== -1) {
+        parent.children.splice(index, 1);
       }
     } else if (this.resolvedRegionId) {
-      const targetRegion = this.page.regions.find((r) => getRegionId(r) === this.resolvedRegionId);
-
-      if (targetRegion && this.actualIndex !== undefined) {
-        targetRegion.blocks.splice(this.actualIndex, 1);
+      const targetRegion = page.regions.find((r) => getRegionId(r) === this.resolvedRegionId);
+      const index = targetRegion ? targetRegion.blocks.indexOf(this.blockId) : -1;
+      if (targetRegion && index !== -1) {
+        targetRegion.blocks.splice(index, 1);
       }
     }
 
