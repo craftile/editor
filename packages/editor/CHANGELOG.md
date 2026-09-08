@@ -1,5 +1,17 @@
 # @craftile/editor
 
+## 1.3.1
+
+### Patch Changes
+
+- [`a0201c1`](https://github.com/craftile/editor/commit/a0201c1868353db8a286c0e5cfba69faff9bd95f) Thanks [@eldomagan](https://github.com/eldomagan)! - Use `@theme inline reference` so theme variables are not emitted into the built CSS, and fix `--color-gray-950` falling back to the misspelled `--color-gray-050`.
+
+- Updated dependencies []:
+  - @craftile/core@1.3.1
+  - @craftile/event-bus@1.3.1
+  - @craftile/messenger@1.3.1
+  - @craftile/types@1.3.1
+
 ## 1.3.0
 
 ### Minor Changes
