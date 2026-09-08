@@ -1,5 +1,13 @@
 # @craftile/core
 
+## 1.3.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @craftile/event-bus@1.3.1
+  - @craftile/types@1.3.1
+
 ## 1.3.0
 
 ### Minor Changes
