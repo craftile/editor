@@ -1,5 +1,21 @@
 # @craftile/core
 
+## 1.3.2
+
+### Patch Changes
+
+- [`dc710e1`](https://github.com/craftile/editor/commit/dc710e197545abde599b559373f7b3d20900908f) Thanks [@eldomagan](https://github.com/eldomagan)! - Undoing a duplicate now emits `block:remove`, so the preview and persisted updates drop the copy. Redoing a duplicate restores the copy with the same block IDs.
+
+- [`220a5a0`](https://github.com/craftile/editor/commit/220a5a05f268fd5df7ed6e07b5e6b98673151d6d) Thanks [@eldomagan](https://github.com/eldomagan)! - `block:move` now reports the resolved index instead of the requested one. Appending a block reports its real final index instead of `undefined` (which updates turned into `toIndex: 0`), and undoing a move reports the position the block actually moved to.
+
+- [`c7f1d6c`](https://github.com/craftile/editor/commit/c7f1d6c8761160a9bebb279621e407943ee263cd) Thanks [@eldomagan](https://github.com/eldomagan)! - Redoing a preset insert now restores the preset's children with the same block IDs.
+
+- [`b75dfe9`](https://github.com/craftile/editor/commit/b75dfe9c1c601bfed9dc653757b228c8cc479551) Thanks [@eldomagan](https://github.com/eldomagan)! - Removing a block now also removes its descendants from the page instead of leaving them as orphans, and undo restores them.
+
+- Updated dependencies []:
+  - @craftile/event-bus@1.3.2
+  - @craftile/types@1.3.2
+
 ## 1.3.1
 
 ### Patch Changes
