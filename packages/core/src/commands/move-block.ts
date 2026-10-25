@@ -23,6 +23,8 @@ export class MoveBlockCommand implements Command {
   private originalParentId?: string;
   private originalIndex!: number;
   private originalRegionId?: string;
+  private resolvedIndex!: number;
+  private resolvedRegionId?: string;
 
   private emit: EngineEmitFn;
 
@@ -66,12 +68,14 @@ export class MoveBlockCommand implements Command {
     }
 
     this.moved = true;
+    this.resolvedIndex = target.index;
+    this.resolvedRegionId = target.kind === 'region' ? target.regionId : undefined;
 
     this.emit('block:move', {
       blockId: this.blockId,
       targetParentId: this.targetParentId,
-      targetIndex: this.targetIndex,
-      targetRegionId: target.kind === 'region' ? target.regionId : undefined,
+      targetIndex: this.resolvedIndex,
+      targetRegionId: this.resolvedRegionId,
       sourceParentId: this.originalParentId || null,
       sourceRegionId: this.originalRegionId || null,
       sourceIndex: this.originalIndex,
@@ -185,8 +189,8 @@ export class MoveBlockCommand implements Command {
       targetIndex: this.originalIndex,
       targetRegionId: this.originalRegionId,
       sourceParentId: this.targetParentId || null,
-      sourceRegionId: this.targetRegionId || null,
-      sourceIndex: this.targetIndex || 0,
+      sourceRegionId: this.resolvedRegionId || null,
+      sourceIndex: this.resolvedIndex,
     });
   }
 

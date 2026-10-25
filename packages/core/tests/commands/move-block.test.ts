@@ -93,6 +93,18 @@ describe('MoveBlockCommand', () => {
       expect(emittedEvents[0].data.targetRegionId).toBe('main');
     });
 
+    it('should emit the resolved index when appending without a target index', () => {
+      const command = new MoveBlockCommand(() => page, {
+        blockId: 'child-1',
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      expect(page.regions[0].blocks).toEqual(['block-1', 'block-2', 'block-3', 'child-1']);
+      expect(emittedEvents[0].data.targetIndex).toBe(3);
+    });
+
     it('should move block to different region', () => {
       const command = new MoveBlockCommand(() => page, {
         blockId: 'block-1',
@@ -300,6 +312,27 @@ describe('MoveBlockCommand', () => {
       command.revert();
       expect(page.regions[0].blocks).toEqual(originalMainBlocks);
       expect(page.regions[1].blocks).toEqual(originalSidebarBlocks);
+    });
+
+    it('should emit the resolved source position on revert', () => {
+      const command = new MoveBlockCommand(() => page, {
+        blockId: 'child-1',
+        emit: mockEmit,
+      });
+
+      command.apply();
+      command.revert();
+
+      expect(emittedEvents[1].event).toBe('block:move');
+      expect(emittedEvents[1].data).toEqual({
+        blockId: 'child-1',
+        targetParentId: 'block-2',
+        targetIndex: 0,
+        targetRegionId: undefined,
+        sourceParentId: null,
+        sourceRegionId: 'main',
+        sourceIndex: 3,
+      });
     });
   });
 });
