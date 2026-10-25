@@ -450,6 +450,23 @@ describe('InsertBlockFromPresetCommand', () => {
       command.revert();
       expect(Object.keys(page.blocks)).toHaveLength(initialBlockCount);
     });
+
+    it('should restore the same ids on redo', () => {
+      const command = new InsertBlockFromPresetCommand(() => page, {
+        blockType: 'container',
+        presetIndex: 2, // Nested layout
+        blocksManager,
+        emit: mockEmit,
+      });
+
+      command.apply();
+      const pageAfterApply = structuredClone(page);
+
+      command.revert();
+      command.apply();
+
+      expect(page).toEqual(pageAfterApply);
+    });
   });
 
   describe('Semantic IDs', () => {

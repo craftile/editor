@@ -31,6 +31,10 @@ export class InsertBlockFromPresetCommand implements Command {
   private emit: EngineEmitFn;
   private createdBlockIds: string[] = [];
 
+  // Child IDs in creation order, reused on redo so children keep their IDs
+  private childIds: string[] = [];
+  private childIdIndex = 0;
+
   constructor(getPage: () => Page, options: InsertBlockFromPresetOptions) {
     this.getPage = getPage;
     this.blockType = options.blockType;
@@ -74,6 +78,9 @@ export class InsertBlockFromPresetCommand implements Command {
     this.resolvedRegionId = target.kind === 'region' ? target.regionId : undefined;
 
     const blockSchema = this.blocksManager.get(this.blockType);
+
+    this.createdBlockIds = [];
+    this.childIdIndex = 0;
 
     if (this.presetData) {
       this.insertedBlock = {
@@ -185,7 +192,7 @@ export class InsertBlockFromPresetCommand implements Command {
     const childIds: string[] = [];
 
     for (const structure of structures) {
-      const childId = generateId();
+      const childId = this.nextChildId();
       const childSchema = this.blocksManager.get(structure.type);
 
       if (!childSchema) {
@@ -218,6 +225,14 @@ export class InsertBlockFromPresetCommand implements Command {
     }
 
     return childIds;
+  }
+
+  private nextChildId(): string {
+    if (this.childIdIndex === this.childIds.length) {
+      this.childIds.push(generateId());
+    }
+
+    return this.childIds[this.childIdIndex++];
   }
 
   private buildProperties(blockSchema?: BlockSchema, presetProperties?: Record<string, any>): Record<string, any> {
