@@ -13,16 +13,20 @@ export class DuplicateBlockCommand implements Command {
   private blockId: string;
 
   // State for reverting
-  private duplicatedBlockId!: string;
+  private duplicatedBlockId: string;
   private duplicatedBlock?: Block;
   private parentId?: string | null;
   private insertIndex!: number;
   private regionId?: string | null;
   private emit: EngineEmitFn;
 
+  // Original descendant ID -> copy ID, reused on redo so the copy keeps its IDs
+  private cloneIds = new Map<string, string>();
+
   constructor(getPage: () => Page, options: DuplicateBlockOptions) {
     this.getPage = getPage;
     this.blockId = options.blockId;
+    this.duplicatedBlockId = generateId();
     this.emit = options.emit;
   }
 
@@ -32,8 +36,6 @@ export class DuplicateBlockCommand implements Command {
     if (!originalBlock) {
       throw new Error(`Block not found: ${this.blockId}`);
     }
-
-    this.duplicatedBlockId = generateId();
 
     this.duplicatedBlock = this.cloneBlockWithNewIds(
       page,
@@ -62,6 +64,13 @@ export class DuplicateBlockCommand implements Command {
     }
 
     this.removeDuplicatedBlock(this.getPage());
+
+    this.emit('block:remove', {
+      blockId: this.duplicatedBlockId,
+      block: this.duplicatedBlock,
+      parentId: this.parentId || undefined,
+      regionId: this.regionId || undefined,
+    });
   }
 
   getBlockId(): string {
@@ -100,7 +109,11 @@ export class DuplicateBlockCommand implements Command {
       for (const childId of block.children) {
         const childBlock = page.blocks[childId];
         if (childBlock) {
-          const newChildId = generateId();
+          let newChildId = this.cloneIds.get(childId);
+          if (!newChildId) {
+            newChildId = generateId();
+            this.cloneIds.set(childId, newChildId);
+          }
           this.cloneBlockWithNewIds(page, childBlock, newChildId, newId);
           clonedBlock.children.push(newChildId);
         }

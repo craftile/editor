@@ -142,4 +142,93 @@ describe('DuplicateBlockCommand', () => {
     expect(page.regions).toHaveLength(1);
     expect(page.regions[0].blocks).toEqual(['block-1', 'block-2']);
   });
+
+  it('should emit block:remove and restore the page when reverting', () => {
+    page.blocks['child-2'] = {
+      id: 'child-2',
+      type: 'text',
+      properties: { value: 'Child Text 2' },
+      parentId: 'block-2',
+      children: [],
+    };
+    page.blocks['block-2'].children = ['child-1', 'child-2'];
+    const pageBefore = structuredClone(page);
+
+    const command = new DuplicateBlockCommand(() => page, {
+      blockId: 'child-1',
+      emit: mockEmit,
+    });
+
+    command.apply();
+    const duplicatedId = command.getDuplicatedBlockId();
+    expect(page.blocks['block-2'].children).toEqual(['child-1', duplicatedId, 'child-2']);
+
+    command.revert();
+
+    expect(emittedEvents).toHaveLength(2);
+    expect(emittedEvents[1].event).toBe('block:remove');
+    expect(emittedEvents[1].data.blockId).toBe(duplicatedId);
+    expect(emittedEvents[1].data.block.id).toBe(duplicatedId);
+    expect(emittedEvents[1].data.parentId).toBe('block-2');
+    expect(page).toEqual(pageBefore);
+  });
+
+  it('should restore the same ids on redo', () => {
+    page.blocks['grandchild-1'] = {
+      id: 'grandchild-1',
+      type: 'button',
+      properties: { text: 'Grandchild' },
+      parentId: 'child-1',
+      children: [],
+    };
+    page.blocks['child-1'].children = ['grandchild-1'];
+
+    const command = new DuplicateBlockCommand(() => page, {
+      blockId: 'block-2',
+      emit: mockEmit,
+    });
+
+    command.apply();
+    const duplicatedId = command.getDuplicatedBlockId();
+    const pageAfterApply = structuredClone(page);
+
+    command.revert();
+    command.apply();
+
+    expect(command.getDuplicatedBlockId()).toBe(duplicatedId);
+    expect(page).toEqual(pageAfterApply);
+    expect(emittedEvents[2].event).toBe('block:duplicate');
+    expect(emittedEvents[2].data.newBlockId).toBe(duplicatedId);
+  });
+
+  it('should fully revert a duplicate with nested children', () => {
+    page.blocks['grandchild-1'] = {
+      id: 'grandchild-1',
+      type: 'button',
+      properties: { text: 'Grandchild' },
+      parentId: 'child-1',
+      children: [],
+    };
+    page.blocks['child-1'].children = ['grandchild-1'];
+    const pageBefore = structuredClone(page);
+
+    const command = new DuplicateBlockCommand(() => page, {
+      blockId: 'block-2',
+      emit: mockEmit,
+    });
+
+    command.apply();
+    const duplicatedId = command.getDuplicatedBlockId();
+    expect(Object.keys(page.blocks)).toHaveLength(Object.keys(pageBefore.blocks).length + 3);
+
+    command.revert();
+
+    expect(page).toEqual(pageBefore);
+
+    const removeEvents = emittedEvents.filter((e) => e.event === 'block:remove');
+    expect(removeEvents).toHaveLength(1);
+    expect(removeEvents[0].data.blockId).toBe(duplicatedId);
+    expect(removeEvents[0].data.regionId).toBe('main');
+    expect(removeEvents[0].data.parentId).toBeUndefined();
+  });
 });
