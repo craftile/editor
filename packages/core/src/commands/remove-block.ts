@@ -11,6 +11,7 @@ export class RemoveBlockCommand implements Command {
   private getPage: () => Page;
   private blockId: string;
   private removedBlock?: Block;
+  private removedDescendants: Block[] = [];
   private originalIndex?: number;
   private originalParentId?: string;
   private regionId?: string;
@@ -49,6 +50,11 @@ export class RemoveBlockCommand implements Command {
       }
     }
 
+    this.removedDescendants = this.collectDescendants(page, this.removedBlock);
+    for (const descendant of this.removedDescendants) {
+      delete page.blocks[descendant.id];
+    }
+
     delete page.blocks[this.blockId];
 
     this.emit('block:remove', {
@@ -67,6 +73,9 @@ export class RemoveBlockCommand implements Command {
     const page = this.getPage();
 
     page.blocks[this.blockId] = this.removedBlock;
+    for (const descendant of this.removedDescendants) {
+      page.blocks[descendant.id] = descendant;
+    }
 
     if (this.originalParentId) {
       const parent = page.blocks[this.originalParentId];
@@ -95,5 +104,18 @@ export class RemoveBlockCommand implements Command {
 
   getRemovedBlock(): Block | undefined {
     return this.removedBlock;
+  }
+
+  private collectDescendants(page: Page, block: Block): Block[] {
+    const descendants: Block[] = [];
+
+    for (const childId of block.children) {
+      const child = page.blocks[childId];
+      if (child) {
+        descendants.push(child, ...this.collectDescendants(page, child));
+      }
+    }
+
+    return descendants;
   }
 }

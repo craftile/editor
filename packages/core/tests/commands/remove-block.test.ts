@@ -85,6 +85,28 @@ describe('RemoveBlockCommand', () => {
       expect(emittedEvents[0].data.parentId).toBe('block-2');
       expect(emittedEvents[0].data.regionId).toBeUndefined();
     });
+
+    it('should remove descendants of the removed block', () => {
+      page.blocks['block-2-1-1'] = {
+        id: 'block-2-1-1',
+        type: 'text',
+        properties: { value: 'Deeply nested text' },
+        parentId: 'block-2-1',
+        children: [],
+      };
+      page.blocks['block-2-1'].children = ['block-2-1-1'];
+
+      const command = new RemoveBlockCommand(() => page, {
+        blockId: 'block-2',
+        emit: mockEmit,
+      });
+
+      command.apply();
+
+      expect(Object.keys(page.blocks)).toEqual(['block-1']);
+      expect(emittedEvents).toHaveLength(1);
+      expect(emittedEvents[0].data.blockId).toBe('block-2');
+    });
   });
 
   describe('Validation', () => {
@@ -119,6 +141,28 @@ describe('RemoveBlockCommand', () => {
       expect(page.blocks['block-1']).toBeDefined();
       expect(page.blocks['block-1']).toEqual(originalBlock);
       expect(page.regions[0].blocks).toEqual(originalRegionBlocks);
+    });
+
+    it('should restore descendants on revert', () => {
+      page.blocks['block-2-1-1'] = {
+        id: 'block-2-1-1',
+        type: 'text',
+        properties: { value: 'Deeply nested text' },
+        parentId: 'block-2-1',
+        children: [],
+      };
+      page.blocks['block-2-1'].children = ['block-2-1-1'];
+      const pageBefore = structuredClone(page);
+
+      const command = new RemoveBlockCommand(() => page, {
+        blockId: 'block-2',
+        emit: mockEmit,
+      });
+
+      command.apply();
+      command.revert();
+
+      expect(page).toEqual(pageBefore);
     });
   });
 });
